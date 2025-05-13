@@ -9,8 +9,24 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
 db_name = "fragen.db"
 
 
+def add_frage(con, cur, frage, antwort):
+    cur.execute("INSERT INTO fragen (frage, antwort) VALUES (?, ?)", (frage, antwort))
+    con.commit()
+    
+    
+def del_frage(con, cur, id):
+    cur.execute("DELETE FROM fragen WHERE id=?", (id,))
+    con.commit()
+    
+    
+def get_fragen(con, cur):
+    cur.execute("SELECT * FROM fragen")
+    return cur.fetchall()
+
+
 def main(con, cur):
-    print("Hi")
+    add_frage(con, cur, "Test Frage", "Test Antwort")
+    print(get_fragen(con, cur))
     
     
 if __name__ == "__main__":
