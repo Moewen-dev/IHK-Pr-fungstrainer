@@ -1,5 +1,7 @@
 import sqlite3
 import sys
+import tkinter as tk
+from tkinter import ttk
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -23,6 +25,46 @@ def get_fragen(con, cur):
     cur.execute("SELECT * FROM fragen")
     return cur.fetchall()
 
+
+import tkinter as tk
+from tkinter import ttk
+import gui_funktionen  # Unser Modul importieren
+
+# Hauptfenster und Inhalt vorbereiten
+root = tk.Tk()
+root.title("Vollbild GUI Vorlage")
+root.attributes("-fullscreen", True)
+
+inhalt_frame = tk.Frame(root)
+inhalt_frame.pack(fill="both", expand=True)
+
+# Übergib root & inhalt_frame an das Modul
+gui_funktionen.init(root, inhalt_frame)
+
+# Tastenkürzel
+root.bind("<Escape>", gui_funktionen.end_fullscreen)
+root.bind("<F11>", gui_funktionen.toggle_fullscreen)
+
+# Menü
+menubar = tk.Menu(root)
+file_menu = tk.Menu(menubar, tearoff=0)
+file_menu.add_command(label="Startseite", command=gui_funktionen.Startseite)
+file_menu.add_command(label="Admin", command=gui_funktionen.Admin)
+file_menu.add_command(label="Prüfungs Modus", command=gui_funktionen.Prüfungsmodus)
+file_menu.add_separator()
+file_menu.add_command(label="Beenden", command=root.quit)
+menubar.add_cascade(label="Datei", menu=file_menu)
+
+help_menu = tk.Menu(menubar, tearoff=0)
+help_menu.add_command(label="Über", command=lambda: tk.messagebox.showinfo("Info", "GUI Vorlage"))
+menubar.add_cascade(label="Hilfe", menu=help_menu)
+
+root.config(menu=menubar)
+
+# Startansicht
+gui_funktionen.Startseite()
+
+root.mainloop()
 
 def main(con, cur):
     add_frage(con, cur, "Test Frage", "Test Antwort")
@@ -52,3 +94,6 @@ if __name__ == "__main__":
     except sqlite3.OperationalError as e:
         print(f"Failed to Open Database: {e}")
         sys.exit(1)
+        
+        
+        
