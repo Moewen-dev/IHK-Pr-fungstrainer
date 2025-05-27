@@ -1,0 +1,41 @@
+import tkinter as tk
+
+# Diese Variablen werden später vom Hauptprogramm übergeben
+root = None
+inhalt_frame = None
+
+def init(uebergebenes_root, uebergebenes_inhalt_frame):
+    global root, inhalt_frame
+    root = uebergebenes_root
+    inhalt_frame = uebergebenes_inhalt_frame
+
+def toggle_fullscreen(event=None):
+    root.attributes("-fullscreen", not root.attributes("-fullscreen"))
+
+def end_fullscreen(event=None):
+    root.attributes("-fullscreen", False)
+
+def clear_inhalt():
+    for widget in inhalt_frame.winfo_children():
+        widget.destroy()
+
+def Admin():
+    clear_inhalt()
+    admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
+    admin_frame.pack(fill="both", expand=True)
+    label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
+    label.pack(pady=100)
+
+def Prüfungsmodus():
+    clear_inhalt()
+    prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
+    prüfungs_frame.pack(fill="both", expand=True)
+    label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
+    label.pack(pady=100)
+
+def Startseite():
+    clear_inhalt()
+    start_frame = tk.Frame(inhalt_frame, bg="white")
+    start_frame.pack(fill="both", expand=True)
+    label = tk.Label(start_frame, text="Willkommen!", font=("Arial", 30), bg="white")
+    label.pack(pady=100)

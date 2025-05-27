@@ -2,6 +2,7 @@ import sqlite3
 import sys
 import tkinter as tk
 from tkinter import ttk
+import gui_funktionen
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
