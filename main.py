@@ -61,7 +61,6 @@ def main(con, cur):
     menubar.add_cascade(label="Datei", menu=file_menu)
 
     help_menu = tk.Menu(menubar, tearoff=0)
-    help_menu.add_command(label="Über", command=lambda: tk.messagebox.showinfo("Info", "GUI Vorlage"))
     menubar.add_cascade(label="Hilfe", menu=help_menu)
 
     root.config(menu=menubar)
