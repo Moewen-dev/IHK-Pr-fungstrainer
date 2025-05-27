@@ -27,6 +27,7 @@ def get_fragen(con, cur):
     return cur.fetchall()
 
 
+<<<<<<< HEAD
 import tkinter as tk
 from tkinter import ttk
 import gui_funktionen  # Unser Modul importieren
@@ -72,13 +73,20 @@ def main(con, cur):
     print(get_fragen(con, cur))
 
 
+=======
+>>>>>>> 229c9ff4c95222ec2692635fc5d2e814a3334ef5
 class Frage:
     def __init__(self, id, frage, antwort):
         self.id = id
         self.frage = frage
         self.antwort = antwort
         
-    
+
+def main(con, cur):
+    add_frage(con, cur, "Test Frage", "Test Antwort")
+    print(get_fragen(con, cur))
+
+
 if __name__ == "__main__":
     try:
         with sqlite3.connect(db_name) as con:
