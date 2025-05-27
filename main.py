@@ -27,7 +27,14 @@ def get_fragen(con, cur):
 def main(con, cur):
     add_frage(con, cur, "Test Frage", "Test Antwort")
     print(get_fragen(con, cur))
-    
+
+
+class Frage:
+    def __init__(self, id, frage, antwort):
+        self.id = id
+        self.frage = frage
+        self.antwort = antwort
+        
     
 if __name__ == "__main__":
     try:
