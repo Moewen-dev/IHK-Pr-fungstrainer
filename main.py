@@ -24,18 +24,18 @@ def get_fragen(con, cur):
     return cur.fetchall()
 
 
-def main(con, cur):
-    add_frage(con, cur, "Test Frage", "Test Antwort")
-    print(get_fragen(con, cur))
-
-
 class Frage:
     def __init__(self, id, frage, antwort):
         self.id = id
         self.frage = frage
         self.antwort = antwort
         
-    
+
+def main(con, cur):
+    add_frage(con, cur, "Test Frage", "Test Antwort")
+    print(get_fragen(con, cur))
+
+
 if __name__ == "__main__":
     try:
         with sqlite3.connect(db_name) as con:
