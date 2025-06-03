@@ -2,6 +2,11 @@ Gui:
     - Login für Admin
     - Admin Gui
         -> Fragen hinzufügen
+            -> FRAGE
+            -> A1
+            -> A2
+            -> A3
+            -> Richtige Antwort makieren
         -> Fragen löschen
     - User Gui 
         -> Frage anzeigen (nur multiple choice) 

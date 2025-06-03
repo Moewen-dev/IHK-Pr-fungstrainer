@@ -1,21 +1,17 @@
 {
   "fragen": [
     {
-      "frage": "Was zeichnet einen Typ-1-Hypervisor aus?",
-      "optionen": {
-        "A": "Läuft innerhalb eines Betriebssystems",
-        "B": "Läuft direkt auf der Hardware",
-        "C": "Wird nur für mobile Geräte verwendet"
-      },
+      "frage": "Was zeichnet einen Typ-1-Hypervisor aus?",      
+      "A": "Läuft innerhalb eines Betriebssystems",
+      "B": "Läuft direkt auf der Hardware",
+      "C": "Wird nur für mobile Geräte verwendet",      
       "richtigeAntwort": "B"
     },
     {
       "frage": "Welche Aussage trifft auf einen Typ-2-Hypervisor zu?",
-      "optionen": {
-        "A": "Er benötigt kein Host-Betriebssystem",
-        "B": "Er ist in BIOS/UEFI integriert",
-        "C": "Er läuft als Anwendung auf einem Betriebssystem"
-      },
+      "A": "Er benötigt kein Host-Betriebssystem",
+      "B": "Er ist in BIOS/UEFI integriert",
+      "C": "Er läuft als Anwendung auf einem Betriebssystem",
       "richtigeAntwort": "C"
     }
   ]
