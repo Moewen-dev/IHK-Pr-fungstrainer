@@ -44,4 +44,4 @@ def Startseite():
     Lernbtn.pack(pady=100)
 
     Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14))
-    Prüfungsbtn.pack(pady=100)
+    Prüfungsbtn.pack(pady=50)
