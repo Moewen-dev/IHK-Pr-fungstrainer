@@ -21,7 +21,7 @@ def check_admin_login(username: str, password: str) -> bool:
 def main():
     print("=== Admin Login ===")
     username = input("Benutzername: ")
-    password = input("Passwort: ") 
+    password = input("Passwort: ")
 
     if check_admin_login(username, password):
         print("✅ Login erfolgreich! Willkommen im Admin-Bereich.")
@@ -29,6 +29,5 @@ def main():
         print("❌ Login fehlgeschlagen. Benutzername oder Passwort ist falsch.")
 
 if __name__ == "__main__":
-    main()
-    
+    main()    
     
