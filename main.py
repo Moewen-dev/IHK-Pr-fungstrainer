@@ -7,13 +7,15 @@ import gui_funktionen
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
     frage TEXT NOT NULL,
-    antwort TEXT NOT NULL);""",]
+    a1 TEXT NOT NULL,
+    a2 TEXT NOT NULL,
+    a3 TEXT NOT NULL);""",]
 
 db_name = "fragen.db"
 
 
-def add_frage(con, cur, frage, antwort):
-    cur.execute("INSERT INTO fragen (frage, antwort) VALUES (?, ?)", (frage, antwort))
+def add_frage(con, cur, frage, a1, a2, a3):
+    cur.execute("INSERT INTO fragen (frage, a1, a2, a3) VALUES (?, ?, ?, ?)", (frage, a1, a2, a3))
     con.commit()
     
     
@@ -28,10 +30,12 @@ def get_fragen(con, cur):
 
 
 class Frage:
-    def __init__(self, id, frage, antwort):
+    def __init__(self, id, frage, a1, a2, a3):
         self.id = id
         self.frage = frage
-        self.antwort = antwort
+        self.a1 = a1
+        self.a2 = a2
+        self.a3 = a3
         
 
 def main(con, cur):
