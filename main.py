@@ -1,5 +1,6 @@
 import sqlite3
 import sys
+import json
 import tkinter as tk
 from tkinter import ttk
 import gui_funktionen
@@ -9,13 +10,14 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     frage TEXT NOT NULL,
     a1 TEXT NOT NULL,
     a2 TEXT NOT NULL,
-    a3 TEXT NOT NULL);""",]
+    a3 TEXT NOT NULL,
+    antwort INTEGER NOT NULL);""",]
 
 db_name = "fragen.db"
 
 
-def add_frage(con, cur, frage, a1, a2, a3):
-    cur.execute("INSERT INTO fragen (frage, a1, a2, a3) VALUES (?, ?, ?, ?)", (frage, a1, a2, a3))
+def add_frage(con, cur, frage, a1, a2, a3, antwort):
+    cur.execute("INSERT INTO fragen (frage, a1, a2, a3, antwort) VALUES (?, ?, ?, ?, ?)", (frage, a1, a2, a3, antwort))
     con.commit()
     
     
@@ -29,13 +31,20 @@ def get_fragen(con, cur):
     return cur.fetchall()
 
 
+def import_fragen(con, cur, filename):
+    with open(filename, "r") as f:
+        fragen = json.load(f)
+    return fragen
+
+
 class Frage:
-    def __init__(self, id, frage, a1, a2, a3):
+    def __init__(self, id, frage, a1, a2, a3, antwort):
         self.id = id
         self.frage = frage
         self.a1 = a1
         self.a2 = a2
         self.a3 = a3
+        self.antwort = antwort
         
 
 def main(con, cur):
