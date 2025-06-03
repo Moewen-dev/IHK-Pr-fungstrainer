@@ -33,6 +33,11 @@ def Prüfungsmodus():
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
 
+def Lernmodus():
+    clear_inhalt()
+    prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
+    prüfungs_frame.pack(fill="both", expand=True)
+
 def Startseite():
     clear_inhalt()
     start_frame = tk.Frame(inhalt_frame, bg="white")
@@ -40,8 +45,8 @@ def Startseite():
     label = tk.Label(start_frame, text="Willkommen!", font=("Arial", 30), bg="white")
     label.pack(pady=100)
 
-    Lernbtn = tk.Button(start_frame, text="Weiter", font=("Arial", 14))
+    Lernbtn = tk.Button(start_frame, text="Weiter", font=("Arial", 14), command=Lernmodus)
     Lernbtn.pack(pady=100)
 
     Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
-    Prüfungsbtn.pack(pady=50)
+    Prüfungsbtn.pack(pady=100)
