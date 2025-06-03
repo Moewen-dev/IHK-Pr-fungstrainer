@@ -31,7 +31,7 @@ def get_fragen(con, cur):
     return cur.fetchall()
 
 
-def import_fragen(con, cur, filename):
+def import_fragen(filename):
     with open(filename, "r") as f:
         fragen = json.load(f)
     return fragen
@@ -82,7 +82,7 @@ def main(con, cur):
     gui_funktionen.Startseite()
 
     # Gui öffnen
-    root.mainloop() 
+    root.mainloop()
 
 
 if __name__ == "__main__":
