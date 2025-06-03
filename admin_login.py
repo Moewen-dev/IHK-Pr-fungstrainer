@@ -18,16 +18,4 @@ with open(HASH_FILE, "r") as f:
 def check_admin_login(username: str, password: str) -> bool:
     return username == ADMIN_USERNAME and hash_password(password) == ADMIN_PASSWORD_HASH
 
-def main():
-    print("=== Admin Login ===")
-    username = input("Benutzername: ")
-    password = input("Passwort: ")
 
-    if check_admin_login(username, password):
-        print("✅ Login erfolgreich! Willkommen im Admin-Bereich.")
-    else:
-        print("❌ Login fehlgeschlagen. Benutzername oder Passwort ist falsch.")
-
-if __name__ == "__main__":
-    main()    
-    
