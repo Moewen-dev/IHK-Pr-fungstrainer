@@ -39,3 +39,9 @@ def Startseite():
     start_frame.pack(fill="both", expand=True)
     label = tk.Label(start_frame, text="Willkommen!", font=("Arial", 30), bg="white")
     label.pack(pady=100)
+
+    Lernbtn = tk.Button(start_frame, text="Weiter", font=("Arial", 14))
+    Lernbtn.pack(pady=100)
+
+    Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14))
+    Prüfungsbtn.pack(pady=100)
