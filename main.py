@@ -63,7 +63,9 @@ def main(con, cur):
     inhalt_frame.pack(fill="both", expand=True)
 
     # Übergib root & inhalt_frame an das Modul
-    gui_funktionen.init(root, inhalt_frame)
+    # main.py
+    gui_funktionen.init(root, inhalt_frame, con, cur)
+
 
     # Tastenkürzel
     root.bind("<Escape>", gui_funktionen.end_fullscreen)
