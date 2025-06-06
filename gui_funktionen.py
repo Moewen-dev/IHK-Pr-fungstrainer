@@ -43,6 +43,8 @@ def Prüfungsmodus():
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
     fragen_import = tk.Button(text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
+    fragen_import.pack(pady=100)
+    
 def Lernmodus():
     clear_inhalt()
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
