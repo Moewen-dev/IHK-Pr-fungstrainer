@@ -26,7 +26,7 @@ def clear_inhalt():
         widget.destroy()
 
 def openfile():
-    Tk().withdraw() 
+    tk().withdraw() 
     filename = askopenfilename() 
     return filename
 
@@ -36,6 +36,8 @@ def Admin():
     admin_frame.pack(fill="both", expand=True)
     label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
     label.pack(pady=100)
+    fragen_import = tk.Button(text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
+    fragen_import.pack(pady=100)
 
 def Prüfungsmodus():
     clear_inhalt()
@@ -43,8 +45,6 @@ def Prüfungsmodus():
     prüfungs_frame.pack(fill="both", expand=True)
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
-    fragen_import = tk.Button(text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
-    fragen_import.pack(pady=100)
     
 def Lernmodus():
     clear_inhalt()
