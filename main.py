@@ -14,7 +14,14 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     A TEXT NOT NULL,
     B TEXT NOT NULL,
     C TEXT NOT NULL,
-    antwort INTEGER NOT NULL);""",]
+    antwort INTEGER NOT NULL);""",
+    """CREATE TABLE IF NOT EXISTS userdata (
+    user_id INTEGER PRIMARY KEY,
+    is_admin INTEGER NOT NULL,
+    username TEXT NOT NULL,
+    pw_hash TEXT NOT NULL,
+    fragen_total INTEGER NOT NULL,
+    fragen_richtig INTEGER NOT NULL);"""]
 
 db_name = "fragen.db"
 
@@ -24,9 +31,14 @@ def add_frage(con, cur, frage, A, B, C, antwort):
     con.commit()
     
     
-def del_frage(con, cur, id):
-    cur.execute("DELETE FROM fragen WHERE id=?", (id,))
-    con.commit()
+def del_frage(con, cur):
+    try:
+        id = int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))
+        cur.execute("DELETE FROM fragen WHERE id=?", (id,))
+        con.commit()
+    except TypeError as e:
+        print(f"ERROR: {e}")
+    
     
     
 def get_fragen(cur):
@@ -129,7 +141,7 @@ def Startseite():
     Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
     Prüfungsbtn.pack(pady=50)
     
-    Adminbtn = tk.Button(start_frame, text="Adminbereich (Login)", font=("Arial", 14), command=AdminLogin)
+    Adminbtn = tk.Button(start_frame, text="Adminbereich", font=("Arial", 14), command=AdminLogin)
     Adminbtn.pack(pady=20)
 
 
@@ -171,7 +183,9 @@ def Admin():
     fragen_import = tk.Button(admin_frame, text="Fragen importieren", font=("Arial", 14),
                               command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.pack(pady=50)
-
+    fragen_delete = tk.Button(admin_frame, text="Fragen löschen", font=("Arial", 14),
+                                command=lambda: del_frage(con, cur))
+    fragen_delete.pack(pady=40)
 
 # Admin Bereich Ende
 
@@ -196,7 +210,7 @@ def main(con, cur):
     menubar = tk.Menu(root)
     file_menu = tk.Menu(menubar, tearoff=0)
     file_menu.add_command(label="Startseite", command=Startseite)
-    file_menu.add_command(label="Admin", command=Admin)
+    file_menu.add_command(label="Adminbereich", command=AdminLogin)
     file_menu.add_command(label="Prüfungs Modus", command=Prüfungsmodus)
     file_menu.add_separator()
     file_menu.add_command(label="Beenden", command=root.quit)
