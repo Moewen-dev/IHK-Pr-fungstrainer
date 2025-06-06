@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from main import import_fragen
 from tkinter.filedialog import askopenfilename
+from tkinter import messagebox
+from admin import check_admin_login
+
 # Diese Variablen werden später vom Hauptprogramm übergeben
 root = None
 inhalt_frame = None
@@ -30,14 +33,47 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
+# Admin Bereich Start
+
+def AdminLogin():
+    clear_inhalt()
+    login_frame = tk.Frame(inhalt_frame, bg="lightgray")
+    login_frame.pack(fill="both", expand=True)
+
+    tk.Label(login_frame, text="Admin Login", font=("Arial", 24), bg="lightgray").pack(pady=20)
+
+    tk.Label(login_frame, text="Benutzername:", bg="lightgray").pack(pady=(10, 0))
+    username_entry = tk.Entry(login_frame)
+    username_entry.pack(pady=5)
+
+    tk.Label(login_frame, text="Passwort:", bg="lightgray").pack(pady=(10, 0))
+    password_entry = tk.Entry(login_frame, show="*")
+    password_entry.pack(pady=5)
+
+    def handle_login():
+        username = username_entry.get()
+        password = password_entry.get()
+
+        if check_admin_login(username, password):
+            Admin()
+        else:
+            messagebox.showerror("Fehler", "Benutzername oder Passwort falsch!")
+
+    login_button = tk.Button(login_frame, text="Login", command=handle_login)
+    login_button.pack(pady=20)
+
 def Admin():
     clear_inhalt()
     admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
     admin_frame.pack(fill="both", expand=True)
     label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
     label.pack(pady=100)
-    #fragen_import = tk.Button(admin_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
-    #fragen_import.pack(pady=50)
+    fragen_import = tk.Button(admin_frame, text="Zur Prüfungssimulation", font=("Arial", 14),
+                              command=lambda: import_fragen(openfile()))
+    fragen_import.pack(pady=50)
+
+
+# Admin Bereich Ende
 
 def Prüfungsmodus():
     clear_inhalt()
@@ -64,3 +100,8 @@ def Startseite():
 
     Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
     Prüfungsbtn.pack(pady=50)
+    
+    Adminbtn = tk.Button(start_frame, text="Adminbereich (Login)", font=("Arial", 14), command=AdminLogin)
+    Adminbtn.pack(pady=20)
+    #fragen_import = tk.Button(admin_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
+    #fragen_import.pack(pady=50)
