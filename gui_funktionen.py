@@ -24,6 +24,11 @@ def clear_inhalt():
     for widget in inhalt_frame.winfo_children():
         widget.destroy()
 
+def openfile():
+    Tk().withdraw() 
+    filename = askopenfilename() 
+    return filename
+
 def Admin():
     clear_inhalt()
     admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
