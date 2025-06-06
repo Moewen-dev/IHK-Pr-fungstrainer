@@ -33,10 +33,11 @@ def add_frage(con, cur, frage, A, B, C, antwort):
 def del_frage(con, cur):
     try:
         id = int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))
+        cur.execute("DELETE FROM fragen WHERE id=?", (id,))
+        con.commit()
     except TypeError as e:
         print(f"ERROR: {e}")
-    cur.execute("DELETE FROM fragen WHERE id=?", (id,))
-    con.commit()
+    
     
     
 def get_fragen(cur):
