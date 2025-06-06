@@ -26,9 +26,14 @@ def del_frage(con, cur, id):
     con.commit()
     
     
-def get_fragen(con, cur):
+def get_fragen(cur):
     cur.execute("SELECT * FROM fragen")
-    return cur.fetchall()
+    db_data = cur.fetchall()
+    fragen = []
+    for data in db_data:
+        frage = Frage(data[0], data[1], data[2], data[3], data[4], data[5])
+        fragen.append(frage)
+    return fragen
 
 
 def import_fragen(con, cur, filename):
@@ -53,7 +58,7 @@ class Frage:
         self.antwort = antwort
         
 
-def main(con, cur):
+def main(con, cur):    
     # Hauptfenster und Inhalt vorbereiten
     root = tk.Tk()
     root.title("Vollbild GUI Vorlage")
@@ -91,7 +96,7 @@ def main(con, cur):
 
     # Gui öffnen
     root.mainloop()
-
+    
 
 if __name__ == "__main__":
     try:
