@@ -13,7 +13,11 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     A TEXT NOT NULL,
     B TEXT NOT NULL,
     C TEXT NOT NULL,
-    antwort INTEGER NOT NULL);""",]
+    antwort INTEGER NOT NULL);""",
+    """CREATE TABLE IF NOT EXISTS userdata (
+    user_id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL,
+    pw_hash TEXT NOT NULL,)"""]
 
 db_name = "fragen.db"
 
