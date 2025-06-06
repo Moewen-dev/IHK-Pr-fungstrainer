@@ -30,7 +30,11 @@ def add_frage(con, cur, frage, A, B, C, antwort):
     con.commit()
     
     
-def del_frage(con, cur, id):
+def del_frage(con, cur):
+    try:
+        id = int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))
+    except TypeError as e:
+        print(f"ERROR: {e}")
     cur.execute("DELETE FROM fragen WHERE id=?", (id,))
     con.commit()
     
@@ -159,7 +163,7 @@ def Admin():
                               command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.pack(pady=50)
     fragen_delete = tk.Button(admin_frame, text="Fragen löschen", font=("Arial", 14),
-                                command=lambda: del_frage(con, cur, int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))))
+                                command=lambda: del_frage(con, cur))
     fragen_delete.pack(pady=40)
 
 # Admin Bereich Ende
