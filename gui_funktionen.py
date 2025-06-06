@@ -1,5 +1,6 @@
 import tkinter as tk
-
+from tkinter.filedialog import askopenfilename
+from main import import_fragen
 # Diese Variablen werden später vom Hauptprogramm übergeben
 root = None
 inhalt_frame = None
@@ -32,7 +33,7 @@ def Prüfungsmodus():
     prüfungs_frame.pack(fill="both", expand=True)
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
-
+    fragen_import = tk.Button(text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
 def Lernmodus():
     clear_inhalt()
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
@@ -49,4 +50,4 @@ def Startseite():
     Lernbtn.pack(pady=100)
 
     Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
-    Prüfungsbtn.pack(pady=100)
+    Prüfungsbtn.pack(pady=50)
