@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from main import import_fragen
+from tkinter.filedialog import askopenfilename
 # Diese Variablen werden später vom Hauptprogramm übergeben
 root = None
 inhalt_frame = None
@@ -24,12 +25,19 @@ def clear_inhalt():
     for widget in inhalt_frame.winfo_children():
         widget.destroy()
 
+def openfile():
+    tk().withdraw() 
+    filename = askopenfilename() 
+    return filename
+
 def Admin():
     clear_inhalt()
     admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
     admin_frame.pack(fill="both", expand=True)
     label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
     label.pack(pady=100)
+    fragen_import = tk.Button(admin_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
+    fragen_import.pack(pady=50)
 
 def Prüfungsmodus():
     clear_inhalt()
@@ -37,7 +45,7 @@ def Prüfungsmodus():
     prüfungs_frame.pack(fill="both", expand=True)
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
-    fragen_import = tk.Button(text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
+    
 def Lernmodus():
     clear_inhalt()
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
