@@ -4,6 +4,8 @@ import json
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
+from tkinter import messagebox
+from admin_login import check_admin_login
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -31,7 +33,6 @@ def get_fragen(cur):
     db_data = cur.fetchall()
     fragen = []
     for data in db_data:
-        print("Data:", data)
         frage = Frage(data[0], data[1], data[2], data[3], data[4], data[5])
         fragen.append(frage)
     return fragen
@@ -50,12 +51,13 @@ def import_fragen(con, cur, filename):
 
 
 # Gui Funktionen
-def init(uebergebenes_root, uebergebenes_inhalt_frame, uebergebenes_con=None, uebergebenes_cur=None):
-    global root, inhalt_frame, con, cur
-    root = uebergebenes_root
-    inhalt_frame = uebergebenes_inhalt_frame
-    con = uebergebenes_con
-    cur = uebergebenes_cur
+# Hauptfenster und Inhalt vorbereiten
+root = tk.Tk()
+root.title("Vollbild GUI Vorlage")
+root.attributes("-fullscreen", True)
+
+inhalt_frame = tk.Frame(root)
+inhalt_frame.pack(fill="both", expand=True)
 
 def toggle_fullscreen(event=None):
     root.attributes("-fullscreen", not root.attributes("-fullscreen"))
@@ -106,6 +108,52 @@ def Startseite():
 
     Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
     Prüfungsbtn.pack(pady=50)
+    
+    Adminbtn = tk.Button(start_frame, text="Adminbereich (Login)", font=("Arial", 14), command=AdminLogin)
+    Adminbtn.pack(pady=20)
+
+
+# Admin Bereich Start
+
+def AdminLogin():
+    clear_inhalt()
+    login_frame = tk.Frame(inhalt_frame, bg="lightgray")
+    login_frame.pack(fill="both", expand=True)
+
+    tk.Label(login_frame, text="Admin Login", font=("Arial", 24), bg="lightgray").pack(pady=20)
+
+    tk.Label(login_frame, text="Benutzername:", bg="lightgray").pack(pady=(10, 0))
+    username_entry = tk.Entry(login_frame)
+    username_entry.pack(pady=5)
+
+    tk.Label(login_frame, text="Passwort:", bg="lightgray").pack(pady=(10, 0))
+    password_entry = tk.Entry(login_frame, show="*")
+    password_entry.pack(pady=5)
+
+    def handle_login():
+        username = username_entry.get()
+        password = password_entry.get()
+
+        if check_admin_login(username, password):
+            Admin()
+        else:
+            messagebox.showerror("Fehler", "Benutzername oder Passwort falsch!")
+
+    login_button = tk.Button(login_frame, text="Login", command=handle_login)
+    login_button.pack(pady=20)
+
+def Admin():
+    clear_inhalt()
+    admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
+    admin_frame.pack(fill="both", expand=True)
+    label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
+    label.pack(pady=100)
+    fragen_import = tk.Button(admin_frame, text="Fragen importieren", font=("Arial", 14),
+                              command=lambda: import_fragen(con, cur, openfile()))
+    fragen_import.pack(pady=50)
+
+
+# Admin Bereich Ende
 
 
 class Frage:
@@ -118,27 +166,8 @@ class Frage:
         self.antwort = antwort
         
 
-def main(con, cur):    
+def main(con, cur):
     
-    import_fragen(con, cur, "question.json")
-    fragen = get_fragen(cur)
-    
-    print(fragen[5].frage)
-    
-    
-    # Hauptfenster und Inhalt vorbereiten
-    root = tk.Tk()
-    root.title("Vollbild GUI Vorlage")
-    root.attributes("-fullscreen", True)
-
-    inhalt_frame = tk.Frame(root)
-    inhalt_frame.pack(fill="both", expand=True)
-
-    # Übergib root & inhalt_frame an das Modul
-    # main.py
-    init(root, inhalt_frame, con, cur)
-
-
     # Tastenkürzel
     root.bind("<Escape>", end_fullscreen)
     root.bind("<F11>", toggle_fullscreen)
