@@ -25,12 +25,10 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
 
 db_name = "fragen.db"
 
-
 def add_frage(con, cur, frage, A, B, C, antwort):
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort) VALUES (?, ?, ?, ?, ?)", (frage, A, B, C, antwort))
     con.commit()
-    
-    
+       
 def del_frage(con, cur):
     try:
         id = int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))
@@ -38,9 +36,7 @@ def del_frage(con, cur):
         con.commit()
     except TypeError as e:
         print(f"ERROR: {e}")
-    
-    
-    
+
 def get_fragen(cur):
     cur.execute("SELECT * FROM fragen")
     db_data = cur.fetchall()
@@ -49,7 +45,6 @@ def get_fragen(cur):
         frage = Frage(data[0], data[1], data[2], data[3], data[4], data[5])
         fragen.append(frage)
     return fragen
-
 
 def import_fragen(con, cur, filename):
     with open(filename, "r") as f:
@@ -62,6 +57,9 @@ def import_fragen(con, cur, filename):
         antwort = item["richtigeAntwort"]
         add_frage(con, cur, frage, A, B, C, antwort)
 
+def add_user(con, cur, is_admin, username, pw_hash, fragen_total, fragen_richtig):
+    cur.execute("INSERT INTO userdata (is_admin, username, pw_hash, fragen_total, fragen_richtig) VALUES (?, ?, ?, ?, ?)", (is_admin, username, pw_hash, fragen_total, fragen_richtig))
+    con.commit()
 
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
@@ -144,7 +142,6 @@ def Startseite():
     Adminbtn = tk.Button(start_frame, text="Adminbereich", font=("Arial", 14), command=AdminLogin)
     Adminbtn.pack(pady=20)
 
-
 # Admin Bereich Start
 
 def AdminLogin():
@@ -189,7 +186,6 @@ def Admin():
 
 # Admin Bereich Ende
 
-
 class Frage:
     def __init__(self, id, frage, A, B, C, antwort):
         self.id = id
@@ -198,8 +194,16 @@ class Frage:
         self.B = B
         self.C = C
         self.antwort = antwort
+    
+class User:
+    def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
+        self.user_id = user_id
+        self.is_admin = is_admin
+        self.username = username
+        self.pw_hash = pw_hash
+        self.fragen_total = fragen_total
+        self.fragen_richtig = fragen_richtig
         
-
 def main(con, cur):
 
     # Tastenkürzel
