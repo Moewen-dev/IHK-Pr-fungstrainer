@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from main import import_fragen
+from tkinter.filedialog import askopenfilename
 # Diese Variablen werden später vom Hauptprogramm übergeben
 root = None
 inhalt_frame = None
