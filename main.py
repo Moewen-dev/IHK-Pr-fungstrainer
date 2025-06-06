@@ -155,7 +155,9 @@ def Admin():
     fragen_import = tk.Button(admin_frame, text="Fragen importieren", font=("Arial", 14),
                               command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.pack(pady=50)
-
+    fragen_delete = tk.Button(admin_frame, text="Fragen löschen", font=("Arial", 14),
+                                command=lambda: del_frage(con, cur, int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))))
+    fragen_delete.pack(pady=40)
 
 # Admin Bereich Ende
 
