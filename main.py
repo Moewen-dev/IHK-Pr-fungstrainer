@@ -201,7 +201,7 @@ class Frage:
         
 
 def main(con, cur):
-    
+
     # Tastenkürzel
     root.bind("<Escape>", end_fullscreen)
     root.bind("<F11>", toggle_fullscreen)
