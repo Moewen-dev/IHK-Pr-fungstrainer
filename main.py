@@ -109,7 +109,7 @@ def Startseite():
     Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
     Prüfungsbtn.pack(pady=50)
     
-    Adminbtn = tk.Button(start_frame, text="Adminbereich (Login)", font=("Arial", 14), command=AdminLogin)
+    Adminbtn = tk.Button(start_frame, text="Adminbereich", font=("Arial", 14), command=AdminLogin)
     Adminbtn.pack(pady=20)
 
 
@@ -176,7 +176,7 @@ def main(con, cur):
     menubar = tk.Menu(root)
     file_menu = tk.Menu(menubar, tearoff=0)
     file_menu.add_command(label="Startseite", command=Startseite)
-    file_menu.add_command(label="Admin", command=Admin)
+    file_menu.add_command(label="Adminbereich", command=AdminLogin)
     file_menu.add_command(label="Prüfungs Modus", command=Prüfungsmodus)
     file_menu.add_separator()
     file_menu.add_command(label="Beenden", command=root.quit)
