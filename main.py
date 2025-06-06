@@ -6,6 +6,7 @@ from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from admin_login import check_admin_login
+import random
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -95,6 +96,25 @@ def Lernmodus():
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
     prüfungs_frame.pack(fill="both", expand=True)
 
+    auswahl = tk.StringVar()
+
+    fragen = get_fragen(cur)
+    random.shuffle(fragen)
+    
+    aktuelle_frage = fragen.pop(0)
+
+    Frage_label = tk.Label(text=aktuelle_frage.frage)
+    Frage_label.pack(pady=50)
+
+    frageA = tk.Radiobutton(text=aktuelle_frage.A, variable=auswahl, value="A")
+    frageA.pack(pady=50) 
+    frageB = tk.Radiobutton(text=aktuelle_frage.B, variable=auswahl, value="B").pack(pady=50)
+    frageC = tk.Radiobutton(text=aktuelle_frage.C, variable=auswahl, value="C").pack(pady=50)
+
+    if auswahl == aktuelle_frage.antwort:
+        print("Die Antwort war Richtig!")
+    else:
+        print("Die Antwort war falsch!")
 
 def Startseite():
     clear_inhalt()
