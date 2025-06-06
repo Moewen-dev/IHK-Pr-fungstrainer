@@ -43,24 +43,6 @@ def Lernmodus():
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
     prüfungs_frame.pack(fill="both", expand=True)
 
-    if cur is not None:
-        cur.execute("SELECT * FROM fragen")
-        fragen = cur.fetchall()
-    
-        Frag2e = fragen[1]
-        (ID, frage, A, B, C, antwort) = Frag2e
-
-        label = tk.Label(prüfungs_frame, text=frage, font=("Arial", 10), bg="lightblue")
-        label.pack(pady=20)
-
-        Abnt = tk.Button(prüfungs_frame, text=A, font=("Arial", 10), bg="lightblue")
-        Abnt.pack(pady=20)
-
-        Bbnt = tk.Button(prüfungs_frame, text=B, font=("Arial", 10), bg="lightblue")
-        Bbnt.pack(pady=20)
-
-        Cbnt = tk.Button(prüfungs_frame, text=C, font=("Arial", 10), bg="lightblue")
-        Cbnt.pack(pady=20)
 
 def Startseite():
     clear_inhalt()
