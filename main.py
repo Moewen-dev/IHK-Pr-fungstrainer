@@ -33,6 +33,7 @@ def get_fragen(cur):
     for data in db_data:
         frage = Frage(data[0], data[1], data[2], data[3], data[4], data[5])
         fragen.append(frage)
+        print("Data:" + data)
     return fragen
 
 
@@ -59,6 +60,9 @@ class Frage:
         
 
 def main(con, cur):    
+    
+    import_fragen(con, cur, "question.json")
+    
     # Hauptfenster und Inhalt vorbereiten
     root = tk.Tk()
     root.title("Vollbild GUI Vorlage")
@@ -96,7 +100,7 @@ def main(con, cur):
 
     # Gui öffnen
     root.mainloop()
-    
+
 
 if __name__ == "__main__":
     try:

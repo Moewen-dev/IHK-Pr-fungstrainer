@@ -36,8 +36,8 @@ def Admin():
     admin_frame.pack(fill="both", expand=True)
     label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
     label.pack(pady=100)
-    fragen_import = tk.Button(admin_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
-    fragen_import.pack(pady=50)
+    #fragen_import = tk.Button(admin_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
+    #fragen_import.pack(pady=50)
 
 def Prüfungsmodus():
     clear_inhalt()
