@@ -57,6 +57,10 @@ def import_fragen(con, cur, filename):
         antwort = item["richtigeAntwort"]
         add_frage(con, cur, frage, A, B, C, antwort)
 
+def add_user(con, cur, is_admin, username, pw_hash, fragen_total, fragen_richtig):
+    cur.execute("INSERT INTO userdata (is_admin, username, pw_hash, fragen_total, fragen_richtig) VALUES (?, ?, ?, ?, ?)", (is_admin, username, pw_hash, fragen_total, fragen_richtig))
+    con.commit()
+
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
 root = tk.Tk()
@@ -190,6 +194,15 @@ class Frage:
         self.B = B
         self.C = C
         self.antwort = antwort
+    
+class User:
+    def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
+        self.user_id = user_id
+        self.is_admin = is_admin
+        self.username = username
+        self.pw_hash = pw_hash
+        self.fragen_total = fragen_total
+        self.fragen_richtig = fragen_richtig
         
 def main(con, cur):
     
