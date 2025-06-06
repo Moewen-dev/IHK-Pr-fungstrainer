@@ -8,16 +8,16 @@ import gui_funktionen
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
     frage TEXT NOT NULL,
-    a1 TEXT NOT NULL,
-    a2 TEXT NOT NULL,
-    a3 TEXT NOT NULL,
+    A TEXT NOT NULL,
+    B TEXT NOT NULL,
+    C TEXT NOT NULL,
     antwort INTEGER NOT NULL);""",]
 
 db_name = "fragen.db"
 
 
-def add_frage(con, cur, frage, a1, a2, a3, antwort):
-    cur.execute("INSERT INTO fragen (frage, a1, a2, a3, antwort) VALUES (?, ?, ?, ?, ?)", (frage, a1, a2, a3, antwort))
+def add_frage(con, cur, frage, A, B, C, antwort):
+    cur.execute("INSERT INTO fragen (frage, A, B, C, antwort) VALUES (?, ?, ?, ?, ?)", (frage, A, B, C, antwort))
     con.commit()
     
     
@@ -31,19 +31,25 @@ def get_fragen(con, cur):
     return cur.fetchall()
 
 
-def import_fragen(filename):
+def import_fragen(con, cur, filename):
     with open(filename, "r") as f:
         fragen = json.load(f)
-    return fragen
+    for item in fragen["fragen"]:
+        frage = item["frage"]
+        A = item["A"]
+        B = item["B"]
+        C = item["C"]
+        antwort = item["richtigeAntwort"]
+        add_frage(con, cur, frage, A, B, C, antwort)
 
 
 class Frage:
-    def __init__(self, id, frage, a1, a2, a3, antwort):
+    def __init__(self, id, frage, A, B, C, antwort):
         self.id = id
         self.frage = frage
-        self.a1 = a1
-        self.a2 = a2
-        self.a3 = a3
+        self.A = A
+        self.B = B
+        self.C = C
         self.antwort = antwort
         
 
@@ -57,7 +63,9 @@ def main(con, cur):
     inhalt_frame.pack(fill="both", expand=True)
 
     # Übergib root & inhalt_frame an das Modul
-    gui_funktionen.init(root, inhalt_frame)
+    # main.py
+    gui_funktionen.init(root, inhalt_frame, con, cur)
+
 
     # Tastenkürzel
     root.bind("<Escape>", gui_funktionen.end_fullscreen)
