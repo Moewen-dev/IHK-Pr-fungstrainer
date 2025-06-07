@@ -106,25 +106,64 @@ def Lernmodus():
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
     prüfungs_frame.pack(fill="both", expand=True)
 
-    auswahl = tk.StringVar()
-
     fragen = get_fragen(cur)
     random.shuffle(fragen)
-    
-    aktuelle_frage = fragen.pop(0)
+    frageliste = fragen
 
-    Frage_label = tk.Label(text=aktuelle_frage.frage)
+    frage_index = 0
+
+    auswahl = tk.StringVar(value="X")
+
+    zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame)
+
+
+def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame):
+    for widget in prüfungs_frame.winfo_children():
+        widget.destroy()
+
+    aktuelle_frage = frageliste[frage_index]
+
+    Frage_label = tk.Label(prüfungs_frame, text=aktuelle_frage.frage)
     Frage_label.pack(pady=50)
 
-    frageA = tk.Radiobutton(text=aktuelle_frage.A, variable=auswahl, value="A")
-    frageA.pack(pady=50) 
-    frageB = tk.Radiobutton(text=aktuelle_frage.B, variable=auswahl, value="B").pack(pady=50)
-    frageC = tk.Radiobutton(text=aktuelle_frage.C, variable=auswahl, value="C").pack(pady=50)
+    frageA = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
+    frageA.pack(pady=5) 
 
-    if auswahl == aktuelle_frage.antwort:
-        print("Die Antwort war Richtig!")
+    frageB = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
+    frageB.pack(pady=5)
+
+    frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
+    frageC.pack(pady=5)
+
+    submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame))
+    submit_btn.pack(pady=30)
+
+def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame):
+    for widget in prüfungs_frame.winfo_children():
+        widget.destroy()
+        
+    if aktuelle_frage.antwort == auswahl.get():
+
+        r_antwort = tk.Frame(prüfungs_frame, bg="Green")
+        r_antwort.pack(fill="both", expand=True)
+
+        r_label = tk.Label(prüfungs_frame, text="Das war Richtig!")
+        r_label.pack(pady=50)
     else:
-        print("Die Antwort war falsch!")
+
+        fa_antwort = tk.Frame(prüfungs_frame, bg="Red")
+        fa_antwort.pack(fill="both", expand=True)
+
+        f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:")
+        f_antwort.pack(pady=50)
+
+        l_antwort = tk.Label(prüfungs_frame, text=aktuelle_frage.antwort)
+        l_antwort.pack(pady=50)
+
+    frage_index += 1
+
+    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame))
+    weiter_btn.pack(pady=20)
 
 def Startseite():
     clear_inhalt()
