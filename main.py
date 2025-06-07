@@ -121,6 +121,8 @@ def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
+    auswahl = tk.StringVar(value="X")
+    
     aktuelle_frage = frageliste[frage_index]
 
     Frage_label = tk.Label(prüfungs_frame, text=aktuelle_frage.frage)
