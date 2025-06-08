@@ -101,6 +101,7 @@ def Prüfungsmodus():
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
     
+#Startet den Lernmodus mit den Fragen. Initalisiert Variabel und leitet weiter nach "zeige Fragen"
 def Lernmodus():
     clear_inhalt()
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
@@ -118,6 +119,7 @@ def Lernmodus():
     zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen)
 
 
+#Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
 def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
@@ -155,6 +157,7 @@ def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
         wiederholenbtn = tk.Button(prüfungs_frame, text="Nochmal alle Fragen durch gehen", command=lambda:Lernmodus())
         wiederholenbtn.pack(pady=25)
 
+#Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
 def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
