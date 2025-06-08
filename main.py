@@ -168,8 +168,11 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
         l_antwort = tk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
         user.fragen_total += 1
+        user.fragen_falsch.append(aktuelle_frage.id)
 
     frage_index += 1
+    
+    user.save()
     
     weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen))
     weiter_btn.pack(pady=20)
@@ -289,8 +292,18 @@ def login(cur, username, pw_hash):
             user.is_admin = data[1]
             user.pw_hash = pw_hash
             user.username = username
-            user.fragen_richtig = data[5]
-            user.fragen_total = data[4]
+            if data[5] != None:
+                user.fragen_richtig = data[5]
+            else:
+                user.fragen_richtig = 0
+            if data[4] != None:
+                user.fragen_total = data[4]
+            else:
+                user.fragen_total = 0
+            if data[6] != None:
+                user.fragen_falsch = json.loads(data[6])
+            else:
+                user.fragen_falsch = []
             return True
     return False
 
@@ -319,8 +332,10 @@ class User:
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
         self.fragen_falsch = []
     
-    def save(self, con, cur):
-        print("TODO: save userdata in db")
+    def save(self):
+        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ? WHERE user_id = ?"
+        cur.execute(save_statement, (self.fragen_total, self.fragen_richtig, json.dumps(self.fragen_falsch, indent=None), self.user_id))
+        con.commit()
         
 def main(con, cur):
     # Benutzer Initialisieren
