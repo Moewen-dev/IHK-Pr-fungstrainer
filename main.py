@@ -36,6 +36,8 @@ def del_frage(con, cur):
         con.commit()
     except TypeError as e:
         print(f"ERROR: {e}")
+    except ValueError as e:
+        print(f"ERROR: {e}")
 
 def get_fragen(cur):
     cur.execute("SELECT * FROM fragen")
@@ -81,7 +83,6 @@ def clear_inhalt():
         widget.destroy()
 
 def openfile():
-    tk().withdraw() 
     filename = askopenfilename() 
     return filename
 
