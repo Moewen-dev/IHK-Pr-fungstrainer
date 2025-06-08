@@ -146,21 +146,15 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
         
     if aktuelle_frage.antwort == auswahl.get():
 
-        r_antwort = tk.Frame(prüfungs_frame, bg="Green")
-        r_antwort.pack(fill="both", expand=True)
-
-        r_label = tk.Label(prüfungs_frame, text="Das war Richtig!")
+        r_label = tk.Label(prüfungs_frame, text="Das war Richtig!", bg="Green")
         r_label.pack(pady=50)
     else:
-
-        fa_antwort = tk.Frame(prüfungs_frame, bg="Red")
-        fa_antwort.pack(fill="both", expand=True)
-
-        f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:")
+        f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:", bg="Red")
         f_antwort.pack(pady=50)
 
-        l_antwort = tk.Label(prüfungs_frame, text=aktuelle_frage.antwort)
-        l_antwort.pack(pady=50)
+        richtige_antwort_text = getattr(aktuelle_frage, aktuelle_frage.antwort)
+        l_antwort = tk.Label(prüfungs_frame, text=richtige_antwort_text)
+        l_antwort.pack(pady=10)
 
     frage_index += 1
 
