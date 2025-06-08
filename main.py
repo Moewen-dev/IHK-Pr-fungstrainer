@@ -18,7 +18,8 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     username TEXT NOT NULL,
     pw_hash TEXT NOT NULL,
     fragen_total INTEGER NOT NULL,
-    fragen_richtig INTEGER NOT NULL);"""]
+    fragen_richtig INTEGER NOT NULL,
+    fragen_falsch TEXT NOT NULL);"""]
 
 db_name = "fragen.db"
 
@@ -59,8 +60,9 @@ def import_fragen(con, cur, filename):
     except TypeError as e:
         print(f"Error: {e}")
 
-def add_user(con, cur, is_admin, username, pw_hash, fragen_total, fragen_richtig):
-    cur.execute("INSERT INTO userdata (is_admin, username, pw_hash, fragen_total, fragen_richtig) VALUES (?, ?, ?, ?, ?)", (is_admin, username, pw_hash, fragen_total, fragen_richtig))
+def add_user(con, cur, is_admin, username, pw_hash, fragen_total, fragen_richtig, fragen_falsch):
+    cur.execute("INSERT INTO userdata (is_admin, username, pw_hash, fragen_total, fragen_richtig, fragen_falsch) VALUES (?, ?, ?, ?, ?, ?)", 
+                (is_admin, username, pw_hash, fragen_total, fragen_richtig, fragen_falsch))
     con.commit()
 
 # Gui Funktionen
@@ -142,7 +144,7 @@ def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
         Fertig_label = tk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
         Fertig_label.pack(pady=50)
 
-        statbtn = tk.Button(prüfungs_frame, text="Zurück zur Startseite", command=lambda:Startseite())
+        statbtn = tk.Button(prüfungs_frame, text="Zurück zur Startseite", command=Menu)
         statbtn.pack(padx=25)
 
         wiederholenbtn = tk.Button(prüfungs_frame, text="Nochmal alle Fragen durch gehen", command=lambda:Lernmodus())
@@ -170,6 +172,8 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
 
     frage_index += 1
 
+    print(f"Fragen Total: {user.fragen_total}\nFragen Richtig: {user.fragen_richtig}\n")
+    
     weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen))
     weiter_btn.pack(pady=20)
 
@@ -285,6 +289,10 @@ class User:
         self.pw_hash = pw_hash
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
+        self.fragen_falsch = []
+    
+    def save(self, con, cur):
+        print("TODO: save userdata in db")
         
 def main(con, cur):
     # Benutzer Initialisieren
