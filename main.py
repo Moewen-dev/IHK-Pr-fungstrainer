@@ -1,12 +1,9 @@
-import sqlite3
-import sys
-import json
+import sqlite3, sys, json, random, hashlib
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from admin_login import check_admin_login
-import random
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -118,7 +115,6 @@ def Lernmodus():
     auswahl = tk.StringVar(value="X")
 
     zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen)
-
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
 def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
@@ -237,8 +233,17 @@ def Admin():
     fragen_delete = tk.Button(admin_frame, text="Fragen löschen", font=("Arial", 14),
                                 command=lambda: del_frage(con, cur))
     fragen_delete.pack(pady=40)
-
 # Admin Bereich Ende
+
+# Login Funktion
+def login(cur, username, pw_hash):
+    userdata = cur.execute("SELECT * FROM userdata").fetchall()
+    for data in userdata:
+        data_username = data[2]
+        data_pw_hash = data[3] 
+        if data_username == username and data_pw_hash == pw_hash:
+            return data[0]
+    return 0
 
 class Frage:
     def __init__(self, id, frage, A, B, C, antwort):
@@ -255,8 +260,8 @@ class User:
         self.is_admin = is_admin
         self.username = username
         self.pw_hash = pw_hash
-        self.fragen_total = fragen_total
-        self.fragen_richtig = fragen_richtig
+        self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
+        self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
         
 def main(con, cur):
 
@@ -285,7 +290,6 @@ def main(con, cur):
     # Gui öffnen
     root.mainloop()
     
-
 if __name__ == "__main__":
     try:
         with sqlite3.connect(db_name) as con:
@@ -302,6 +306,4 @@ if __name__ == "__main__":
     except sqlite3.OperationalError as e:
         print(f"Failed to Open Database: {e}")
         sys.exit(1)
-        
-        
-        
+         
