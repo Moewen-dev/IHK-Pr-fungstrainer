@@ -232,34 +232,6 @@ def Guilogin():
     loginbtn.pack(pady=20)
     
 # Admin Bereich Start
-"""
-def AdminLogin():
-    clear_inhalt()
-    login_frame = tk.Frame(inhalt_frame, bg="lightgray")
-    login_frame.pack(fill="both", expand=True)
-
-    tk.Label(login_frame, text="Admin Login", font=("Arial", 24), bg="lightgray").pack(pady=20)
-
-    tk.Label(login_frame, text="Benutzername:", bg="lightgray").pack(pady=(10, 0))
-    username_entry = tk.Entry(login_frame)
-    username_entry.pack(pady=5)
-
-    tk.Label(login_frame, text="Passwort:", bg="lightgray").pack(pady=(10, 0))
-    password_entry = tk.Entry(login_frame, show="*")
-    password_entry.pack(pady=5)
-
-    def handle_login():
-        username = username_entry.get()
-        password = password_entry.get()
-
-        if check_admin_login(username, password):
-            Admin()
-        else:
-            messagebox.showerror("Fehler", "Benutzername oder Passwort falsch!")
-
-    login_button = tk.Button(login_frame, text="Login", command=handle_login)
-    login_button.pack(pady=20)
-"""
 def Admin():
     if user.is_admin != 1:
         return
@@ -274,7 +246,6 @@ def Admin():
     fragen_delete = tk.Button(admin_frame, text="Fragen löschen", font=("Arial", 14),
                                 command=lambda: del_frage(con, cur))
     fragen_delete.pack(pady=40)
-# Admin Bereich Ende
 
 # Login Funktion
 def login(cur, username, pw_hash):
