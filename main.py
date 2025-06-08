@@ -111,36 +111,51 @@ def Lernmodus():
     frageliste = fragen
 
     frage_index = 0
+    alle_fragen = len(frageliste)
 
     auswahl = tk.StringVar(value="X")
 
-    zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame)
+    zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen)
 
 
-def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame):
+def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
-    auswahl = tk.StringVar(value="X")
-    
-    aktuelle_frage = frageliste[frage_index]
+    if frage_index < alle_fragen:
 
-    Frage_label = tk.Label(prüfungs_frame, text=aktuelle_frage.frage)
-    Frage_label.pack(pady=50)
+        aktuelle_frage = frageliste[frage_index]
 
-    frageA = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
-    frageA.pack(pady=5) 
+        auswahl = tk.StringVar(value="X")
 
-    frageB = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
-    frageB.pack(pady=5)
+        Fortschirt_label = tk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {alle_fragen}")
+        Fortschirt_label.pack(pady=25)
 
-    frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
-    frageC.pack(pady=5)
+        Frage_label = tk.Label(prüfungs_frame, text=aktuelle_frage.frage)
+        Frage_label.pack(pady=50)
 
-    submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame))
-    submit_btn.pack(pady=30)
+        frageA = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
+        frageA.pack(pady=5) 
 
-def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame):
+        frageB = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
+        frageB.pack(pady=5)
+
+        frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
+        frageC.pack(pady=5)
+
+        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen))
+        submit_btn.pack(pady=30)
+    else:
+        Fertig_label = tk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
+        Fertig_label.pack(pady=50)
+
+        statbtn = tk.Button(prüfungs_frame, text="Zurück zur Startseite", command=lambda:Startseite())
+        statbtn.pack(padx=25)
+
+        wiederholenbtn = tk.Button(prüfungs_frame, text="Nochmal alle Fragen durch gehen", command=lambda:Lernmodus())
+        wiederholenbtn.pack(pady=25)
+
+def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
         
@@ -158,7 +173,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
 
     frage_index += 1
 
-    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame))
+    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen))
     weiter_btn.pack(pady=20)
 
 def Startseite():
