@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
-from admin_login import check_admin_login
+#from admin_login import check_admin_login
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -32,9 +32,9 @@ def del_frage(con, cur):
         cur.execute("DELETE FROM fragen WHERE id=?", (id,))
         con.commit()
     except TypeError as e:
-        print(f"ERROR: {e}")
+        print(f"Error: {e}")
     except ValueError as e:
-        print(f"ERROR: {e}")
+        print(f"Error: {e}")
 
 def get_fragen(cur):
     cur.execute("SELECT * FROM fragen")
@@ -46,15 +46,18 @@ def get_fragen(cur):
     return fragen
 
 def import_fragen(con, cur, filename):
-    with open(filename, "r") as f:
-        fragen = json.load(f)
-    for item in fragen["fragen"]:
-        frage = item["frage"]
-        A = item["A"]
-        B = item["B"]
-        C = item["C"]
-        antwort = item["richtigeAntwort"]
-        add_frage(con, cur, frage, A, B, C, antwort)
+    try:
+        with open(filename, "r") as f:
+            fragen = json.load(f)
+        for item in fragen["fragen"]:
+            frage = item["frage"]
+            A = item["A"]
+            B = item["B"]
+            C = item["C"]
+            antwort = item["richtigeAntwort"]
+            add_frage(con, cur, frage, A, B, C, antwort)
+    except TypeError as e:
+        print(f"Error: {e}")
 
 def add_user(con, cur, is_admin, username, pw_hash, fragen_total, fragen_richtig):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash, fragen_total, fragen_richtig) VALUES (?, ?, ?, ?, ?)", (is_admin, username, pw_hash, fragen_total, fragen_richtig))
@@ -82,15 +85,6 @@ def clear_inhalt():
 def openfile():
     filename = askopenfilename() 
     return filename
-
-def Admin():
-    clear_inhalt()
-    admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
-    admin_frame.pack(fill="both", expand=True)
-    label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
-    label.pack(pady=100)
-    #fragen_import = tk.Button(admin_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=import_fragen(openfile))
-    #fragen_import.pack(pady=50)
 
 def Prüfungsmodus():
     clear_inhalt()
@@ -120,7 +114,7 @@ def Lernmodus():
 def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
-
+    
     if frage_index < alle_fragen:
 
         aktuelle_frage = frageliste[frage_index]
@@ -163,6 +157,8 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
 
         r_label = tk.Label(prüfungs_frame, text="Das war Richtig!", bg="Green")
         r_label.pack(pady=50)
+        user.fragen_richtig += 1
+        user.fragen_total += 1
     else:
         f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:", bg="Red")
         f_antwort.pack(pady=50)
@@ -170,6 +166,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
         richtige_antwort_text = getattr(aktuelle_frage, aktuelle_frage.antwort)
         l_antwort = tk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
+        user.fragen_total += 1
 
     frage_index += 1
 
@@ -177,23 +174,65 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
     weiter_btn.pack(pady=20)
 
 def Startseite():
-    clear_inhalt()
-    start_frame = tk.Frame(inhalt_frame, bg="white")
-    start_frame.pack(fill="both", expand=True)
-    label = tk.Label(start_frame, text="Willkommen!", font=("Arial", 30), bg="white")
-    label.pack(pady=100)
+    if user.user_id == 0:
+        clear_inhalt()
+        start_frame = tk.Frame(inhalt_frame, bg="white")
+        start_frame.pack(fill="both", expand=True)
+        label = tk.Label(start_frame, text="Willkommen!", font=("Arial", 30), bg="white")
+        label.pack(pady=100)
+        
+        Loginbtn = tk.Button(start_frame, text="Login", font=("Arial", 14), command=Guilogin)
+        Loginbtn.pack(pady=100)
+        
+        Registerbtn = tk.Button(start_frame, text="Registrieren", font=("Arial", 14))
+        Registerbtn.pack(pady=0)
+    else:
+        Menu()
 
-    Lernbtn = tk.Button(start_frame, text="Weiter", font=("Arial", 14), command=Lernmodus)
+def Menu():
+    clear_inhalt()
+    menu_frame = tk.Frame(inhalt_frame, bg="white")
+    menu_frame.pack(fill="both", expand=True)
+    label = tk.Label(menu_frame, text="Willkommen!", font=("Arial", 30), bg="white")
+    label.pack(pady=100)
+    
+    Lernbtn = tk.Button(menu_frame, text="Weiter", font=("Arial", 14), command=Lernmodus)
     Lernbtn.pack(pady=100)
 
-    Prüfungsbtn = tk.Button(start_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
+    Prüfungsbtn = tk.Button(menu_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
     Prüfungsbtn.pack(pady=50)
     
-    Adminbtn = tk.Button(start_frame, text="Adminbereich", font=("Arial", 14), command=AdminLogin)
-    Adminbtn.pack(pady=20)
+    if user.is_admin == 1:
+        Adminbtn = tk.Button(menu_frame, text="Adminbereich", font=("Arial", 14), command=Admin)
+        Adminbtn.pack(pady=20)
 
+def Guilogin():
+    clear_inhalt()
+    login_frame = tk.Frame(inhalt_frame, bg="white")
+    login_frame.pack(fill="both", expand=True)
+    label = tk.Label(login_frame, text="Loginbereich", font=("Arial", 20), bg="white")
+    label.pack(pady=100)
+    
+    tk.Label(login_frame, text="Benutzername:", bg="white").pack(pady=(10, 0))
+    username_entry = tk.Entry(login_frame)
+    username_entry.pack(pady=5)
+    
+    tk.Label(login_frame, text="Passwort:", bg="white").pack(pady=(10, 0))
+    password_entry = tk.Entry(login_frame, show="*")
+    password_entry.pack(pady=5)
+    
+    def handle_login():
+        username = username_entry.get()
+        pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
+        if login(cur, username, pw_hash):
+            Menu()
+            return
+    
+    loginbtn = tk.Button(login_frame, text="Login", command=handle_login)
+    loginbtn.pack(pady=20)
+    
 # Admin Bereich Start
-
+"""
 def AdminLogin():
     clear_inhalt()
     login_frame = tk.Frame(inhalt_frame, bg="lightgray")
@@ -220,8 +259,10 @@ def AdminLogin():
 
     login_button = tk.Button(login_frame, text="Login", command=handle_login)
     login_button.pack(pady=20)
-
+"""
 def Admin():
+    if user.is_admin != 1:
+        return
     clear_inhalt()
     admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
     admin_frame.pack(fill="both", expand=True)
@@ -242,8 +283,19 @@ def login(cur, username, pw_hash):
         data_username = data[2]
         data_pw_hash = data[3] 
         if data_username == username and data_pw_hash == pw_hash:
-            return data[0]
-    return 0
+            user.user_id = data[0]
+            user.is_admin = data[1]
+            user.pw_hash = pw_hash
+            user.username = username
+            user.fragen_richtig = data[5]
+            user.fragen_total = data[4]
+            return True
+    return False
+
+# Zum Abmelden einfach Benutzer Objekt nullen
+def abmelden():
+    global user
+    user = User(0, 0, 0, 0, 0, 0)
 
 class Frage:
     def __init__(self, id, frage, A, B, C, antwort):
@@ -264,7 +316,10 @@ class User:
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
         
 def main(con, cur):
-
+    # Benutzer Initialisieren
+    global user
+    user = User(0, 0, 0, 0, 0, 0)
+    
     # Tastenkürzel
     root.bind("<Escape>", end_fullscreen)
     root.bind("<F11>", toggle_fullscreen)
@@ -273,9 +328,10 @@ def main(con, cur):
     menubar = tk.Menu(root)
     file_menu = tk.Menu(menubar, tearoff=0)
     file_menu.add_command(label="Startseite", command=Startseite)
-    file_menu.add_command(label="Adminbereich", command=AdminLogin)
+    file_menu.add_command(label="Adminbereich", command=Admin)
     file_menu.add_command(label="Prüfungs Modus", command=Prüfungsmodus)
     file_menu.add_separator()
+    file_menu.add_command(label="Abmelden", command=abmelden)
     file_menu.add_command(label="Beenden", command=root.quit)
     menubar.add_cascade(label="Datei", menu=file_menu)
 
