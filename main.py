@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
-#from admin_login import check_admin_login
 
 #Liste für die falschen Fragen, damit diese nicht geleert wird
 falsche_fragen = []
@@ -20,9 +19,9 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     is_admin INTEGER NOT NULL,
     username TEXT NOT NULL,
     pw_hash TEXT NOT NULL,
-    fragen_total INTEGER NOT NULL,
-    fragen_richtig INTEGER NOT NULL,
-    fragen_falsch TEXT NOT NULL);"""]
+    fragen_total INTEGER,
+    fragen_richtig INTEGER,
+    fragen_falsch TEXT);"""]
 
 db_name = "fragen.db"
 
@@ -75,9 +74,9 @@ def import_fragen(con, cur, filename):
     except TypeError as e:
         print(f"Error: {e}")
 
-def add_user(con, cur, is_admin, username, pw_hash, fragen_total, fragen_richtig, fragen_falsch):
-    cur.execute("INSERT INTO userdata (is_admin, username, pw_hash, fragen_total, fragen_richtig, fragen_falsch) VALUES (?, ?, ?, ?, ?, ?)", 
-                (is_admin, username, pw_hash, fragen_total, fragen_richtig, fragen_falsch))
+def add_user(con, cur, is_admin, username, pw_hash):
+    print(f"Admin: {is_admin}\nUsername: {username}\npw hash: {pw_hash}")
+    cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
 
 # Gui Funktionen
@@ -216,12 +215,13 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
         l_antwort = tk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
         user.fragen_total += 1
+        user.fragen_falsch.append(aktuelle_frage.id)
 
         falsche_fragen.append(aktuelle_frage.id)
 
     frage_index += 1
-
-    print(f"Fragen Total: {user.fragen_total}\nFragen Richtig: {user.fragen_richtig}\n")
+    
+    user.save()
     
     weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen, falsche_fragen))
     weiter_btn.pack(pady=20)
@@ -237,7 +237,7 @@ def Startseite():
         Loginbtn = tk.Button(start_frame, text="Login", font=("Arial", 14), command=Guilogin)
         Loginbtn.pack(pady=100)
         
-        Registerbtn = tk.Button(start_frame, text="Registrieren", font=("Arial", 14))
+        Registerbtn = tk.Button(start_frame, text="Registrieren", font=("Arial", 14), command=Guiregister)
         Registerbtn.pack(pady=0)
     else:
         Menu()
@@ -283,7 +283,37 @@ def Guilogin():
     
     loginbtn = tk.Button(login_frame, text="Login", command=handle_login)
     loginbtn.pack(pady=20)
+
+def Guiregister():
+    clear_inhalt()
+    register_frame = tk.Frame(inhalt_frame, bg="white")
+    register_frame.pack(fill="both", expand=True)
+    label = tk.Label(register_frame, text="Registrierbereich", font=("Arial", 20), bg="white")
+    label.pack(pady=100)
     
+    tk.Label(register_frame, text="Benutzername:", bg="white").pack(pady=(10, 0))
+    username_entry = tk.Entry(register_frame)
+    username_entry.pack(pady=5)
+    
+    tk.Label(register_frame, text="Passwort:", bg="white").pack(pady=(10, 0))
+    password_entry = tk.Entry(register_frame, show="*")
+    password_entry.pack(pady=5)
+    
+    is_admin = tk.IntVar()
+    tk.Label(register_frame, text="Admin: ", bg="white").pack(pady=(10, 0))
+    is_admin_entry = tk.Checkbutton(register_frame, text="Admin", variable=is_admin)
+    is_admin_entry.pack(pady=5)
+    
+    def handle_register():
+        username = username_entry.get()
+        pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
+        add_user(con, cur, is_admin.get(), username, pw_hash)
+        Guilogin()
+        
+    registerbtn = tk.Button(register_frame, text="Register", command=handle_register)
+    registerbtn.pack(pady=20)
+    
+ 
 # Admin Bereich Start
 def Admin():
     if user.is_admin != 1:
@@ -311,8 +341,18 @@ def login(cur, username, pw_hash):
             user.is_admin = data[1]
             user.pw_hash = pw_hash
             user.username = username
-            user.fragen_richtig = data[5]
-            user.fragen_total = data[4]
+            if data[5] != None:
+                user.fragen_richtig = data[5]
+            else:
+                user.fragen_richtig = 0
+            if data[4] != None:
+                user.fragen_total = data[4]
+            else:
+                user.fragen_total = 0
+            if data[6] != None:
+                user.fragen_falsch = json.loads(data[6])
+            else:
+                user.fragen_falsch = []
             return True
     return False
 
@@ -320,6 +360,7 @@ def login(cur, username, pw_hash):
 def abmelden():
     global user
     user = User(0, 0, 0, 0, 0, 0)
+    Startseite()
 
 class Frage:
     def __init__(self, id, frage, A, B, C, antwort):
@@ -340,8 +381,10 @@ class User:
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
         self.fragen_falsch = []
     
-    def save(self, con, cur):
-        print("TODO: save userdata in db")
+    def save(self):
+        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ? WHERE user_id = ?"
+        cur.execute(save_statement, (self.fragen_total, self.fragen_richtig, json.dumps(self.fragen_falsch, indent=None), self.user_id))
+        con.commit()
         
 def main(con, cur):
     # Benutzer Initialisieren
