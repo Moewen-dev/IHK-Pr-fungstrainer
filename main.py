@@ -4,9 +4,6 @@ from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 
-#Liste für die falschen Fragen, damit diese nicht geleert wird
-falsche_fragen = []
-
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
     frage TEXT NOT NULL,
@@ -113,8 +110,6 @@ def Prüfungsmodus():
 def Lernmodus():
     clear_inhalt()
 
-    global falsche_fragen
-
     # Auswahl anzeigen
     wahl_var = tk.BooleanVar(value=True)
 
@@ -124,11 +119,11 @@ def Lernmodus():
     falsche_fragen_btn = tk.Radiobutton(inhalt_frame, text="Nur die Falschen wiederholen?", variable=wahl_var, value=False)
     falsche_fragen_btn.pack(pady=10)
 
-    weiter_btn = tk.Button(inhalt_frame, text="Weiter mit der Auswahl", command=lambda: starte_fragen(wahl_var.get(), falsche_fragen))
+    weiter_btn = tk.Button(inhalt_frame, text="Weiter mit der Auswahl", command=lambda: starte_fragen(wahl_var.get()))
     weiter_btn.pack(pady=20)
 
 
-def starte_fragen(wahl, falsche_fragen):
+def starte_fragen(wahl):
     clear_inhalt()
 
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
@@ -137,7 +132,7 @@ def starte_fragen(wahl, falsche_fragen):
     if wahl:
         fragen = get_fragen(cur)
     else:
-        fragen = Fragen_nach_ID(cur, falsche_fragen)
+        fragen = Fragen_nach_ID(cur)
 
     random.shuffle(fragen)
     frageliste = fragen
@@ -147,11 +142,11 @@ def starte_fragen(wahl, falsche_fragen):
 
     auswahl = tk.StringVar(value="X")
 
-    zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen, falsche_fragen)
+    zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen)
 
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
-def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen, falsche_fragen):
+def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
     
@@ -176,7 +171,7 @@ def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen, 
         frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
         frageC.pack(pady=5)
 
-        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen, falsche_fragen))
+        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen))
         submit_btn.pack(pady=30)
     else:
         Fertig_label = tk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
@@ -189,7 +184,7 @@ def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen, 
         wiederholenbtn.pack(pady=25)
 
 #Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
-def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen, falsche_fragen):
+def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
         
@@ -202,8 +197,8 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
 
         print("Die Frage wurde richtig beantwortet!")
 
-        if aktuelle_frage.id in falsche_fragen:
-            falsche_fragen.remove(aktuelle_frage.id)
+        if aktuelle_frage.id in user.falsche_fragen:
+            user.falsche_fragen.remove(aktuelle_frage.id)
             print(f"Die Frage mit der ID {aktuelle_frage.id} wurde herraus genommen")
     else:
         f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:", bg="Red")
@@ -217,13 +212,13 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
         user.fragen_total += 1
         user.fragen_falsch.append(aktuelle_frage.id)
 
-        falsche_fragen.append(aktuelle_frage.id)
+        user.falsche_fragen.append(aktuelle_frage.id)
 
     frage_index += 1
     
     user.save()
     
-    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen, falsche_fragen))
+    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen))
     weiter_btn.pack(pady=20)
 
 def Startseite():
