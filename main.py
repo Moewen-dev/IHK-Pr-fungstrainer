@@ -135,24 +135,23 @@ def starte_fragen(wahl):
         fragen = Fragen_nach_ID(cur)
 
     random.shuffle(fragen)
-    frageliste = fragen
 
-    frage_index = 0
-    alle_fragen = len(frageliste)
-
-    auswahl = tk.StringVar(value="X")
-
-    zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen)
+    zeige_frage(fragen, prüfungs_frame)
 
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
-def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
+def zeige_frage(fragen, auswahl, prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
-    
+
+    auswahl = tk.StringVar(value="X")
+
+    frage_index = 0
+    alle_fragen = len(fragen)
+
     if frage_index < alle_fragen:
 
-        aktuelle_frage = frageliste[frage_index]
+        aktuelle_frage = fragen[frage_index]
 
         auswahl = tk.StringVar(value="X")
 
@@ -171,7 +170,7 @@ def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
         frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
         frageC.pack(pady=5)
 
-        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen))
+        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen))
         submit_btn.pack(pady=30)
     else:
         Fertig_label = tk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
@@ -184,7 +183,7 @@ def zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen):
         wiederholenbtn.pack(pady=25)
 
 #Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
-def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfungs_frame, alle_fragen):
+def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
         
@@ -218,7 +217,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, frageliste, frage_index, prüfun
     
     user.save()
     
-    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(frageliste, frage_index, auswahl, prüfungs_frame, alle_fragen))
+    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(fragen, frage_index, auswahl, prüfungs_frame, alle_fragen))
     weiter_btn.pack(pady=20)
 
 def Startseite():
