@@ -4,9 +4,6 @@ from tkinter import ttk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 
-# Variable - siehe Adminbereich_mit_Login
-nach_login = None
-
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
     frage TEXT NOT NULL,
@@ -143,7 +140,7 @@ def starte_fragen(wahl):
 
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
-def zeige_frage(fragen, auswahl, prüfungs_frame):
+def zeige_frage(fragen, prüfungs_frame): #def zeige_frage(fragen, auswahl, prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
@@ -256,7 +253,7 @@ def Menu():
         Adminbtn = tk.Button(menu_frame, text="Adminbereich", font=("Arial", 14), command=Admin)
         Adminbtn.pack(pady=20)
 
-def Guilogin(callback=nach_login):
+def Guilogin():
     clear_inhalt()
     login_frame = tk.Frame(inhalt_frame, bg="white")
     login_frame.pack(fill="both", expand=True)
@@ -275,29 +272,15 @@ def Guilogin(callback=nach_login):
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
         if login(cur, username, pw_hash):
-            if callback:     
-                callback() # Für Adminbereich_mit_Login
-            else:
-                Menu()
-            return
+            if user.is_admin == 1:
+                Admin()
         else:
-            messagebox.showerror("Fehler", "Login fehlgeschlagen")
-    
+            Menu()
+
     loginbtn = tk.Button(login_frame, text="Login", command=handle_login)
     loginbtn.pack(pady=20)
 
-# Adminbereich öffnen, wenn der Benutzer angemeldet ist und Adminrechte hat
-# sonst wird der Login Dialog geöffnet und nach dem Login der Adminbereich geöffnet -> Dazu wird das Callback "nach_login" verwendet.
-def Adminbereich_mit_Login():
-    if user.user_id == 0 or user.is_admin != 1:
-        def nach_login():
-            if user.is_admin == 1:
-                Admin()
-            else:
-                messagebox.showerror("Zugriff verweigert", "Nur Administratoren dürfen den Adminbereich öffnen.")
-        Guilogin(callback=nach_login)
-    else:
-        Admin()
+
 
 def Guiregister():
     clear_inhalt()
