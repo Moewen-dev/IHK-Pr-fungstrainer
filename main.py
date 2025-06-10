@@ -45,10 +45,10 @@ def get_fragen(cur):
         fragen.append(frage)
     return fragen
 
-def Fragen_nach_ID(cur):
-    placeholder = ",".join(["?"] * len(user.fragen_falsch))  
+def Fragen_nach_ID(cur, id_liste):
+    placeholder = ",".join(["?"] * len(id_liste))  
     query = f"SELECT * FROM fragen WHERE id IN ({placeholder})"
-    cur.execute(query, user.fragen_falsch)
+    cur.execute(query, id_liste)
     db_data = cur.fetchall()
     
     fragen = []
@@ -99,19 +99,12 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
-# Verbessert
 def Prüfungsmodus():
-    if user.user_id == 0:
-        messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich an, um den Prüfungsmodus zu nutzen.")
-        Guilogin()
-        return
-
     clear_inhalt()
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
     prüfungs_frame.pack(fill="both", expand=True)
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
-
     
 #Startet den Lernmodus mit den Fragen. Initalisiert Variabel und leitet weiter nach "zeige Fragen"
 def Lernmodus():
@@ -147,7 +140,7 @@ def starte_fragen(wahl):
 
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
-def zeige_frage(fragen, prüfungs_frame): #def zeige_frage(fragen, auswahl, prüfungs_frame):
+def zeige_frage(fragen, auswahl, prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
@@ -260,7 +253,6 @@ def Menu():
         Adminbtn = tk.Button(menu_frame, text="Adminbereich", font=("Arial", 14), command=Admin)
         Adminbtn.pack(pady=20)
 
-# Login und Register Bereich
 def Guilogin():
     clear_inhalt()
     login_frame = tk.Frame(inhalt_frame, bg="white")
@@ -282,11 +274,9 @@ def Guilogin():
         if login(cur, username, pw_hash):
             Menu()
             return
-
+    
     loginbtn = tk.Button(login_frame, text="Login", command=handle_login)
     loginbtn.pack(pady=20)
-
-
 
 def Guiregister():
     clear_inhalt()
@@ -416,7 +406,7 @@ def main(con, cur):
     root.config(menu=menubar)
 
     # Startansicht
-    Startseite()
+    Menu()
 
     # Gui öffnen
     root.mainloop()
