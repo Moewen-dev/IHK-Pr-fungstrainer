@@ -45,10 +45,10 @@ def get_fragen(cur):
         fragen.append(frage)
     return fragen
 
-def Fragen_nach_ID(cur, id_liste):
-    placeholder = ",".join(["?"] * len(id_liste))  
+def Fragen_nach_ID(cur):
+    placeholder = ",".join(["?"] * len(user.fragen_falsch))  
     query = f"SELECT * FROM fragen WHERE id IN ({placeholder})"
-    cur.execute(query, id_liste)
+    cur.execute(query, user.fragen_falsch)
     db_data = cur.fetchall()
     
     fragen = []
