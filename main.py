@@ -427,7 +427,7 @@ def main(con, cur):
     root.config(menu=menubar)
 
     # Startansicht
-    Menu()
+    Startseite()
 
     # Gui öffnen
     root.mainloop()
