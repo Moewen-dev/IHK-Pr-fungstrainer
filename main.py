@@ -99,12 +99,20 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
+# Verbessert
 def Prüfungsmodus():
+    if user.user_id == 0:
+        messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich an, um den Prüfungsmodus zu nutzen.")
+        Guilogin()
+        return
+
     clear_inhalt()
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
     prüfungs_frame.pack(fill="both", expand=True)
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
+
+    
     
 #Startet den Lernmodus mit den Fragen. Initalisiert Variabel und leitet weiter nach "zeige Fragen"
 def Lernmodus():
@@ -406,7 +414,7 @@ def main(con, cur):
     root.config(menu=menubar)
 
     # Startansicht
-    Menu()
+    Startseite()
 
     # Gui öffnen
     root.mainloop()
