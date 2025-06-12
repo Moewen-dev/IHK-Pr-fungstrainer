@@ -139,21 +139,22 @@ def starte_fragen(wahl):
     if wahl:
         fragen = get_fragen(cur)
     else:
-        fragen = Fragen_nach_ID(cur)
+        fragen = Fragen_nach_ID(cur, user.fragen_falsch)
 
     random.shuffle(fragen)
 
-    zeige_frage(fragen, prüfungs_frame)
+    frage_index = 0
+
+    zeige_frage(fragen, prüfungs_frame, frage_index)
 
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
-def zeige_frage(fragen, auswahl, prüfungs_frame): # Funktioniert nicht
+def zeige_frage(fragen, prüfungs_frame, frage_index):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
     auswahl = tk.StringVar(value="X")
 
-    frage_index = 0
     alle_fragen = len(fragen)
 
     if frage_index < alle_fragen:
@@ -203,8 +204,8 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
 
         print("Die Frage wurde richtig beantwortet!")
 
-        if aktuelle_frage.id in user.falsche_fragen:
-            user.falsche_fragen.remove(aktuelle_frage.id)
+        if aktuelle_frage.id in user.fragen_falsch:
+            user.fragen_falsch.remove(aktuelle_frage.id)
             print(f"Die Frage mit der ID {aktuelle_frage.id} wurde herraus genommen")
     else:
         f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:", bg="Red")
@@ -218,13 +219,11 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         user.fragen_total += 1
         user.fragen_falsch.append(aktuelle_frage.id)
 
-        user.falsche_fragen.append(aktuelle_frage.id)
-
     frage_index += 1
     
     user.save()
     
-    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(fragen, frage_index, auswahl, prüfungs_frame, alle_fragen))
+    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(fragen, prüfungs_frame, frage_index))
     weiter_btn.pack(pady=20)
 
 def Startseite():
