@@ -217,7 +217,10 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         l_antwort = tk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
         user.fragen_total += 1
-        user.fragen_falsch.append(aktuelle_frage.id)
+        if aktuelle_frage.id in user.fragen_falsch:
+            print("Frage schon vorhanden und muss nicht erneut hinzugefügt werden ")
+        else:
+            user.fragen_falsch.append(aktuelle_frage.id)
 
     frage_index += 1
     
