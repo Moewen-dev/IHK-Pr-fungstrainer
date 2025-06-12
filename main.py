@@ -147,7 +147,7 @@ def starte_fragen(wahl):
 
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
-def zeige_frage(fragen, auswahl, prüfungs_frame): # Funktioniert nicht
+def zeige_frage(fragen, auswahl, prüfungs_frame): # Funktioniert nicht, wenn "auswahl" übergeben wird
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
@@ -203,7 +203,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
 
         print("Die Frage wurde richtig beantwortet!")
 
-        if aktuelle_frage.id in user.falsche_fragen:
+        if aktuelle_frage.id in user.falsche_fragen: # AttributeError: 'User' object has no attribute 'falsche_fragen'
             user.falsche_fragen.remove(aktuelle_frage.id)
             print(f"Die Frage mit der ID {aktuelle_frage.id} wurde herraus genommen")
     else:
