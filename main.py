@@ -113,7 +113,6 @@ def Prüfungsmodus():
     label.pack(pady=100)
 
     
-    
 #Startet den Lernmodus mit den Fragen. Initalisiert Variabel und leitet weiter nach "zeige Fragen"
 def Lernmodus():
     clear_inhalt()
@@ -148,7 +147,7 @@ def starte_fragen(wahl):
 
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
-def zeige_frage(fragen, auswahl, prüfungs_frame):
+def zeige_frage(fragen, auswahl, prüfungs_frame): # Funktioniert nicht
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
@@ -261,6 +260,7 @@ def Menu():
         Adminbtn = tk.Button(menu_frame, text="Adminbereich", font=("Arial", 14), command=Admin)
         Adminbtn.pack(pady=20)
 
+# Login
 def Guilogin():
     clear_inhalt()
     login_frame = tk.Frame(inhalt_frame, bg="white")
@@ -286,6 +286,7 @@ def Guilogin():
     loginbtn = tk.Button(login_frame, text="Login", command=handle_login)
     loginbtn.pack(pady=20)
 
+# Registrierungsbereich
 def Guiregister():
     clear_inhalt()
     register_frame = tk.Frame(inhalt_frame, bg="white")
@@ -315,10 +316,15 @@ def Guiregister():
     registerbtn = tk.Button(register_frame, text="Register", command=handle_register)
     registerbtn.pack(pady=20)
     
- 
-# Admin Bereich Start
+
+# Admin Bereich
 def Admin():
-    if user.is_admin != 1:
+    if user.user_id == 0:
+        Guilogin()
+        messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich als Admin an, um den Adminbereich zu nutzen.")
+        return
+    elif user.is_admin != 1:
+        messagebox.showerror("Keine Admin-Berechtigung", "Bitte melden Sie sich mit einem Admin-Konto an, um den Adminbereich zu nutzen.")
         return
     clear_inhalt()
     admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
@@ -361,8 +367,12 @@ def login(cur, username, pw_hash):
 # Zum Abmelden einfach Benutzer Objekt nullen
 def abmelden():
     global user
-    user = User(0, 0, 0, 0, 0, 0)
-    Startseite()
+    if user.user_id != 0:
+        user = User(0, 0, 0, 0, 0, 0)
+        Startseite()
+        messagebox.showinfo("Abmeldung", "Sie wurden erfolgreich abgemeldet.")
+    else:
+        messagebox.showwarning("Abmeldung nicht möglich", "Sie sind nicht angemeldet.")
 
 class Frage:
     def __init__(self, id, frage, A, B, C, antwort):
@@ -402,7 +412,7 @@ def main(con, cur):
     file_menu = tk.Menu(menubar, tearoff=0)
     file_menu.add_command(label="Startseite", command=Startseite)
     file_menu.add_command(label="Adminbereich", command=Admin)
-    file_menu.add_command(label="Prüfungs Modus", command=Prüfungsmodus)
+    file_menu.add_command(label="Prüfungsmodus", command=Prüfungsmodus) 
     file_menu.add_separator()
     file_menu.add_command(label="Abmelden", command=abmelden)
     file_menu.add_command(label="Beenden", command=root.quit)
