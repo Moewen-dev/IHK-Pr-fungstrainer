@@ -2,6 +2,7 @@ import sqlite3, sys, json, random, hashlib
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
+from tkinter import ttk
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -138,30 +139,35 @@ def del_frage(con, cur):
     del_window.title("Fragen Löschen")
     del_window.geometry("800x600")
     
-    label = tk.Label(del_window, text="Einfach die zu Löschenden Fragen auswählen und OK drücken.")
-    alle_fragen = get_fragen(cur)
-    for frage in alle_fragen:
-        choice = ""
-        tk.Checkbutton(del_window, text=frage.frage, variable=choice).pack()
-        print(choice)
-    exit_btn = tk.Button(del_window, text="Exit", command=del_window.destroy)
+    canvas = tk.Canvas(del_window)
+    scrollbar = ttk.Scrollbar(del_window, orient="vertical", command=canvas.yview)
+    scroll_frame = ttk.Frame(canvas)
     
-    label.pack()
-    exit_btn.pack()
+    def configure_scroll_region(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+        
+    scroll_frame.bind("<Configure>", configure_scroll_region)
+    canvas.configure(yscrollcommand=scrollbar.set)
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+    canvas.create_window((0,0), window=scroll_frame, anchor="nw")
     
-    del_window.mainloop()
+    fragen = get_fragen(cur)
     
-    """
-    try:
-        id = int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))
-        cur.execute("DELETE FROM fragen WHERE id=?", (id,))
-        con.commit()
-    except TypeError as e:
-        print(f"Error: {e}")
-    except ValueError as e:
-        print(f"Error: {e}")
-    """
-
+    for i, frage in enumerate(fragen):
+        checkbox = ttk.Checkbutton(scroll_frame, text=frage.frage, variable=frage.delete)
+        checkbox.pack(pady=5, padx=10, anchor="w")
+    
+    def delete_selected():
+        for frage in fragen:
+            if frage.delete.get():
+                cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
+                con.commit()
+        del_window.destroy()
+    
+    confirm_btn = ttk.Button(del_window, text="Löschen", command=delete_selected)
+    confirm_btn.pack(side="bottom", pady=10)
+        
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
 def zeige_frage(fragen, prüfungs_frame, frage_index):
     for widget in prüfungs_frame.winfo_children():
@@ -397,6 +403,7 @@ class Frage:
         self.B = B
         self.C = C
         self.antwort = antwort
+        self.delete = tk.BooleanVar()
     
     # gebe nur ID aus wenn mit repr(Frage) gecallt für Debug 
     def __repr__(self):
