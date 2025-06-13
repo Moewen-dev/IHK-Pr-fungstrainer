@@ -1,8 +1,7 @@
 import sqlite3, sys, json, random, hashlib
 import tkinter as tk
-from tkinter import ttk
 from tkinter.filedialog import askopenfilename
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -90,7 +89,7 @@ def openfile():
 def Prüfungsmodus():
     if user.user_id == 0:
         messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich an, um den Prüfungsmodus zu nutzen.")
-        Guilogin()
+        Startseite()
         return
 
     clear_inhalt()
@@ -99,7 +98,7 @@ def Prüfungsmodus():
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
 
-#Startet den Lernmodus mit den Fragen. Initalisiert Variabel und leitet weiter nach "zeige Fragen"
+#Startet den Lernmodus mit den Fragen. Initalisiert Variablen und leitet weiter zu "zeige Fragen"
 def Lernmodus():
     clear_inhalt()
 
@@ -115,7 +114,6 @@ def Lernmodus():
     weiter_btn = tk.Button(inhalt_frame, text="Weiter mit der Auswahl", command=lambda: starte_fragen(wahl_var.get()))
     weiter_btn.pack(pady=20)
 
-
 def starte_fragen(wahl):
     clear_inhalt()
 
@@ -125,9 +123,10 @@ def starte_fragen(wahl):
     if wahl:
         fragen = get_fragen(cur)
     else:
-        raw_fragen = get_fragen(cur)
+        # Prüfe ob Frage falsch ist und wenn ja füge nur diese zur fragen liste hinzu
+        alle_fragen = get_fragen(cur)
         fragen = []
-        for frage in raw_fragen:
+        for frage in alle_fragen:
             if frage.id in user.fragen_falsch:
                 fragen.append(frage)
 
@@ -366,9 +365,10 @@ class Frage:
         self.B = B
         self.C = C
         self.antwort = antwort
-        
+    
+    # gebe nur ID aus wenn mit repr(Frage) gecallt für Debug 
     def __repr__(self):
-        return f"\nID: {self.id}, Antwort: {self.antwort}\n"
+        return f"\"ID: {self.id}\""
     
 class User:
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
@@ -380,6 +380,7 @@ class User:
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
         self.fragen_falsch = []
     
+    # Speicher aktuellen Datenstand in die Datenbank 
     def save(self):
         save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ? WHERE user_id = ?"
         cur.execute(save_statement, (self.fragen_total, self.fragen_richtig, json.dumps(self.fragen_falsch, indent=None), self.user_id))
