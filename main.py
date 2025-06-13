@@ -193,6 +193,10 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
 
         submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen))
         submit_btn.pack(pady=30)
+        
+        Startbtn = tk.Button(prüfungs_frame, text="Startseite", font=("Arial", 8), command=Startseite)
+        Startbtn.pack(pady=5)
+        
     else:
         Fertig_label = tk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
         Fertig_label.pack(pady=50)
@@ -290,6 +294,8 @@ def Guilogin():
         if login(cur, username, pw_hash):
             Menu()
             return
+        else:
+            messagebox.showerror("Login fehlgeschlagen", "Benutzername oder Passwort ist falsch.")
     
     loginbtn = tk.Button(login_frame, text="Login", command=handle_login)
     loginbtn.pack(pady=20)
@@ -319,6 +325,7 @@ def Guiregister():
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
         add_user(con, cur, is_admin.get(), username, pw_hash)
+        messagebox.showinfo("Erfolg", f"Benutzer erfolgreich registriert. Ihr Benutzername lautet: {username}")
         Guilogin()
         
     registerbtn = tk.Button(register_frame, text="Register", command=handle_register)
