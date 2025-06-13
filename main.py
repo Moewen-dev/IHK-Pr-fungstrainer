@@ -55,6 +55,7 @@ def import_fragen(con, cur, filename):
             C = item["C"]
             antwort = item["richtigeAntwort"]
             add_frage(con, cur, frage, A, B, C, antwort)
+        tk.messagebox.showinfo("Erfolg", "Fragen erfolgreich hinzugefügt.")
     except TypeError as e:
         print(f"Error: {e}")
 
