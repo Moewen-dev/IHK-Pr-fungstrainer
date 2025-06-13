@@ -2,41 +2,41 @@
   "fragen": [
     {
       "frage": "Was zeichnet einen Typ-1-Hypervisor aus?",
-      "A": "Laeuft innerhalb eines Betriebssystems",
-      "B": "Laeuft direkt auf der Hardware",
-      "C": "Wird nur fuer mobile Geraete verwendet",
+      "A": "Läuft innerhalb eines Betriebssystems",
+      "B": "Läuft direkt auf der Hardware",
+      "C": "Wird nur für mobile Geräte verwendet",
       "richtigeAntwort": "B"
     },
     {
       "frage": "Welche Aussage trifft auf einen Typ-2-Hypervisor zu?",
-      "A": "Er benoetigt kein Host-Betriebssystem",
+      "A": "Er benötigt kein Host-Betriebssystem",
       "B": "Er ist in BIOS/UEFI integriert",
-      "C": "Er laeuft als Anwendung auf einem Betriebssystem",
+      "C": "Er läuft als Anwendung auf einem Betriebssystem",
       "richtigeAntwort": "C"
     },
     {
       "frage": "Was sind Vorteile einer Servervirtualisierung?",
       "A": "Bessere Stromversorgung, geringerer RAM-Verbrauch, weniger Lizenzen",
       "B": "Bessere Auslastung, einfache Sicherung, flexible Skalierung",
-      "C": "Keine Backups notwendig, keine Ausfaelle, keine Updates noetig",
+      "C": "Keine Backups notwendig, keine Ausfälle, keine Updates nötig",
       "richtigeAntwort": "B"
     },
     {
       "frage": "Was sind Nachteile einer Servervirtualisierung?",
-      "A": "Erhoehte Komplexitaet, Lizenzkosten, Performance-Overhead",
+      "A": "Erhöhte Komplexität, Lizenzkosten, Performance-Overhead",
       "B": "Mehr Stromverbrauch, mehr RAM, langsamere Backups",
-      "C": "Nur Windows-Server moeglich, kein Netzwerkzugriff, kein Monitoring",
+      "C": "Nur Windows-Server möglich, kein Netzwerkzugriff, kein Monitoring",
       "richtigeAntwort": "A"
     },
     {
-      "frage": "Wie viele 8-TiB-Festplatten braucht man fuer 160 TiB netto in RAID 6?",
+      "frage": "Wie viele 8-TiB-Festplatten braucht man für 160 TiB netto in RAID 6?",
       "A": "22",
       "B": "20",
       "C": "18",
       "richtigeAntwort": "B"
     },
     {
-      "frage": "Wie viele Festplatten-Ausfaelle vertraegt ein RAID 10 gleichzeitig?",
+      "frage": "Wie viele Festplatten-Ausfälle verträgt ein RAID 10 gleichzeitig?",
       "A": "Maximal zwei beliebige",
       "B": "Immer nur eine",
       "C": "Zwei, wenn in verschiedenen Spiegeln",
@@ -57,7 +57,7 @@
       "richtigeAntwort": "B"
     },
     {
-      "frage": "Was ist ein typischer Einsatzfall fuer einen Typ-1-Hypervisor?",
+      "frage": "Was ist ein typischer Einsatzfall für einen Typ-1-Hypervisor?",
       "A": "Private Spieleserver zu Hause",
       "B": "Virtualisierung in Rechenzentren",
       "C": "Virtualisierung mobiler Apps",
@@ -71,21 +71,21 @@
       "richtigeAntwort": "A"
     },
     {
-      "frage": "Wie viele 8-TiB-Festplatten braucht man fuer 80 TiB netto in RAID 6?",
+      "frage": "Wie viele 8-TiB-Festplatten braucht man für 80 TiB netto in RAID 6?",
       "A": "12",
       "B": "10",
       "C": "11",
       "richtigeAntwort": "A"
     },
     {
-      "frage": "Wie hoch ist der Speicherverlust durch Paritaet bei RAID 6 mit 8 Platten?",
+      "frage": "Wie hoch ist der Speicherverlust durch Parität bei RAID 6 mit 8 Platten?",
       "A": "16 TiB",
       "B": "8 TiB",
       "C": "0 TiB",
       "richtigeAntwort": "A"
     },
     {
-      "frage": "Wie viele Platten braucht man fuer 64 TiB netto in RAID 10 mit 8-TiB-Platten?",
+      "frage": "Wie viele Platten braucht man für 64 TiB netto in RAID 10 mit 8-TiB-Platten?",
       "A": "16",
       "B": "14",
       "C": "12",
@@ -94,13 +94,13 @@
     {
       "frage": "Was beschreibt das Zero-Trust-Prinzip?",
       "A": "Alle internen Systeme gelten als sicher",
-      "B": "Es wird grundsaetzlich niemandem vertraut",
+      "B": "Es wird grundsätzlich niemandem vertraut",
       "C": "Vertrauen basiert auf Firewalls",
       "richtigeAntwort": "B"
     },
     {
-      "frage": "Was ist ein Beispiel fuer Systemhaertung?",
-      "A": "oeffentliche Dienste freigeben",
+      "frage": "Was ist ein Beispiel für Systemhärtung?",
+      "A": "Öffentliche Dienste freigeben",
       "B": "Standard-Accounts deaktivieren",
       "C": "Offene Ports zulassen",
       "richtigeAntwort": "B"
@@ -109,11 +109,11 @@
       "frage": "Welche Backup-Strategie entspricht der 3-2-1-Regel?",
       "A": "3 Kopien, 2 Medienarten, 1 externes Backup",
       "B": "3 Festplatten, 2 Admins, 1 Netzwerk",
-      "C": "3 Clouds, 2 VPNs, 1 Backup taeglich",
+      "C": "3 Clouds, 2 VPNs, 1 Backup täglich",
       "richtigeAntwort": "A"
     },
     {
-      "frage": "Welche Maßnahme reduziert Datenverluste bei SAN-Ausfaellen?",
+      "frage": "Welche Maßnahme reduziert Datenverluste bei SAN-Ausfällen?",
       "A": "Snapshot-Sicherung alle 5 Minuten",
       "B": "Vollbackup alle 2 Wochen",
       "C": "Archivierung auf CD",
@@ -123,7 +123,7 @@
       "frage": "Was ist ein typisches Merkmal eines Software-Upgrades?",
       "A": "Fehlerbehebungen ohne Kosten",
       "B": "Neue Funktionen, evtl. kostenpflichtig",
-      "C": "Taeglicher Patch",
+      "C": "Täglicher Patch",
       "richtigeAntwort": "B"
     },
     {
@@ -134,10 +134,10 @@
       "richtigeAntwort": "C"
     },
     {
-      "frage": "Was ist ein Vorteil von Typ-1-Hypervisoren gegenueber Typ-2?",
+      "frage": "Was ist ein Vorteil von Typ-1-Hypervisoren gegenüber Typ-2?",
       "A": "Bessere Integration in Desktop-Umgebungen",
       "B": "Direkter Hardwarezugriff und mehr Performance",
-      "C": "Einfachere Installation ueber App Store",
+      "C": "Einfachere Installation über App Store",
       "richtigeAntwort": "B"
     },
     {
@@ -148,7 +148,7 @@
       "richtigeAntwort": "C"
     },
     {
-      "frage": "Wie viele Festplatten muessen bei RAID 10 vorhanden sein?",
+      "frage": "Wie viele Festplatten müssen bei RAID 10 vorhanden sein?",
       "A": "Eine gerade Zahl, mindestens vier",
       "B": "Mindestens drei",
       "C": "Unbegrenzt viele ungerade",
@@ -158,20 +158,20 @@
       "frage": "Welche Aussage trifft auf RAID 6 zu?",
       "A": "Spiegelt Daten doppelt",
       "B": "Kann zwei Plattenverluste verkraften",
-      "C": "Benoetigt genau 4 Platten",
+      "C": "Benötigt genau 4 Platten",
       "richtigeAntwort": "B"
     },
     {
-      "frage": "Was ist ein Beispiel fuer eine organisatorische Schutzmaßnahme?",
-      "A": "Regelmaeßige Passwortaenderungspflicht",
+      "frage": "Was ist ein Beispiel für eine organisatorische Schutzmaßnahme?",
+      "A": "Regelmäßige Passwortänderungspflicht",
       "B": "Deaktivierung ungenutzter Dienste",
       "C": "Firewall-Regel einrichten",
       "richtigeAntwort": "A"
     },
     {
       "frage": "Wann muss laut DSGVO eine Meldung an Betroffene erfolgen?",
-      "A": "Bei jeder IT-Stoerung",
-      "B": "Wenn personenbezogene Daten stark gefaehrdet sind",
+      "A": "Bei jeder IT-Störung",
+      "B": "Wenn personenbezogene Daten stark gefährdet sind",
       "C": "Nur bei Angriffen aus dem Ausland",
       "richtigeAntwort": "B"
     },
@@ -179,28 +179,28 @@
       "frage": "Welche Maßnahme passt zum Prinzip 'Least Privilege'?",
       "A": "Alle Benutzer sind Administratoren",
       "B": "Zugriffsrechte nach Notwendigkeit",
-      "C": "Alles basiert auf Vertrauensverhaeltnissen",
+      "C": "Alles basiert auf Vertrauensverhältnissen",
       "richtigeAntwort": "B"
     },
     {
-      "frage": "Was prueft ein Penetrationstest?",
+      "frage": "Was prüft ein Penetrationstest?",
       "A": "Passwortsicherheit und Schwachstellen",
       "B": "Tastaturbelegung",
       "C": "Festplattenlaufzeit",
       "richtigeAntwort": "A"
     },
     {
-      "frage": "Wie kann die Wiederherstellungsdauer nach einem Ausfall verkuerzt werden?",
+      "frage": "Wie kann die Wiederherstellungsdauer nach einem Ausfall verkürzt werden?",
       "A": "Seltener sichern",
       "B": "Snapshots und schnellere Medien nutzen",
-      "C": "Taegliche Sicherung auf Band",
+      "C": "Tägliche Sicherung auf Band",
       "richtigeAntwort": "B"
     },
     {
       "frage": "Was sollte Bestandteil eines Backupkonzepts nach 3-2-1 sein?",
       "A": "Nur Cloud-Backups",
       "B": "Unterschiedliche Medien und externe Lagerung",
-      "C": "Kein Backup noetig bei RAID",
+      "C": "Kein Backup nötig bei RAID",
       "richtigeAntwort": "B"
     },
     {
@@ -211,7 +211,7 @@
       "richtigeAntwort": "B"
     },
     {
-      "frage": "Was ist ein moeglicher Nachteil eines Upgrades?",
+      "frage": "Was ist ein möglicher Nachteil eines Upgrades?",
       "A": "Mehr Sicherheit",
       "B": "Kostenpflichtig und evtl. inkompatibel",
       "C": "Verbesserte Performance",

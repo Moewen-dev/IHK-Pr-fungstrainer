@@ -46,7 +46,7 @@ def get_fragen(cur):
 
 def import_fragen(con, cur, filename):
     try:
-        with open(filename, "r") as f:
+        with open(filename, "r", encoding="utf-8") as f:
             fragen = json.load(f)
         for item in fragen["fragen"]:
             frage = item["frage"]
