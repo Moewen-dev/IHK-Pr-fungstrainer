@@ -2,7 +2,7 @@ import sqlite3, sys, json, random, hashlib
 import tkinter as tk
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename
-from tkinter import messagebox
+from tkinter import messagebox, simpledialog
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -45,18 +45,6 @@ def get_fragen(cur):
         fragen.append(frage)
     return fragen
 
-def Fragen_nach_ID(cur, id_liste):
-    placeholder = ",".join(["?"] * len(id_liste))  
-    query = f"SELECT * FROM fragen WHERE id IN ({placeholder})"
-    cur.execute(query, id_liste)
-    db_data = cur.fetchall()
-    
-    fragen = []
-    for data in db_data:
-        frage = Frage(data[0], data[1], data[2], data[3], data[4], data[5])
-        fragen.append(frage)
-    return fragen
-
 def import_fragen(con, cur, filename):
     try:
         with open(filename, "r") as f:
@@ -72,7 +60,6 @@ def import_fragen(con, cur, filename):
         print(f"Error: {e}")
 
 def add_user(con, cur, is_admin, username, pw_hash):
-    print(f"Admin: {is_admin}\nUsername: {username}\npw hash: {pw_hash}")
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
 
@@ -112,7 +99,6 @@ def Prüfungsmodus():
     label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
     label.pack(pady=100)
 
-    
 #Startet den Lernmodus mit den Fragen. Initalisiert Variabel und leitet weiter nach "zeige Fragen"
 def Lernmodus():
     clear_inhalt()
@@ -139,7 +125,11 @@ def starte_fragen(wahl):
     if wahl:
         fragen = get_fragen(cur)
     else:
-        fragen = Fragen_nach_ID(cur, user.fragen_falsch)
+        raw_fragen = get_fragen(cur)
+        fragen = []
+        for frage in raw_fragen:
+            if frage.id in user.fragen_falsch:
+                fragen.append(frage)
 
     random.shuffle(fragen)
 
@@ -202,24 +192,17 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         user.fragen_richtig += 1
         user.fragen_total += 1
 
-        print("Die Frage wurde richtig beantwortet!")
-
         if aktuelle_frage.id in user.fragen_falsch:
             user.fragen_falsch.remove(aktuelle_frage.id)
-            print(f"Die Frage mit der ID {aktuelle_frage.id} wurde herraus genommen")
     else:
         f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:", bg="Red")
         f_antwort.pack(pady=50)
-
-        print("Die Frage wurde nicht richtig brantwortet!")
 
         richtige_antwort_text = getattr(aktuelle_frage, aktuelle_frage.antwort)
         l_antwort = tk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
         user.fragen_total += 1
-        if aktuelle_frage.id in user.fragen_falsch:
-            print("Frage schon vorhanden und muss nicht erneut hinzugefügt werden ")
-        else:
+        if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
 
     frage_index += 1
@@ -318,11 +301,10 @@ def Guiregister():
     registerbtn = tk.Button(register_frame, text="Register", command=handle_register)
     registerbtn.pack(pady=20)
     
-
 # Admin Bereich
 def Admin():
     if user.user_id == 0:
-        Guilogin()
+        Startseite()
         messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich als Admin an, um den Adminbereich zu nutzen.")
         return
     elif user.is_admin != 1:
@@ -384,6 +366,9 @@ class Frage:
         self.B = B
         self.C = C
         self.antwort = antwort
+        
+    def __repr__(self):
+        return f"\nID: {self.id}, Antwort: {self.antwort}\n"
     
 class User:
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
@@ -419,9 +404,6 @@ def main(con, cur):
     file_menu.add_command(label="Abmelden", command=abmelden)
     file_menu.add_command(label="Beenden", command=root.quit)
     menubar.add_cascade(label="Datei", menu=file_menu)
-
-    help_menu = tk.Menu(menubar, tearoff=0)
-    menubar.add_cascade(label="Hilfe", menu=help_menu)
 
     root.config(menu=menubar)
 
