@@ -55,7 +55,7 @@ def import_fragen(con, cur, filename):
             C = item["C"]
             antwort = item["richtigeAntwort"]
             add_frage(con, cur, frage, A, B, C, antwort)
-        tk.messagebox.showinfo("Erfolg", "Fragen erfolgreich hinzugefügt.")
+        messagebox.showinfo("Erfolg", "Fragen erfolgreich hinzugefügt.")
     except TypeError as e:
         print(f"Error: {e}")
 
@@ -296,6 +296,7 @@ def Guiregister():
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
         add_user(con, cur, is_admin.get(), username, pw_hash)
+        messagebox.showinfo("Erfolg", f"Benutzer erfolgreich registriert. Ihr Benutzername lautet: {username}")
         Guilogin()
         
     registerbtn = tk.Button(register_frame, text="Register", command=handle_register)
