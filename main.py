@@ -19,21 +19,11 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     fragen_richtig INTEGER,
     fragen_falsch TEXT);"""]
 
-db_name = "fragen.db"
+db_name = "data.db"
 
 def add_frage(con, cur, frage, A, B, C, antwort):
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort) VALUES (?, ?, ?, ?, ?)", (frage, A, B, C, antwort))
     con.commit()
-       
-def del_frage(con, cur):
-    try:
-        id = int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))
-        cur.execute("DELETE FROM fragen WHERE id=?", (id,))
-        con.commit()
-    except TypeError as e:
-        print(f"Error: {e}")
-    except ValueError as e:
-        print(f"Error: {e}")
 
 def get_fragen(cur):
     cur.execute("SELECT * FROM fragen")
@@ -47,14 +37,19 @@ def get_fragen(cur):
 def import_fragen(con, cur, filename):
     try:
         with open(filename, "r", encoding="utf-8") as f:
-            fragen = json.load(f)
-        for item in fragen["fragen"]:
-            frage = item["frage"]
-            A = item["A"]
-            B = item["B"]
-            C = item["C"]
-            antwort = item["richtigeAntwort"]
-            add_frage(con, cur, frage, A, B, C, antwort)
+            neue_fragen = json.load(f)
+        fragen = []
+        db_fragen = get_fragen(cur)
+        for item in neue_fragen["fragen"]:
+            fragen.append(Frage(0, item["frage"], item["A"], item["B"], item["C"], item["richtigeAntwort"]))
+        if db_fragen == []:
+            for neue_frage in fragen:
+                add_frage(con, cur, neue_frage.frage, neue_frage.A, neue_frage.B, neue_frage.C, neue_frage.antwort)
+        for db_frage in db_fragen:
+            for frage in fragen:
+                if db_frage.frage != frage.frage:
+        
+            
         tk.messagebox.showinfo("Erfolg", "Fragen erfolgreich hinzugefügt.")
     except TypeError as e:
         print(f"Error: {e}")
@@ -137,6 +132,34 @@ def starte_fragen(wahl):
 
     zeige_frage(fragen, prüfungs_frame, frage_index)
 
+def del_frage(con, cur):
+    del_window = tk.Toplevel()
+    del_window.title("Fragen Löschen")
+    del_window.geometry("800x600")
+    
+    label = tk.Label(del_window, text="Einfach die zu Löschenden Fragen auswählen und OK drücken.")
+    alle_fragen = get_fragen(cur)
+    for frage in alle_fragen:
+        choice = ""
+        tk.Checkbutton(del_window, text=frage.frage, variable=choice).pack()
+        print(choice)
+    exit_btn = tk.Button(del_window, text="Exit", command=del_window.destroy)
+    
+    label.pack()
+    exit_btn.pack()
+    
+    del_window.mainloop()
+    
+    """
+    try:
+        id = int(tk.simpledialog.askstring("Frage löschen", "Geben Sie die ID der zu löschenden Frage ein:"))
+        cur.execute("DELETE FROM fragen WHERE id=?", (id,))
+        con.commit()
+    except TypeError as e:
+        print(f"Error: {e}")
+    except ValueError as e:
+        print(f"Error: {e}")
+    """
 
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
 def zeige_frage(fragen, prüfungs_frame, frage_index):
