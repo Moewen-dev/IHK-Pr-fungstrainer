@@ -45,12 +45,13 @@ def import_fragen(con, cur, filename):
         if db_fragen == []:
             for neue_frage in fragen:
                 add_frage(con, cur, neue_frage.frage, neue_frage.A, neue_frage.B, neue_frage.C, neue_frage.antwort)
-        for db_frage in db_fragen:
+        else:
+            db_fragen_liste = []
+            for db_frage in db_fragen:
+                db_fragen_liste.append(db_frage.frage)
             for frage in fragen:
-                if db_frage.frage != frage.frage:
-        
-            
-        tk.messagebox.showinfo("Erfolg", "Fragen erfolgreich hinzugefügt.")
+                if frage.frage not in db_fragen_liste:
+                    add_frage(con, cur, frage.frage, frage.A, frage.B, frage.C, frage.antwort)
     except TypeError as e:
         print(f"Error: {e}")
 
