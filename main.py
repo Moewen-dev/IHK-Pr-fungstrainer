@@ -99,6 +99,7 @@ def add_user(con, cur, is_admin, username, pw_hash):
 # Hauptfenster und Inhalt vorbereiten
 root = tk.Tk()
 root.title("Vollbild GUI Vorlage")
+root.geometry("500x600")
 
 inhalt_frame = ttk.Frame(root, padding=(3,3,12,12))
 inhalt_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
@@ -191,6 +192,10 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
 
         auswahl = tk.StringVar(value="X")
 
+        progress = tk.IntVar(value=frage_index + 1)  # Fortschritt aktualisieren
+        progressbar = ttk.Progressbar(prüfungs_frame, maximum=alle_fragen, variable=progress, length=400)
+        progressbar.pack(pady=10)
+
         Fortschirt_label = ttk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {alle_fragen}")
         Fortschirt_label.pack(pady=25)
 
@@ -259,32 +264,39 @@ def Startseite():
         clear_inhalt()
         start_frame = ttk.Frame(inhalt_frame)
         start_frame.pack(fill="both", expand=True)
-        label = ttk.Label(start_frame, text="Willkommen!")
-        label.pack(pady=100)
+        label = ttk.Label(start_frame, text="Willkommen \n zum IHK Prüfungstrainer!", font=("arial", 30, "bold"))
+        label.place(x=0, y=0)
+
+        button_rahmen = ttk.LabelFrame(start_frame, text="Benutzerzugang")
+        button_rahmen.place(x=170, y=180)
+
+        Loginbtn = ttk.Button(button_rahmen, text="Login", command=Guilogin)
+        Loginbtn.pack(pady=20, padx=40)
         
-        Loginbtn = ttk.Button(start_frame, text="Login", command=Guilogin)
-        Loginbtn.pack(pady=100)
-        
-        Registerbtn = ttk.Button(start_frame, text="Registrieren", command=Guiregister)
-        Registerbtn.pack(pady=0)
+        Registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=Guiregister)
+        Registerbtn.pack(pady=20, padx=40)
     else:
         Menu()
 
 def Menu():
     clear_inhalt()
     menu_frame = ttk.Frame(inhalt_frame)
+
+    button_rahmen3 = ttk.LabelFrame(inhalt_frame, text="Auswahl")
+    button_rahmen3.place(x=60, y=150)
+
     menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
-    label = ttk.Label(menu_frame, text="Willkommen!", font=("TkCaptionFont"))
+    label = ttk.Label(button_rahmen3, text="Willkommen!\nIm IHK Prüfungs trainer\nWas möchtest du Machen?", font=("arial", 15, "bold"))
     label.grid(column=0, row=0, columnspan=3, sticky=(tk.N), padx=5, pady=5)
     
-    Lernbtn = ttk.Button(menu_frame, text="Weiter", command=Lernmodus)
+    Lernbtn = ttk.Button(button_rahmen3, text="Weiter Lernen", command=Lernmodus)
     Lernbtn.grid(column=0, row=1, sticky=(tk.S, tk.W), padx=5, pady=10)
 
-    Prüfungsbtn = ttk.Button(menu_frame, text="Zur Prüfungssimulation", command=Prüfungsmodus)
+    Prüfungsbtn = ttk.Button(button_rahmen3, text="Zur Prüfungssimulation", command=Prüfungsmodus)
     Prüfungsbtn.grid(column=1, row=1, sticky=(tk.S), padx=5, pady=10)
     
     if user.is_admin == 1:
-        Adminbtn = ttk.Button(menu_frame, text="Adminbereich", command=Admin)
+        Adminbtn = ttk.Button(button_rahmen3, text="Adminbereich", command=Admin)
         Adminbtn.grid(column=2, row=1, sticky=(tk.S, tk.E), padx=5, pady=10)
 
 # Login
@@ -292,16 +304,19 @@ def Guilogin():
     clear_inhalt()
     login_frame = ttk.Frame(inhalt_frame)
     login_frame.pack(fill="both", expand=True)
-    label = ttk.Label(login_frame, text="Loginbereich")
+    label = ttk.Label(login_frame, text="Loginbereich", font=("arial", 30, "bold"))
     label.pack(pady=100)
     
-    ttk.Label(login_frame, text="Benutzername:").pack(pady=(10, 0))
-    username_entry = ttk.Entry(login_frame)
-    username_entry.pack(pady=5)
+    button_rahmen2 = ttk.LabelFrame(login_frame)
+    button_rahmen2.place(x=170, y=180)
+
+    ttk.Label(button_rahmen2, text="Benutzername:").pack(pady=(10, 0))
+    username_entry = ttk.Entry(button_rahmen2)
+    username_entry.pack(pady=0)
     
-    ttk.Label(login_frame, text="Passwort:").pack(pady=(10, 0))
-    password_entry = ttk.Entry(login_frame, show="*")
-    password_entry.pack(pady=5)
+    ttk.Label(button_rahmen2, text="Passwort:").pack(pady=(10, 0))
+    password_entry = ttk.Entry(button_rahmen2, show="*")
+    password_entry.pack(pady=0)
     
     def handle_login():
         username = username_entry.get()
@@ -312,8 +327,8 @@ def Guilogin():
         else:
             messagebox.showerror("Login fehlgeschlagen", "Benutzername oder Passwort ist falsch.")
     
-    loginbtn = ttk.Button(login_frame, text="Login", command=handle_login)
-    loginbtn.pack(pady=20)
+    loginbtn = ttk.Button(button_rahmen2, text="Login", command=handle_login)
+    loginbtn.pack(pady=20, padx=40)
 
 # Registrierungsbereich
 def Guiregister():
