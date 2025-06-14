@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from tkinter import ttk
+from tkinter import font
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -98,10 +99,17 @@ def add_user(con, cur, is_admin, username, pw_hash):
 # Hauptfenster und Inhalt vorbereiten
 root = tk.Tk()
 root.title("Vollbild GUI Vorlage")
-root.attributes("-fullscreen", True)
 
-inhalt_frame = tk.Frame(root)
-inhalt_frame.pack(fill="both", expand=True)
+inhalt_frame = ttk.Frame(root, padding=(3,3,12,12))
+inhalt_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+
+root.columnconfigure(0, weight=1)
+root.rowconfigure(0, weight=1)
+inhalt_frame.columnconfigure(0, weight=3)
+inhalt_frame.columnconfigure(1, weight=3)
+inhalt_frame.columnconfigure(3, weight=3)
+inhalt_frame.rowconfigure(0, weight=3)
+inhalt_frame.rowconfigure(1, weight=3)
 
 def toggle_fullscreen(event=None):
     root.attributes("-fullscreen", not root.attributes("-fullscreen"))
@@ -125,9 +133,9 @@ def Prüfungsmodus():
         return
 
     clear_inhalt()
-    prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
+    prüfungs_frame = ttk.Frame(inhalt_frame)
     prüfungs_frame.pack(fill="both", expand=True)
-    label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
+    label = ttk.Label(prüfungs_frame, text="Prüfungsmodus aktiv")
     label.pack(pady=100)
 
 #Startet den Lernmodus mit den Fragen. Initalisiert Variablen und leitet weiter zu "zeige Fragen"
@@ -137,19 +145,19 @@ def Lernmodus():
     # Auswahl anzeigen
     wahl_var = tk.BooleanVar(value=True)
 
-    gesamtfragen_btn = tk.Radiobutton(inhalt_frame, text="Willst du alle Fragen lernen?", variable=wahl_var, value=True)
+    gesamtfragen_btn = ttk.Radiobutton(inhalt_frame, text="Willst du alle Fragen lernen?", variable=wahl_var, value=True)
     gesamtfragen_btn.pack(pady=10)
 
-    falsche_fragen_btn = tk.Radiobutton(inhalt_frame, text="Nur die Falschen wiederholen?", variable=wahl_var, value=False)
+    falsche_fragen_btn = ttk.Radiobutton(inhalt_frame, text="Nur die Falschen wiederholen?", variable=wahl_var, value=False)
     falsche_fragen_btn.pack(pady=10)
 
-    weiter_btn = tk.Button(inhalt_frame, text="Weiter mit der Auswahl", command=lambda: starte_fragen(wahl_var.get()))
+    weiter_btn = ttk.Button(inhalt_frame, text="Weiter mit der Auswahl", command=lambda: starte_fragen(wahl_var.get()))
     weiter_btn.pack(pady=20)
 
 def starte_fragen(wahl):
     clear_inhalt()
 
-    prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
+    prüfungs_frame = ttk.Frame(inhalt_frame)
     prüfungs_frame.pack(fill="both", expand=True)
 
     if wahl:
@@ -183,35 +191,35 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
 
         auswahl = tk.StringVar(value="X")
 
-        Fortschirt_label = tk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {alle_fragen}")
+        Fortschirt_label = ttk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {alle_fragen}")
         Fortschirt_label.pack(pady=25)
 
-        Frage_label = tk.Label(prüfungs_frame, text=aktuelle_frage.frage)
+        Frage_label = ttk.Label(prüfungs_frame, text=aktuelle_frage.frage)
         Frage_label.pack(pady=50)
 
-        frageA = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
+        frageA = ttk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
         frageA.pack(pady=5) 
 
-        frageB = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
+        frageB = ttk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
         frageB.pack(pady=5)
 
-        frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
+        frageC = ttk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
         frageC.pack(pady=5)
 
-        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen))
+        submit_btn = ttk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen))
         submit_btn.pack(pady=30)
         
-        Startbtn = tk.Button(prüfungs_frame, text="Startseite", font=("Arial", 8), command=Startseite)
+        Startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=Startseite)
         Startbtn.pack(pady=5)
         
     else:
-        Fertig_label = tk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
+        Fertig_label = ttk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
         Fertig_label.pack(pady=50)
 
-        statbtn = tk.Button(prüfungs_frame, text="Zurück zur Startseite", command=Menu)
+        statbtn = ttk.Button(prüfungs_frame, text="Zurück zur Startseite", command=Menu)
         statbtn.pack(padx=25)
 
-        wiederholenbtn = tk.Button(prüfungs_frame, text="Nochmal alle Fragen durch gehen", command=lambda:Lernmodus())
+        wiederholenbtn = ttk.Button(prüfungs_frame, text="Nochmal alle Fragen durch gehen", command=lambda:Lernmodus())
         wiederholenbtn.pack(pady=25)
 
 #Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
@@ -221,7 +229,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         
     if aktuelle_frage.antwort == auswahl.get():
 
-        r_label = tk.Label(prüfungs_frame, text="Das war Richtig!", bg="Green")
+        r_label = ttk.Label(prüfungs_frame, text="Das war Richtig!")
         r_label.pack(pady=50)
         user.fragen_richtig += 1
         user.fragen_total += 1
@@ -229,11 +237,11 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         if aktuelle_frage.id in user.fragen_falsch:
             user.fragen_falsch.remove(aktuelle_frage.id)
     else:
-        f_antwort = tk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:", bg="Red")
+        f_antwort = ttk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:")
         f_antwort.pack(pady=50)
 
         richtige_antwort_text = getattr(aktuelle_frage, aktuelle_frage.antwort)
-        l_antwort = tk.Label(prüfungs_frame, text=richtige_antwort_text)
+        l_antwort = ttk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
         user.fragen_total += 1
         if aktuelle_frage.id not in user.fragen_falsch:
@@ -243,56 +251,56 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
     
     user.save()
     
-    weiter_btn = tk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(fragen, prüfungs_frame, frage_index))
+    weiter_btn = ttk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(fragen, prüfungs_frame, frage_index))
     weiter_btn.pack(pady=20)
 
 def Startseite():
     if user.user_id == 0:
         clear_inhalt()
-        start_frame = tk.Frame(inhalt_frame, bg="white")
+        start_frame = ttk.Frame(inhalt_frame)
         start_frame.pack(fill="both", expand=True)
-        label = tk.Label(start_frame, text="Willkommen!", font=("Arial", 30), bg="white")
+        label = ttk.Label(start_frame, text="Willkommen!")
         label.pack(pady=100)
         
-        Loginbtn = tk.Button(start_frame, text="Login", font=("Arial", 14), command=Guilogin)
+        Loginbtn = ttk.Button(start_frame, text="Login", command=Guilogin)
         Loginbtn.pack(pady=100)
         
-        Registerbtn = tk.Button(start_frame, text="Registrieren", font=("Arial", 14), command=Guiregister)
+        Registerbtn = ttk.Button(start_frame, text="Registrieren", command=Guiregister)
         Registerbtn.pack(pady=0)
     else:
         Menu()
 
 def Menu():
     clear_inhalt()
-    menu_frame = tk.Frame(inhalt_frame, bg="white")
-    menu_frame.pack(fill="both", expand=True)
-    label = tk.Label(menu_frame, text="Willkommen!", font=("Arial", 30), bg="white")
-    label.pack(pady=100)
+    menu_frame = ttk.Frame(inhalt_frame)
+    menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+    label = ttk.Label(menu_frame, text="Willkommen!", font=("TkCaptionFont"))
+    label.grid(column=0, row=0, columnspan=3, sticky=(tk.N), padx=5, pady=5)
     
-    Lernbtn = tk.Button(menu_frame, text="Weiter", font=("Arial", 14), command=Lernmodus)
-    Lernbtn.pack(pady=100)
+    Lernbtn = ttk.Button(menu_frame, text="Weiter", command=Lernmodus)
+    Lernbtn.grid(column=0, row=1, sticky=(tk.S, tk.W), padx=5, pady=10)
 
-    Prüfungsbtn = tk.Button(menu_frame, text="Zur Prüfungssimulation", font=("Arial", 14), command=Prüfungsmodus)
-    Prüfungsbtn.pack(pady=50)
+    Prüfungsbtn = ttk.Button(menu_frame, text="Zur Prüfungssimulation", command=Prüfungsmodus)
+    Prüfungsbtn.grid(column=1, row=1, sticky=(tk.S), padx=5, pady=10)
     
     if user.is_admin == 1:
-        Adminbtn = tk.Button(menu_frame, text="Adminbereich", font=("Arial", 14), command=Admin)
-        Adminbtn.pack(pady=20)
+        Adminbtn = ttk.Button(menu_frame, text="Adminbereich", command=Admin)
+        Adminbtn.grid(column=2, row=1, sticky=(tk.S, tk.E), padx=5, pady=10)
 
 # Login
 def Guilogin():
     clear_inhalt()
-    login_frame = tk.Frame(inhalt_frame, bg="white")
+    login_frame = ttk.Frame(inhalt_frame)
     login_frame.pack(fill="both", expand=True)
-    label = tk.Label(login_frame, text="Loginbereich", font=("Arial", 20), bg="white")
+    label = ttk.Label(login_frame, text="Loginbereich")
     label.pack(pady=100)
     
-    tk.Label(login_frame, text="Benutzername:", bg="white").pack(pady=(10, 0))
-    username_entry = tk.Entry(login_frame)
+    ttk.Label(login_frame, text="Benutzername:").pack(pady=(10, 0))
+    username_entry = ttk.Entry(login_frame)
     username_entry.pack(pady=5)
     
-    tk.Label(login_frame, text="Passwort:", bg="white").pack(pady=(10, 0))
-    password_entry = tk.Entry(login_frame, show="*")
+    ttk.Label(login_frame, text="Passwort:").pack(pady=(10, 0))
+    password_entry = ttk.Entry(login_frame, show="*")
     password_entry.pack(pady=5)
     
     def handle_login():
@@ -304,28 +312,28 @@ def Guilogin():
         else:
             messagebox.showerror("Login fehlgeschlagen", "Benutzername oder Passwort ist falsch.")
     
-    loginbtn = tk.Button(login_frame, text="Login", command=handle_login)
+    loginbtn = ttk.Button(login_frame, text="Login", command=handle_login)
     loginbtn.pack(pady=20)
 
 # Registrierungsbereich
 def Guiregister():
     clear_inhalt()
-    register_frame = tk.Frame(inhalt_frame, bg="white")
+    register_frame = ttk.Frame(inhalt_frame)
     register_frame.pack(fill="both", expand=True)
-    label = tk.Label(register_frame, text="Registrierbereich", font=("Arial", 20), bg="white")
+    label = ttk.Label(register_frame, text="Registrierbereich")
     label.pack(pady=100)
     
-    tk.Label(register_frame, text="Benutzername:", bg="white").pack(pady=(10, 0))
-    username_entry = tk.Entry(register_frame)
+    ttk.Label(register_frame, text="Benutzername:").pack(pady=(10, 0))
+    username_entry = ttk.Entry(register_frame)
     username_entry.pack(pady=5)
     
-    tk.Label(register_frame, text="Passwort:", bg="white").pack(pady=(10, 0))
-    password_entry = tk.Entry(register_frame, show="*")
+    ttk.Label(register_frame, text="Passwort:").pack(pady=(10, 0))
+    password_entry = ttk.Entry(register_frame, show="*")
     password_entry.pack(pady=5)
     
     is_admin = tk.IntVar()
-    tk.Label(register_frame, text="Admin: ", bg="white").pack(pady=(10, 0))
-    is_admin_entry = tk.Checkbutton(register_frame, text="Admin", variable=is_admin)
+    ttk.Label(register_frame, text="Admin: ").pack(pady=(10, 0))
+    is_admin_entry = ttk.Checkbutton(register_frame, text="Admin", variable=is_admin)
     is_admin_entry.pack(pady=5)
     
     def handle_register():
@@ -335,7 +343,7 @@ def Guiregister():
         messagebox.showinfo("Erfolg", f"Benutzer erfolgreich registriert. Ihr Benutzername lautet: {username}")
         Guilogin()
         
-    registerbtn = tk.Button(register_frame, text="Register", command=handle_register)
+    registerbtn = ttk.Button(register_frame, text="Register", command=handle_register)
     registerbtn.pack(pady=20)
     
 # Admin Bereich
@@ -348,15 +356,13 @@ def Admin():
         messagebox.showerror("Keine Admin-Berechtigung", "Bitte melden Sie sich mit einem Admin-Konto an, um den Adminbereich zu nutzen.")
         return
     clear_inhalt()
-    admin_frame = tk.Frame(inhalt_frame, bg="lightgray")
+    admin_frame = ttk.Frame(inhalt_frame)
     admin_frame.pack(fill="both", expand=True)
-    label = tk.Label(admin_frame, text="Adminbereich", font=("Arial", 30), bg="lightgray")
+    label = ttk.Label(admin_frame, text="Adminbereich")
     label.pack(pady=100)
-    fragen_import = tk.Button(admin_frame, text="Fragen importieren", font=("Arial", 14),
-                              command=lambda: import_fragen(con, cur, openfile()))
+    fragen_import = ttk.Button(admin_frame, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.pack(pady=50)
-    fragen_delete = tk.Button(admin_frame, text="Fragen löschen", font=("Arial", 14),
-                                command=lambda: del_frage(con, cur))
+    fragen_delete = ttk.Button(admin_frame, text="Fragen löschen", command=lambda: del_frage(con, cur))
     fragen_delete.pack(pady=40)
 
 # Login Funktion
@@ -429,6 +435,10 @@ def main(con, cur):
     # Benutzer Initialisieren
     global user
     user = User(0, 0, 0, 0, 0, 0)
+    
+    # Style Theme
+    style = ttk.Style()
+    style.theme_use('clam')
     
     # Tastenkürzel
     root.bind("<Escape>", end_fullscreen)
