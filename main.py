@@ -183,8 +183,6 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
     else:
         prozent_anzahl = ((30 - falsche_Prüfungsfragen) / 30) * 100
 
-        #Benotung hat noch Bug :(
-
         match prozent_anzahl:
             case p if p >= 92:
                 note = f"1 - {prozent_anzahl:.2f}%"
