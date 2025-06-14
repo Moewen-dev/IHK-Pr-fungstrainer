@@ -210,13 +210,11 @@ def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_inde
 
         if aktuelle_frage.id in user.fragen_falsch:     
              user.fragen_falsch.remove(aktuelle_frage.id)
-
-        print("Diese Frage ist Richtig")
     else:
         user.fragen_total += 1
         if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
-        print("Diese Frage ist Falsch")
+        falsche_Prüfungsfragen += 1
 
     user.save()
 
