@@ -56,6 +56,40 @@ def import_fragen(con, cur, filename):
     except TypeError as e:
         print(f"Error: {e}")
 
+def del_frage(con, cur):
+    del_window = tk.Toplevel()
+    del_window.title("Fragen Löschen")
+    del_window.geometry("800x600")
+    
+    canvas = tk.Canvas(del_window)
+    scrollbar = ttk.Scrollbar(del_window, orient="vertical", command=canvas.yview)
+    scroll_frame = ttk.Frame(canvas)
+    
+    def configure_scroll_region(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+        
+    scroll_frame.bind("<Configure>", configure_scroll_region)
+    canvas.configure(yscrollcommand=scrollbar.set)
+    canvas.pack(side="left", fill="both", expand=True)
+    scrollbar.pack(side="right", fill="y")
+    canvas.create_window((0,0), window=scroll_frame, anchor="nw")
+    
+    fragen = get_fragen(cur)
+    
+    for i, frage in enumerate(fragen):
+        checkbox = ttk.Checkbutton(scroll_frame, text=frage.frage, variable=frage.delete)
+        checkbox.pack(pady=5, padx=10, anchor="w")
+    
+    def delete_selected():
+        for frage in fragen:
+            if frage.delete.get():
+                cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
+                con.commit()
+        del_window.destroy()
+    
+    confirm_btn = ttk.Button(del_window, text="Löschen", command=delete_selected)
+    confirm_btn.pack(side="bottom", pady=10)
+
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
@@ -133,40 +167,6 @@ def starte_fragen(wahl):
     frage_index = 0
 
     zeige_frage(fragen, prüfungs_frame, frage_index)
-
-def del_frage(con, cur):
-    del_window = tk.Toplevel()
-    del_window.title("Fragen Löschen")
-    del_window.geometry("800x600")
-    
-    canvas = tk.Canvas(del_window)
-    scrollbar = ttk.Scrollbar(del_window, orient="vertical", command=canvas.yview)
-    scroll_frame = ttk.Frame(canvas)
-    
-    def configure_scroll_region(event):
-        canvas.configure(scrollregion=canvas.bbox("all"))
-        
-    scroll_frame.bind("<Configure>", configure_scroll_region)
-    canvas.configure(yscrollcommand=scrollbar.set)
-    canvas.pack(side="left", fill="both", expand=True)
-    scrollbar.pack(side="right", fill="y")
-    canvas.create_window((0,0), window=scroll_frame, anchor="nw")
-    
-    fragen = get_fragen(cur)
-    
-    for i, frage in enumerate(fragen):
-        checkbox = ttk.Checkbutton(scroll_frame, text=frage.frage, variable=frage.delete)
-        checkbox.pack(pady=5, padx=10, anchor="w")
-    
-    def delete_selected():
-        for frage in fragen:
-            if frage.delete.get():
-                cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
-                con.commit()
-        del_window.destroy()
-    
-    confirm_btn = ttk.Button(del_window, text="Löschen", command=delete_selected)
-    confirm_btn.pack(side="bottom", pady=10)
         
 #Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
 def zeige_frage(fragen, prüfungs_frame, frage_index):
