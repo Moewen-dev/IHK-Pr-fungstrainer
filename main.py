@@ -136,12 +136,11 @@ def Prüfungsmodus():
     clear_inhalt()
     prüfungs_frame = ttk.Frame(inhalt_frame)
     prüfungs_frame.pack(fill="both", expand=True)
-    Begrüßungs_label = tk.Label(prüfungs_frame, 
-                                text="Dies ist der Prüfungsmus. Du wirst 30 fragen bekommen, random aus allen fragen.\nDas Ergebnis was du erziehlst hast, bekommst du wenn du alle Fragen beatnwortet hast.",
-                                font=("Arial", 10))
+    Begrüßungs_label = ttk.Label(prüfungs_frame, 
+                                text="Dies ist der Prüfungsmus. Du wirst 30 fragen bekommen, random aus allen fragen.\nDas Ergebnis was du erziehlst hast, bekommst du wenn du alle Fragen beatnwortet hast.")
     Begrüßungs_label.pack(pady=50)
 
-    Start_Btn = tk.Button(prüfungs_frame, text="Prüfung Starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
+    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung Starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
     Start_Btn.pack(pady=40)
 
 def Starte_Prüpfung(prüfungs_frame):
@@ -163,22 +162,23 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
     if  frage_index < 30:
         aktuelle_frage = prüfungsfragen[frage_index]
 
-        Fortschirt_label = tk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {len(prüfungsfragen)}")
+        Fortschirt_label = ttk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {len(prüfungsfragen)}")
         Fortschirt_label.pack(pady=25)
 
-        Frage_label = tk.Label(prüfungs_frame, text=aktuelle_frage.frage)
+        Frage_label = ttk.Label(prüfungs_frame, text=aktuelle_frage.frage)
         Frage_label.pack(pady=50)
 
-        frageA = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
+        frageA = ttk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
         frageA.pack(pady=5) 
 
-        frageB = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
+        frageB = ttk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
         frageB.pack(pady=5)
 
-        frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
+        frageC = ttk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
         frageC.pack(pady=5)
 
-        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen))
+        submit_btn = ttk.Button(prüfungs_frame,text="Antwort absenden",
+                                command=lambda: prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen))
         submit_btn.pack(pady=30)    
     else:
         prozent_anzahl = ((30 - falsche_Prüfungsfragen) / 30) * 100
@@ -199,7 +199,7 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
             case _:
                 note = f"6 - {prozent_anzahl:.2f}%"
 
-        noten_label = tk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
+        noten_label = ttk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
         noten_label.pack(pady=100)
 
 def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
