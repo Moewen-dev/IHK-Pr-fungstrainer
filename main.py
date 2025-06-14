@@ -127,8 +127,93 @@ def Prüfungsmodus():
     clear_inhalt()
     prüfungs_frame = tk.Frame(inhalt_frame, bg="lightblue")
     prüfungs_frame.pack(fill="both", expand=True)
-    label = tk.Label(prüfungs_frame, text="Prüfungsmodus aktiv", font=("Arial", 30), bg="lightblue")
-    label.pack(pady=100)
+    Begrüßungs_label = tk.Label(prüfungs_frame, 
+                                text="Dies ist der Prüfungsmus. Du wirst 30 fragen bekommen, random aus allen fragen.\nDas Ergebnis was du erziehlst hast, bekommst du wenn du alle Fragen beatnwortet hast.",
+                                font=("Arial", 10))
+    Begrüßungs_label.pack(pady=50)
+
+    Start_Btn = tk.Button(prüfungs_frame, text="Prüfung Starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
+    Start_Btn.pack(pady=40)
+
+def Starte_Prüpfung(prüfungs_frame):
+
+    fragen = get_fragen(cur)
+    prüfungsfragen = random.sample(fragen, 30)
+
+    frage_index = 0
+    falsche_Prüfungsfragen = 0
+
+    zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen)
+
+def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
+    for widget in prüfungs_frame.winfo_children():
+        widget.destroy()
+
+    auswahl = tk.StringVar(value="X")
+
+    if  frage_index < 30:
+        aktuelle_frage = prüfungsfragen[frage_index]
+
+        Fortschirt_label = tk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {len(prüfungsfragen)}")
+        Fortschirt_label.pack(pady=25)
+
+        Frage_label = tk.Label(prüfungs_frame, text=aktuelle_frage.frage)
+        Frage_label.pack(pady=50)
+
+        frageA = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.A, variable=auswahl, value="A")
+        frageA.pack(pady=5) 
+
+        frageB = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.B, variable=auswahl, value="B")
+        frageB.pack(pady=5)
+
+        frageC = tk.Radiobutton(prüfungs_frame, text=aktuelle_frage.C, variable=auswahl, value="C")
+        frageC.pack(pady=5)
+
+        submit_btn = tk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen))
+        submit_btn.pack(pady=30)    
+    else:
+        prozent_anzahl = ((30 - falsche_Prüfungsfragen) / 30) * 100
+
+        #Benotung hat noch Bug :(
+
+        match prozent_anzahl:
+            case p if p >= 92:
+                note = f"1 - {prozent_anzahl:.2f}%"
+            case p if p >= 81:
+                note = f"2 - {prozent_anzahl:.2f}%"
+            case p if p >= 67:
+                note = f"3 - {prozent_anzahl:.2f}%"
+            case p if p >= 50:
+                note = f"4 - {prozent_anzahl:.2f}%"
+            case p if p >= 30:
+                note = f"5 - {prozent_anzahl:.2f}%"
+            case _:
+                note = f"6 - {prozent_anzahl:.2f}%"
+
+        noten_label = tk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
+        noten_label.pack(pady=100)
+
+def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
+
+    if aktuelle_frage.antwort == auswahl.get():
+        user.fragen_richtig += 1
+        user.fragen_total += 1
+
+        if aktuelle_frage.id in user.fragen_falsch:     
+             user.fragen_falsch.remove(aktuelle_frage.id)
+
+        print("Diese Frage ist Richtig")
+    else:
+        user.fragen_total += 1
+        if aktuelle_frage.id not in user.fragen_falsch:
+            user.fragen_falsch.append(aktuelle_frage.id)
+        print("Diese Frage ist Falsch")
+
+    user.save()
+
+    frage_index += 1
+
+    zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen)    
 
 #Startet den Lernmodus mit den Fragen. Initalisiert Variablen und leitet weiter zu "zeige Fragen"
 def Lernmodus():
@@ -155,7 +240,6 @@ def starte_fragen(wahl):
     if wahl:
         fragen = get_fragen(cur)
     else:
-        # Prüfe ob Frage falsch ist und wenn ja füge nur diese zur fragen liste hinzu
         alle_fragen = get_fragen(cur)
         fragen = []
         for frage in alle_fragen:
