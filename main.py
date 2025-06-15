@@ -61,7 +61,7 @@ def import_fragen(con, cur, filename):
 def del_frage(con, cur):
     del_window = tk.Toplevel()
     del_window.title("Fragen Löschen")
-    del_window.geometry("800x600")
+    del_window.geometry("500x600")
     
     canvas = tk.Canvas(del_window)
     scrollbar = ttk.Scrollbar(del_window, orient="vertical", command=canvas.yview)
@@ -563,7 +563,7 @@ def main(con, cur):
     file_menu.add_command(label="Prüfungsmodus", command=Prüfungsmodus)
     file_menu.add_command(label="Dark Mode", command=lambda: root.set_theme("equilux"))
     file_menu.add_command(label="Light Mode", command=lambda: root.set_theme("scidgreen"))
-    file_menu.add_command(label="Test Mode", command=lambda: root.set_theme("breeze"))
+    file_menu.add_command(label="Holz Mode", command=lambda: root.set_theme("kroc"))
     file_menu.add_separator()
     file_menu.add_command(label="Abmelden", command=abmelden)
     file_menu.add_command(label="Beenden", command=root.quit)
