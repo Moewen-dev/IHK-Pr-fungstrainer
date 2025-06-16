@@ -100,7 +100,7 @@ def add_user(con, cur, is_admin, username, pw_hash):
 # Hauptfenster und Inhalt vorbereiten
 #root = tk.Tk()
 root = ThemedTk(theme="scidgreen")
-root.title("IHL Prüfungs Trainer")
+root.title("IHK Prüfungs Trainer")
 root.geometry("500x600")
 
 inhalt_frame = ttk.Frame(root, padding=(3,3,12,12))
@@ -139,10 +139,10 @@ def Prüfungsmodus():
     prüfungs_frame = ttk.Frame(inhalt_frame)
     prüfungs_frame.pack(fill="both", expand=True)
     Begrüßungs_label = ttk.Label(prüfungs_frame, 
-                                text="Dies ist der Prüfungsmus. Du wirst 30 fragen bekommen, random aus allen fragen.\nDas Ergebnis was du erziehlst hast, bekommst du wenn du alle Fragen beatnwortet hast.")
+                                text="Dies ist der Prüfungsmodus. Du wirst 30 Fragen erhalten, welche zufällig aus allen Fragen gezogen werden.\nDas Ergebnis was du erziehlst hast, erhälst du wenn du alle Fragen beatnwortet hast.")
     Begrüßungs_label.pack(pady=50)
 
-    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung Starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
+    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
     Start_Btn.pack(pady=40)
 
 def Starte_Prüpfung(prüfungs_frame):
@@ -561,16 +561,18 @@ def main(con, cur):
     file_menu.add_command(label="Startseite", command=Startseite)
     file_menu.add_command(label="Adminbereich", command=Admin)
     file_menu.add_command(label="Prüfungsmodus", command=Prüfungsmodus)
-    file_menu.add_command(label="Dark Mode", command=lambda: root.set_theme("equilux"))
-    file_menu.add_command(label="Light Mode", command=lambda: root.set_theme("scidgreen"))
-    file_menu.add_command(label="Holz Mode", command=lambda: root.set_theme("kroc"))
     file_menu.add_separator()
     file_menu.add_command(label="Abmelden", command=abmelden)
     file_menu.add_command(label="Beenden", command=root.quit)
     menubar.add_cascade(label="Datei", menu=file_menu)
 
-    root.config(menu=menubar)
+    theme_menu = tk.Menu(menubar, tearoff=0)
+    theme_menu.add_command(label="Dark Mode", command=lambda: root.set_theme("equilux"))
+    theme_menu.add_command(label="Light Mode", command=lambda: root.set_theme("scidgreen"))
+    theme_menu.add_command(label="Holz Mode", command=lambda: root.set_theme("kroc"))
+    menubar.add_cascade(label="Theme", menu=theme_menu)
 
+    root.config(menu=menubar)
     # Startansicht
     Startseite()
 
