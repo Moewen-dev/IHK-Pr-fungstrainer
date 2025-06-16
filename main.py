@@ -139,7 +139,7 @@ def Prüfungsmodus():
     prüfungs_frame = ttk.Frame(inhalt_frame)
     prüfungs_frame.pack(fill="both", expand=True)
     Begrüßungs_label = ttk.Label(prüfungs_frame, 
-                                text="Dies ist der Prüfungsmodus. Du wirst 30 Fragen erhalten, welche zufällig aus allen Fragen gezogen werden.\nDas Ergebnis was du erziehlst hast, erhälst du wenn du alle Fragen beatnwortet hast.")
+                                text="Dies ist der Prüfungsmodus.\nDu wirst 30 Fragen erhalten, welche zufällig aus allen Fragen genommen werden.\nDas Ergebnis was du erziehlst hast, erhälst du wenn du alle Fragen beatnwortet hast.")
     Begrüßungs_label.pack(pady=50)
 
     Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
