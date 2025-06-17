@@ -21,7 +21,10 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     fragen_richtig INTEGER,
     fragen_falsch TEXT,
     stat_fragen_richtig TEXT,
-    stat_fragen_falsch TEXT);"""]
+    stat_fragen_falsch TEXT,
+    pruefungen_total INT,
+    pruefungen_bestanden INT,
+    stat_pruefungen TEXT);"""]
 
 # Datenbank Dateiname
 db_name = "data.db"
@@ -30,7 +33,7 @@ def add_frage(con, cur, frage, A, B, C, antwort):
     # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort) VALUES (?, ?, ?, ?, ?)", (frage, A, B, C, antwort))
     con.commit()
-
+    
 def get_fragen(cur):
     # Fragen aus der Datenbank holen
     cur.execute("SELECT * FROM fragen")
@@ -310,6 +313,12 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
             case _:
                 note = f"6 - {prozent_anzahl:.2f}%"
 
+        if prozent_anzahl >= 50:
+            user.pruefungen_bestanden += 1
+            user.pruefungen_total += 1
+        else:
+            user.pruefungen_total += 1
+        
         noten_label = ttk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
         noten_label.pack(pady=100)
 
@@ -658,16 +667,16 @@ def login(cur, username, pw_hash):
                 user.fragen_total = 0
             if data[6] != None:
                 user.fragen_falsch = json.loads(data[6])
-            else:
-                user.fragen_falsch = []
             if data[7] != None:
                 user.stat_fragen_richtig = json.loads(data[7])
-            else:
-                user.stat_fragen_falsch = []
             if data[8] != None:
                 user.stat_fragen_falsch = json.loads(data[8])
-            else:
-                user.stat_fragen_falsch = []
+            if data[9] != None:
+                user.pruefungen_total = data[9]
+            if data[10] != None:
+                user.pruefungen_bestanden = data[10]
+            if data[11] != None:
+                user.stat_pruefungen = json.loads(data[11])
             return True
     return False
 
@@ -715,11 +724,22 @@ class User:
         self.fragen_falsch = []
         self.stat_fragen_falsch = []            # nur für Statistiken
         self.stat_fragen_richtig = []           # nur für Statistiken
+        self.pruefungen_total = 0
+        self.pruefungen_bestanden = 0
+        self.stat_pruefungen = []               # Liste [Note, Datum+Uhrzeit] Index 0 von dieser liste = erste Prüfung
     
     # Speicher aktuellen Datenstand in die Datenbank 
     def save(self):
-        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ? WHERE user_id = ?"
-        cur.execute(save_statement, (self.fragen_total, self.fragen_richtig, json.dumps(self.fragen_falsch, indent=None), json.dumps(self.stat_fragen_richtig, indent=None), json.dumps(self.stat_fragen_falsch), self.user_id))
+        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ?, pruefungen_total = ?, pruefungen_bestanden = ?, stat_pruefungen = ? WHERE user_id = ?"
+        cur.execute(save_statement, (self.fragen_total, 
+                                     self.fragen_richtig, 
+                                     json.dumps(self.fragen_falsch, indent=None), 
+                                     json.dumps(self.stat_fragen_richtig, indent=None), 
+                                     json.dumps(self.stat_fragen_falsch),
+                                     self.pruefungen_total,
+                                     self.pruefungen_bestanden,
+                                     json.dumps(self.stat_pruefungen), 
+                                     self.user_id))
         con.commit()
         
 def main(con, cur):
