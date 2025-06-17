@@ -140,15 +140,29 @@ def Prüfungsmodus():
     prüfungs_frame.pack(fill="both", expand=True)
     Begrüßungs_label = ttk.Label(prüfungs_frame, 
                                 text="Dies ist der Prüfungsmodus.\nDu wirst 30 Fragen erhalten, welche zufällig aus allen Fragen genommen werden.\nDas Ergebnis was du erziehlst hast, erhälst du wenn du alle Fragen beatnwortet hast.")
-    Begrüßungs_label.pack(pady=50)
+    Begrüßungs_label.grid(row=0, column=0, pady=50)
 
     Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
-    Start_Btn.pack(pady=40)
+    Start_Btn.grid(row=1, column=0, pady=50)
 
 def Starte_Prüpfung(prüfungs_frame):
 
+    for widget in prüfungs_frame.winfo_children():
+        widget.destroy()
+
     fragen = get_fragen(cur)
-    prüfungsfragen = random.sample(fragen, 30)
+    if len(fragen) >= 1:
+        prüfungsfragen = random.sample(fragen, 30)
+    else:
+        Fehler_label = ttk.Label(prüfungs_frame,
+                                 text="Fehler! Es gibt nicht genug Fragen. Importieren sie welche, oder wenden sie sich einen Administrator!")
+        weiterleit_Btn = ttk.Button(prüfungs_frame,
+                                    text="Fragen Importieren",
+                                    command=lambda: Admin())
+        weiterleit_Btn.grid(row=2, column=0, pady=50)
+
+        Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+        return
 
     frage_index = 0
     falsche_Prüfungsfragen = 0
@@ -252,7 +266,20 @@ def starte_fragen(wahl):
     prüfungs_frame.pack(fill="both", expand=True)
 
     if wahl:
+        
         fragen = get_fragen(cur)
+
+        if len(fragen) >= 1:
+            fragen = get_fragen(cur)
+        else:
+            Fehler_label = ttk.Label(prüfungs_frame,
+                                    text="Fehler! Es gibt nicht genug Fragen. Importieren sie welche, oder wenden sie sich einen Administrator!")
+            Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+
+            weiterleit_Btn = ttk.Button(prüfungs_frame,
+                                        text="Fragen Importieren",
+                                        command=lambda: Admin())
+            weiterleit_Btn.grid(row=2, column=0, pady=50)
     else:
         alle_fragen = get_fragen(cur)
         fragen = []
