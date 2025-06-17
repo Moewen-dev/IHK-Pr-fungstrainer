@@ -609,22 +609,24 @@ def Guiregister():
     
 # Admin Bereich
 def Admin():
-    if user.user_id == 0:
+    if user.user_id == 0: # Ist der User nicht angemeldet, wird er zurück zur Startseite geschickt
         Startseite()
         messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich als Admin an, um den Adminbereich zu nutzen.")
         return
-    elif user.is_admin != 1:
+    elif user.is_admin != 1: # Ist der User kein Admin, wird er nicht weitergeleitet und erhält eine Fehlermeldung
         messagebox.showerror("Keine Admin-Berechtigung", "Bitte melden Sie sich mit einem Admin-Konto an, um den Adminbereich zu nutzen.")
         return
     clear_inhalt()
 
-    admin_frame = ttk.Frame(inhalt_frame)
+    admin_frame = ttk.Frame(inhalt_frame) # Admin Frame wird erstellt
     admin_frame.pack(fill="both", expand=True)
-    label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold"))
+    label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold")) # Admin Label wird erstellt
     label.pack(pady=40)
     button_rahmen = ttk.LabelFrame(admin_frame, text="Fragenverwaltung")
     button_rahmen.pack(pady=20, padx=20)
 
+    # Buttons für die Fragenverwaltung
+    # Frage einzeln einfügen, Fragen importieren, Fragen exportieren, Fragen löschen
     fragen_add = ttk.Button(button_rahmen, text="Frage hinzufügen", command=lambda: manuell_fragen(con, cur))
     fragen_add.grid(column=0, row=0, padx=10, pady=10)
     fragen_import = ttk.Button(button_rahmen, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
