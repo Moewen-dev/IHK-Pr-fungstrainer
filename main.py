@@ -109,38 +109,54 @@ def manuell_fragen(con, cur):
     save_btn.pack(pady=20)
 
 def del_frage(con, cur):
-    del_window = tk.Toplevel(background="#d8d8d8")
-    del_window.title("Fragen Löschen")
+    del_window = tk.Toplevel(bg="#d8d8d8")
+    del_window.title("Fragen löschen")
     del_window.geometry("500x600")
-    
-    canvas = tk.Canvas(del_window)
-    scrollbar = ttk.Scrollbar(del_window, orient="vertical", command=canvas.yview)
-    scroll_frame = ttk.Frame(canvas)
-    
-    def configure_scroll_region(event):
-        canvas.configure(scrollregion=canvas.bbox("all"))
-        
-    scroll_frame.bind("<Configure>", configure_scroll_region)
+
+    header = ttk.Label(del_window, text="Wähle die Fragen aus, die du löschen möchtest:", font=("Arial", 12, "bold"), background="#d8d8d8")
+    header.pack(pady=10)
+
+    container = ttk.Frame(del_window)
+    container.pack(fill="both", expand=True, padx=10, pady=10)
+
+    canvas = tk.Canvas(container, borderwidth=0, background="#d8d8d8", highlightthickness=0)
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scroll_frame = ttk.Frame(canvas, style="TFrame")
+
     canvas.configure(yscrollcommand=scrollbar.set)
-    canvas.pack(side="left", fill="both", expand=True)
     scrollbar.pack(side="right", fill="y")
-    canvas.create_window((0,0), window=scroll_frame, anchor="nw")
-    
+    canvas.pack(side="left", fill="both", expand=True)
+    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    def on_frame_configure(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    scroll_frame.bind_all("<MouseWheel>", _on_mousewheel)
+
     fragen = get_fragen(cur)
-    
-    for i, frage in enumerate(fragen):
+    for frage in fragen:
         checkbox = ttk.Checkbutton(scroll_frame, text=frage.frage, variable=frage.delete)
-        checkbox.pack(pady=5, padx=10, anchor="w")
-    
+        checkbox.pack(anchor="w", padx=10, pady=5)
+
     def delete_selected():
+        gelöscht = False
         for frage in fragen:
             if frage.delete.get():
                 cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
-                con.commit()
+                gelöscht = True
+        if gelöscht:
+            con.commit()
+            messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
+        else:
+            messagebox.showwarning("Keine Auswahl", "Bitte wähle mindestens eine Frage aus.")
         del_window.destroy()
-    
-    confirm_btn = ttk.Button(del_window, text="Löschen", command=delete_selected)
-    confirm_btn.pack(side="bottom", padx=10)
+
+    ttk.Button(del_window, text="Ausgewählte Fragen löschen", command=delete_selected).pack(pady=15)
 
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
