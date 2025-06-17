@@ -105,7 +105,7 @@ def manuell_fragen(con, cur):
             return
         add_frage(con, cur, frage, A, B, C, antwort)
         add_window.destroy()
-        messagebox.showinfo("Erfolg", "Frage erfolgreich hinzugefügt.")
+        messagebox.showinfo("Erfolg", f'Frage "{frage}" erfolgreich hinzugefügt.')
 
     save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
     save_btn.pack(pady=20)
@@ -146,16 +146,19 @@ def del_frage(con, cur):
         checkbox.pack(anchor="w", padx=10, pady=5)
 
     def delete_selected():
-        gelöscht = False
-        for frage in fragen:
-            if frage.delete.get():
-                cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
-                gelöscht = True
-        if gelöscht:
-            con.commit()
-            messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
-        else:
+        auszuwählen = [frage for frage in fragen if frage.delete.get()]
+        if not auszuwählen:
             messagebox.showwarning("Keine Auswahl", "Bitte wähle mindestens eine Frage aus.")
+            del_window.lift()
+            del_window.focus_force()
+            return
+        fortfahren = messagebox.askyesno("Bestätigung", "Möchtest du die ausgewählten Fragen wirklich löschen?")
+        if not fortfahren:
+            return
+        for frage in auszuwählen:
+            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
+        con.commit()
+        messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
         del_window.destroy()
 
     ttk.Button(del_window, text="Ausgewählte Fragen löschen", command=delete_selected).pack(pady=15)
