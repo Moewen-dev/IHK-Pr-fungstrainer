@@ -19,7 +19,9 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     pw_hash TEXT NOT NULL,
     fragen_total INTEGER,
     fragen_richtig INTEGER,
-    fragen_falsch TEXT);"""]
+    fragen_falsch TEXT,
+    stat_fragen_richtig TEXT,
+    stat_fragen_falsch TEXT);"""]
 
 db_name = "data.db"
 
@@ -283,11 +285,13 @@ def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_inde
     if aktuelle_frage.antwort == auswahl.get():
         user.fragen_richtig += 1
         user.fragen_total += 1
+        user.stat_fragen_richtig.append([aktuelle_frage.id, current_datetime()])
 
         if aktuelle_frage.id in user.fragen_falsch:     
              user.fragen_falsch.remove(aktuelle_frage.id)
     else:
         user.fragen_total += 1
+        user.stat_fragen_falsch.append([aktuelle_frage.id, current_datetime()])
         if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
         falsche_Prüfungsfragen += 1
@@ -405,6 +409,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         r_label.pack(pady=50)
         user.fragen_richtig += 1
         user.fragen_total += 1
+        user.stat_fragen_richtig.append([aktuelle_frage.id, current_datetime()])
 
         if aktuelle_frage.id in user.fragen_falsch:
             user.fragen_falsch.remove(aktuelle_frage.id)
@@ -416,6 +421,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         l_antwort = ttk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
         user.fragen_total += 1
+        user.stat_fragen_falsch.append([aktuelle_frage.id, current_datetime()])
         if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
 
@@ -582,6 +588,14 @@ def login(cur, username, pw_hash):
                 user.fragen_falsch = json.loads(data[6])
             else:
                 user.fragen_falsch = []
+            if data[7] != None:
+                user.stat_fragen_richtig = json.loads(data[7])
+            else:
+                user.stat_fragen_falsch = []
+            if data[8] != None:
+                user.stat_fragen_falsch = json.loads(data[8])
+            else:
+                user.stat_fragen_falsch = []
             return True
     return False
 
@@ -627,11 +641,13 @@ class User:
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
         self.fragen_falsch = []
+        self.stat_fragen_falsch = []            # nur für Statistiken
+        self.stat_fragen_richtig = []           # nur für Statistiken
     
     # Speicher aktuellen Datenstand in die Datenbank 
     def save(self):
-        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ? WHERE user_id = ?"
-        cur.execute(save_statement, (self.fragen_total, self.fragen_richtig, json.dumps(self.fragen_falsch, indent=None), self.user_id))
+        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ? WHERE user_id = ?"
+        cur.execute(save_statement, (self.fragen_total, self.fragen_richtig, json.dumps(self.fragen_falsch, indent=None), json.dumps(self.stat_fragen_richtig, indent=None), json.dumps(self.stat_fragen_falsch), self.user_id))
         con.commit()
         
 def main(con, cur):
