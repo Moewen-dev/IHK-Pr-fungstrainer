@@ -57,6 +57,18 @@ def import_fragen(con, cur, filename):
     except TypeError as e:
         print(f"Error: {e}")
 
+def export_fragen(cur):
+    try:
+        fragen = get_fragen(cur)
+        to_export = {"fragen": []}
+        for frage in fragen:
+            to_export["fragen"].append(frage.export())
+        with open("fragen_export.json", "wt", encoding="utf-8") as file:
+            file.write(json.dumps(to_export, ensure_ascii=False))
+        messagebox.showinfo("Fragen export", "Fragen erfolgreich exportiert")
+    except:
+        messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
+
 def manuell_fragen(con, cur):
     add_window = tk.Toplevel()
     add_window.title("Frage hinzufügen")
@@ -142,7 +154,7 @@ root.title("IHK Prüfungs Trainer")
 root.geometry("500x600")
 
 inhalt_frame = ttk.Frame(root, padding=(3,3,12,12))
-inhalt_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+inhalt_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
 
 root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
@@ -415,19 +427,19 @@ def Menu():
     button_rahmen = ttk.LabelFrame(inhalt_frame, text="Auswahl")
     button_rahmen.place(x=60, y=150)
 
-    menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+    menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
     label = ttk.Label(button_rahmen, text="Willkommen!\nIm IHK Prüfungs trainer\nWas möchtest du Machen?", font=("arial", 15, "bold"))
     label.grid(column=0, row=0, columnspan=3, sticky=(tk.N), padx=5, pady=5)
     
     Lernbtn = ttk.Button(button_rahmen, text="Weiter Lernen", command=Lernmodus)
-    Lernbtn.grid(column=0, row=1, sticky=(tk.S, tk.W), padx=5, pady=10)
+    Lernbtn.grid(column=0, row=1, sticky=(tk.S, tk.W), padx=5, pady=10) # type: ignore
 
     Prüfungsbtn = ttk.Button(button_rahmen, text="Zur Prüfungssimulation", command=Prüfungsmodus)
     Prüfungsbtn.grid(column=1, row=1, sticky=(tk.S), padx=5, pady=10)
     
     if user.is_admin == 1:
         Adminbtn = ttk.Button(button_rahmen, text="Adminbereich", command=Admin)
-        Adminbtn.grid(column=2, row=1, sticky=(tk.S, tk.E), padx=5, pady=10)
+        Adminbtn.grid(column=2, row=1, sticky=(tk.S, tk.E), padx=5, pady=10) # type: ignore
 
 # Login
 def Guilogin():
@@ -509,10 +521,12 @@ def Admin():
 
     label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold"))
     label.pack(pady=100)
-    fragen_import = ttk.Button(button_rahmen, text="Frage hinzufügen", command=lambda: manuell_fragen(con, cur))
-    fragen_import.pack(pady=30, padx=30)
+    fragen_add = ttk.Button(button_rahmen, text="Frage hinzufügen", command=lambda: manuell_fragen(con, cur))
+    fragen_add.pack(pady=30, padx=30)
     fragen_import = ttk.Button(button_rahmen, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.pack(pady=30, padx=30)
+    fragen_export = ttk.Button(button_rahmen, text="Fragen exportieren", command=lambda: export_fragen(cur))
+    fragen_export.pack(pady=30, padx=30)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
     fragen_delete.pack(pady=30, padx=30)
 
@@ -565,6 +579,15 @@ class Frage:
     # gebe nur ID aus wenn mit repr(Frage) gecallt für Debug 
     def __repr__(self):
         return f"\"ID: {self.id}\""
+    
+    def export(self):
+        return {
+            "frage" : self.frage,
+            "A" : self.A,
+            "B" : self.B,
+            "C" : self.C,
+            "richtigeAntwort" : self.antwort
+            }
     
 class User:
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
