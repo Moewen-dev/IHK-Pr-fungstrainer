@@ -30,11 +30,24 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
 # Datenbank Dateiname
 db_name = "data.db"
 
+# Funktion: add_frage
+# Fügt eine neue Frage in die Datenbank ein.
+# Benötigt:
+#   con: Datenbankverbindung
+#   cur: Datenbankcursor
+#   frage: Text der Frage
+#   A, B, C: Antwortmöglichkeiten
+#   antwort: Richtige Antwort (als Identifier)
+#   kategorie: Optionale Kategorie (Standard "default")
 def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # default kategorie falls keine spezifiziert
     # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort, kategorie) VALUES (?, ?, ?, ?, ?, ?)", (frage, A, B, C, antwort, kategorie))
     con.commit()
     
+# Funktion: get_fragen
+# Ruft alle Fragen aus der Datenbank ab und wandelt sie in Frage-Objekte um.
+# Benötigt:
+#   cur: Datenbankcursor
 def get_fragen(cur):
     # Fragen aus der Datenbank holen
     cur.execute("SELECT * FROM fragen")
@@ -45,6 +58,12 @@ def get_fragen(cur):
         fragen.append(frage)
     return fragen
 
+# Funktion: import_fragen
+# Importiert Fragen aus einer JSON-Datei in die Datenbank und fügt nur neue Fragen hinzu.
+# Benötigt:
+#   con: Datenbankverbindung
+#   cur: Datenbankcursor
+#   filename: Pfad zur JSON-Datei mit Fragen
 def import_fragen(con, cur, filename):
     # Fragen aus einer JSON Datei Importieren
     try:
@@ -68,6 +87,10 @@ def import_fragen(con, cur, filename):
     except TypeError as e:
         print(f"Error: {e}")
 
+# Funktion: export_fragen
+# Exportiert alle Fragen aus der Datenbank in eine JSON-Datei.
+# Benötigt:
+#   cur: Datenbankcursor
 def export_fragen(cur):
     # Fragen werden hier in eine JSON Datei exportiert, dies dient dazu evtl jemanden seine Fragen zu schicken oder sich selber verschiedene Fragensätze zu speichern
     try:
@@ -81,7 +104,11 @@ def export_fragen(cur):
     except:
         messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
 
-# Manuell eine einzelne Frage hinzufügen
+# Funktion: manuell_fragen
+# Öffnet ein Fenster, um eine einzelne Frage manuell hinzuzufügen.
+# Benötigt:
+#   con: Datenbankverbindung
+#   cur: Datenbankcursor
 def manuell_fragen(con, cur):
     # Neues Fenster öffnen
     add_window = tk.Toplevel()
@@ -143,7 +170,11 @@ def manuell_fragen(con, cur):
     save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
     save_btn.pack(pady=20)
 
-# Fragen bearbeiten
+# Funktion: edit_fragen
+# Öffnet ein Fenster, in dem existierende Fragen bearbeitet werden können.
+# Benötigt:
+#   con: Datenbankverbindung
+#   cur: Datenbankcursor
 def edit_fragen(con, cur):
     edit_window = tk.Toplevel(bg="#d8d8d8")
     edit_window.title("Fragen bearbeiten")
@@ -268,6 +299,11 @@ def edit_fragen(con, cur):
         except Exception as e: # Fehler beim Anzeigen einer Frage
             print(f"Fehler beim Anzeigen einer Frage: {e}")
 
+# Funktion: del_frage
+# Zeigt ein Fenster, in dem mehrere Fragen ausgewählt und anschließend gelöscht werden können.
+# Benötigt:
+#   con: Datenbankverbindung
+#   cur: Datenbankcursor
 def del_frage(con, cur):
     # Hier werden alle Fragen angezeigt. Anschließend kann man mehrere auswählen und anschließend löschen
     del_window = tk.Toplevel(bg="#d8d8d8")  # Die Hintergrundfarbe wird Festgelegt
@@ -324,10 +360,22 @@ def del_frage(con, cur):
 
     ttk.Button(del_window, text="Ausgewählte Fragen löschen", command=delete_selected).pack(pady=15)
 
+# Funktion: add_user
+# Fügt einen neuen Benutzer in die Datenbank ein.
+# Benötigt:
+#   con: Datenbankverbindung
+#   cur: Datenbankcursor
+#   is_admin: Gibt an, ob der Benutzer Adminrechte erhält
+#   username: Benutzername
+#   pw_hash: Passwort-Hash
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
 
+# Funktion: current_datetime
+# Liefert das aktuelle Datum und die aktuelle Uhrzeit im angegebenen Format.
+# Benötigt:
+#   format: Optionaler Formatstring (Standard "%d.%m.%Y %H:%M:%S")
 def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
     return datetime.datetime.now().strftime(format)
 
@@ -348,20 +396,34 @@ inhalt_frame.columnconfigure(3, weight=3)
 inhalt_frame.rowconfigure(0, weight=3)
 inhalt_frame.rowconfigure(1, weight=3)
 
+# Funktion: toggle_fullscreen
+# Schaltet das Fenster in den oder aus dem Vollbildmodus.
+# Benötigt:
+#   event: (Optionales) Ereignisobjekt
 def toggle_fullscreen(event=None):
     root.attributes("-fullscreen", not root.attributes("-fullscreen"))
 
+# Funktion: end_fullscreen
+# Beendet den Vollbildmodus.
+# Benötigt:
+#   event: (Optionales) Ereignisobjekt
 def end_fullscreen(event=None):
     root.attributes("-fullscreen", False)
 
+# Funktion: clear_inhalt
+# Löscht alle Widgets im Hauptinhalt-Frame.
 def clear_inhalt():
     for widget in inhalt_frame.winfo_children():
         widget.destroy()
 
+# Funktion: openfile
+# Öffnet den Dateidialog und gibt den ausgewählten Dateipfad zurück.
 def openfile():
     filename = askopenfilename() 
     return filename
 
+# Funktion: Prüfungsmodus
+# Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
 def Prüfungsmodus():
     # Hier wird das Prüfungsmodus Fenster erstellt
     if user.user_id == 0:       # Als erster wird überprüft ob der User angemeldet ist. Wenn nicht wird er zurück zur Startseite geschickt.
@@ -379,7 +441,11 @@ def Prüfungsmodus():
     Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
     Start_Btn.grid(row=1, column=0, pady=50)
 
-def Starte_Prüpfung(prüfungs_frame):
+# Funktion: Starte_Prüfung
+# Löscht das Prüfungsfenster und startet die Prüfung mit 30 zufälligen Fragen.
+# Benötigt:
+#   prüfungs_frame: Das Frame, in dem die Prüfung stattfindet.
+def Starte_Prüfung(prüfungs_frame):
 
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
@@ -403,6 +469,13 @@ def Starte_Prüpfung(prüfungs_frame):
 
     zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen)
 
+# Funktion: zeige_Prüfungsfragen
+# Zeigt die aktuelle Frage im Prüfungsmodus inklusive Fortschrittsanzeige und Antwortmöglichkeiten.
+# Benötigt:
+#   prüfungs_frame: Frame des Prüfungsmodus
+#   frage_index: Index der aktuellen Frage
+#   prüfungsfragen: Liste der Prüfungsfragen
+#   falsche_Prüfungsfragen: Zähler für falsche Antworten
 def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
@@ -463,6 +536,15 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
         noten_label = ttk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
         noten_label.pack(pady=100)
 
+# Funktion: prüffrage_überprüfen
+# Überprüft die abgegebene Antwort im Prüfungsmodus und aktualisiert die Benutzerstatistik.
+# Benötigt:
+#   auswahl: Variable mit gewählter Antwort
+#   aktuelle_frage: Das aktuelle Frage-Objekt
+#   prüfungs_frame: Frame des Prüfungsmodus
+#   frage_index: Index der aktuellen Frage
+#   prüfungsfragen: Liste der Prüfungsfragen
+#   falsche_Prüfungsfragen: Zähler für falsche Antworten
 def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
 
     if aktuelle_frage.antwort == auswahl.get():
@@ -485,7 +567,8 @@ def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_inde
 
     zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen)    
 
-#Startet den Lernmodus mit den Fragen. Initalisiert Variablen und leitet weiter zu "zeige Fragen"
+# Funktion: Lernmodus
+# Initialisiert den Lernmodus, bei dem der Benutzer alle oder nur falsche Fragen wiederholen kann.
 def Lernmodus():
     clear_inhalt()
 
@@ -507,6 +590,10 @@ def Lernmodus():
     weiter_btn = ttk.Button(button_rahmen, text="Weiter", command=lambda: starte_fragen(wahl_var.get()))
     weiter_btn.grid(column=0, row=3, pady=20, padx=10)
 
+# Funktion: starte_fragen
+# Startet den Ablauf des Lernmodus, indem die Auswahl der Fragen getroffen und zufällig gemischt wird.
+# Benötigt:
+#   wahl: Boolean, ob alle Fragen oder nur falsche Fragen geübt werden sollen
 def starte_fragen(wahl):
     clear_inhalt()
 
@@ -540,8 +627,9 @@ def starte_fragen(wahl):
     frage_index = 0
 
     zeige_frage(fragen, prüfungs_frame, frage_index)
-        
-#Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
+    
+# Frage, Prüfungs Frame, Fragen index | auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen
+# Hier werden die Fragen angezeigt und überprüft ob alle Fragen schonmal dran waren
 def zeige_frage(fragen, prüfungs_frame, frage_index):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
@@ -597,7 +685,14 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
         wiederholenbtn = ttk.Button(fertig_rahmen, text="Nochmal alle Fragen durchgehen", command=lambda: Lernmodus())
         wiederholenbtn.grid(column=1, row=1, padx=10, pady=10)
 
-#Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
+# Funktion: frage_überprüfen
+# Überprüft die Antwort einer Frage im Lernmodus und gibt entsprechendes Feedback.
+# Benötigt:
+#   auswahl: Variable mit gewählter Antwort
+#   aktuelle_frage: Das aktuelle Frage-Objekt
+#   fragen: Liste der Fragen
+#   frage_index: Index der aktuellen Frage
+#   prüfungs_frame: Frame, in dem geprüft wird
 def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
@@ -631,6 +726,8 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
     weiter_btn = ttk.Button(prüfungs_frame, text="Weiter", command=lambda: zeige_frage(fragen, prüfungs_frame, frage_index))
     weiter_btn.pack(pady=20)
 
+# Funktion: Startseite
+# Zeigt die Startseite an, entweder mit Login/Registrierungsoption oder als Menü, wenn ein Benutzer angemeldet ist.
 def Startseite():
     if user.user_id == 0:
         clear_inhalt()
@@ -650,6 +747,8 @@ def Startseite():
     else:
         Menu()
 
+# Funktion: Menu
+# Zeigt das Hauptmenü nach erfolgreicher Anmeldung mit verschiedenen Optionen (Lernmodus, Prüfung, Statistik, Adminbereich).
 def Menu():
     clear_inhalt()
     menu_frame = ttk.Frame(inhalt_frame)
@@ -674,6 +773,8 @@ def Menu():
         Adminbtn = ttk.Button(button_rahmen, text="Adminbereich", command=Admin)
         Adminbtn.grid(column=3, row=1, sticky=(tk.S, tk.E), padx=5, pady=10) # type: ignore
 
+# Funktion: Statistik
+# Zeigt die Statistik des Benutzers an, z. B. Anzahl der beantworteten Fragen und falscher Fragen.
 def Statistik():
     clear_inhalt()
     statistik_frame = ttk.Frame(inhalt_frame)
@@ -707,7 +808,8 @@ def Statistik():
         text.grid(column=0, row=i, columnspan=2, sticky=(tk.W))
         i += 1
 
-# Login
+# Funktion: Guilogin
+# Zeigt das Login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
 def Guilogin():
     clear_inhalt()
     login_frame = ttk.Frame(inhalt_frame)
@@ -738,7 +840,8 @@ def Guilogin():
     loginbtn = ttk.Button(button_rahmen, text="Login", command=handle_login)
     loginbtn.pack(pady=20, padx=40)
 
-# Registrierungsbereich
+# Funktion: Guiregister
+# Zeigt das Registrierungsfenster an und verarbeitet die Eingaben, um einen neuen Benutzer anzulegen.
 def Guiregister():
     clear_inhalt()
     register_frame = ttk.Frame(inhalt_frame)
@@ -773,7 +876,8 @@ def Guiregister():
     registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=handle_register)
     registerbtn.grid(column=0, row=4, columnspan=2, pady=20)
     
-# Admin Bereich
+# Funktion: Admin
+# Zeigt den Adminbereich an, in dem Fragen verwaltet (hinzufügen, importieren, bearbeiten, exportieren, löschen) werden können.
 def Admin():
     if user.user_id == 0: # Ist der User nicht angemeldet, wird er zurück zur Startseite geschickt
         Startseite()
@@ -805,7 +909,12 @@ def Admin():
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
     fragen_delete.grid(column=0, row=2, padx=10, pady=10)
 
-# Login Funktion
+# Funktion: login
+# Überprüft die Anmeldedaten eines Benutzers und lädt die zugehörigen Daten, falls diese korrekt sind.
+# Benötigt:
+#   cur: Datenbankcursor
+#   username: Eingebener Benutzername
+#   pw_hash: Eingebener Passwort-Hash
 def login(cur, username, pw_hash):
     userdata = cur.execute("SELECT * FROM userdata").fetchall()
     for data in userdata:
@@ -839,7 +948,8 @@ def login(cur, username, pw_hash):
             return True
     return False
 
-# Zum Abmelden einfach Benutzer Objekt nullen
+# Funktion: abmelden
+# Meldet den aktuellen Benutzer ab, setzt das user-Objekt zurück und zeigt die Startseite an.
 def abmelden():
     global user
     if user.user_id != 0:
@@ -850,6 +960,13 @@ def abmelden():
         messagebox.showwarning("Abmeldung nicht möglich", "Sie sind nicht angemeldet.")
 
 class Frage:
+    # __init__: Initialisiert ein Frage-Objekt.
+    # Benötigt:
+    #   id: Eindeutige Identifikation der Frage
+    #   frage: Fragetext
+    #   A, B, C: Antwortoptionen
+    #   antwort: Richtige Antwort
+    #   kategorie: Optionale Kategorie (Standard "default")
     def __init__(self, id, frage, A, B, C, antwort, kategorie="default"):
         self.id = id
         self.frage = frage
@@ -864,6 +981,7 @@ class Frage:
     def __repr__(self):
         return f"\"ID: {self.id}\""
     
+    # export: Gibt ein Dictionary mit Frageinformationen zurück, geeignet für JSON-Export.
     def export(self):
         return {
             "frage" : self.frage,
@@ -875,6 +993,9 @@ class Frage:
             }
     
 class User:
+    # __init__: Initialisiert ein User-Objekt.
+    # Benötigt:
+    #   user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
         self.user_id = user_id
         self.is_admin = is_admin
@@ -903,6 +1024,11 @@ class User:
                                      self.user_id))
         con.commit()
         
+# Funktion: main
+# Startet die Anwendung, initialisiert den Benutzer und die GUI, und öffnet die Datenbank.
+# Benötigt:
+#   con: Datenbankverbindung
+#   cur: Datenbankcursor
 def main(con, cur):
     # Benutzer Initialisieren
     global user
@@ -952,4 +1078,3 @@ if __name__ == "__main__":
     except sqlite3.OperationalError as e:
         print(f"Failed to Open Database: {e}")
         sys.exit(1)
-         
