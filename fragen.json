@@ -1,0 +1,500 @@
+{
+    "fragen": [
+        {
+            "frage": "Was zeichnet einen Typ-1-Hypervisor aus?",
+            "A": "Läuft innerhalb eines Betriebssystems",
+            "B": "Läuft direkt auf der Hardware",
+            "C": "Wird nur für mobile Geräte verwendet",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Aussage trifft auf einen Typ-2-Hypervisor zu?",
+            "A": "Er benötigt kein Host-Betriebssystem",
+            "B": "Er ist in BIOS/UEFI integriert",
+            "C": "Er läuft als Anwendung auf einem Betriebssystem",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was sind Vorteile einer Servervirtualisierung?",
+            "A": "Bessere Stromversorgung, geringerer RAM-Verbrauch, weniger Lizenzen",
+            "B": "Bessere Auslastung, einfache Sicherung, flexible Skalierung",
+            "C": "Keine Backups notwendig, keine Ausfälle, keine Updates nötig",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was sind Nachteile einer Servervirtualisierung?",
+            "A": "Erhöhte Komplexität, Lizenzkosten, Performance-Overhead",
+            "B": "Mehr Stromverbrauch, mehr RAM, langsamere Backups",
+            "C": "Nur Windows-Server möglich, kein Netzwerkzugriff, kein Monitoring",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wie viele 8-TiB-Festplatten braucht man für 160 TiB netto in RAID 6?",
+            "A": "22",
+            "B": "20",
+            "C": "18",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wie viele Festplatten-Ausfälle verträgt ein RAID 10 gleichzeitig?",
+            "A": "Maximal zwei beliebige",
+            "B": "Immer nur eine",
+            "C": "Zwei, wenn in verschiedenen Spiegeln",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welches Prinzip bedeutet 'Minimale Rechtevergabe'?",
+            "A": "Zero Trust",
+            "B": "Least Privilege",
+            "C": "Need to Know",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was beschreibt die 3-2-1 Backup Regel?",
+            "A": "3 Admins, 2 Firewalls, 1 Backup pro Tag",
+            "B": "3 Backups, 2 Medienarten, 1 extern",
+            "C": "3 Clouds, 2 LANs, 1 VPN",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein typischer Einsatzfall für einen Typ-1-Hypervisor?",
+            "A": "Private Spieleserver zu Hause",
+            "B": "Virtualisierung in Rechenzentren",
+            "C": "Virtualisierung mobiler Apps",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welches Produkt ist ein Typ-2-Hypervisor?",
+            "A": "VMware Workstation",
+            "B": "Microsoft Hyper-V",
+            "C": "XenServer",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wie viele 8-TiB-Festplatten braucht man für 80 TiB netto in RAID 6?",
+            "A": "12",
+            "B": "10",
+            "C": "11",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wie hoch ist der Speicherverlust durch Parität bei RAID 6 mit 8 Platten?",
+            "A": "16 TiB",
+            "B": "8 TiB",
+            "C": "0 TiB",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wie viele Platten braucht man für 64 TiB netto in RAID 10 mit 8-TiB-Platten?",
+            "A": "16",
+            "B": "14",
+            "C": "12",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was beschreibt das Zero-Trust-Prinzip?",
+            "A": "Alle internen Systeme gelten als sicher",
+            "B": "Es wird grundsätzlich niemandem vertraut",
+            "C": "Vertrauen basiert auf Firewalls",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein Beispiel für Systemhärtung?",
+            "A": "Öffentliche Dienste freigeben",
+            "B": "Standard-Accounts deaktivieren",
+            "C": "Offene Ports zulassen",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Backup-Strategie entspricht der 3-2-1-Regel?",
+            "A": "3 Kopien, 2 Medienarten, 1 externes Backup",
+            "B": "3 Festplatten, 2 Admins, 1 Netzwerk",
+            "C": "3 Clouds, 2 VPNs, 1 Backup täglich",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Maßnahme reduziert Datenverluste bei SAN-Ausfällen?",
+            "A": "Snapshot-Sicherung alle 5 Minuten",
+            "B": "Vollbackup alle 2 Wochen",
+            "C": "Archivierung auf CD",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein typisches Merkmal eines Software-Upgrades?",
+            "A": "Fehlerbehebungen ohne Kosten",
+            "B": "Neue Funktionen, evtl. kostenpflichtig",
+            "C": "Täglicher Patch",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein typisches Merkmal eines Software-Updates?",
+            "A": "Komplettaustausch der Software",
+            "B": "Meist neue Funktionen mit Lizenz",
+            "C": "Fehlerbehebungen und kleinere Verbesserungen",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein Vorteil von Typ-1-Hypervisoren gegenüber Typ-2?",
+            "A": "Bessere Integration in Desktop-Umgebungen",
+            "B": "Direkter Hardwarezugriff und mehr Performance",
+            "C": "Einfachere Installation über App Store",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welcher Hypervisor ist direkt in Windows 10/11 Pro integriert?",
+            "A": "VMware Player",
+            "B": "VirtualBox",
+            "C": "Hyper-V",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wie viele Festplatten müssen bei RAID 10 vorhanden sein?",
+            "A": "Eine gerade Zahl, mindestens vier",
+            "B": "Mindestens drei",
+            "C": "Unbegrenzt viele ungerade",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Aussage trifft auf RAID 6 zu?",
+            "A": "Spiegelt Daten doppelt",
+            "B": "Kann zwei Plattenverluste verkraften",
+            "C": "Benötigt genau 4 Platten",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein Beispiel für eine organisatorische Schutzmaßnahme?",
+            "A": "Regelmäßige Passwortänderungspflicht",
+            "B": "Deaktivierung ungenutzter Dienste",
+            "C": "Firewall-Regel einrichten",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wann muss laut DSGVO eine Meldung an Betroffene erfolgen?",
+            "A": "Bei jeder IT-Störung",
+            "B": "Wenn personenbezogene Daten stark gefährdet sind",
+            "C": "Nur bei Angriffen aus dem Ausland",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Maßnahme passt zum Prinzip 'Least Privilege'?",
+            "A": "Alle Benutzer sind Administratoren",
+            "B": "Zugriffsrechte nach Notwendigkeit",
+            "C": "Alles basiert auf Vertrauensverhältnissen",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was prüft ein Penetrationstest?",
+            "A": "Passwortsicherheit und Schwachstellen",
+            "B": "Tastaturbelegung",
+            "C": "Festplattenlaufzeit",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wie kann die Wiederherstellungsdauer nach einem Ausfall verkürzt werden?",
+            "A": "Seltener sichern",
+            "B": "Snapshots und schnellere Medien nutzen",
+            "C": "Tägliche Sicherung auf Band",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was sollte Bestandteil eines Backupkonzepts nach 3-2-1 sein?",
+            "A": "Nur Cloud-Backups",
+            "B": "Unterschiedliche Medien und externe Lagerung",
+            "C": "Kein Backup nötig bei RAID",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was beschreibt ein Sicherheitsupdate?",
+            "A": "Erweiterung um neue Tools",
+            "B": "Beseitigung von Schwachstellen",
+            "C": "Lizenzumstellung",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein möglicher Nachteil eines Upgrades?",
+            "A": "Mehr Sicherheit",
+            "B": "Kostenpflichtig und evtl. inkompatibel",
+            "C": "Verbesserte Performance",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Netzmaske entspricht einem /24-Netz?",
+            "A": "255.255.0.0",
+            "B": "255.255.255.0",
+            "C": "255.255.255.255",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist die Aufgabe eines DNS-Servers?",
+            "A": "Zuweisung von IP-Adressen",
+            "B": "Namensauflösung von Domains in IP-Adressen",
+            "C": "Verbindung von Bluetooth-Geraeten",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was bewirkt das Kommando 'ipconfig /release' unter Windows?",
+            "A": "Startet den PC neu",
+            "B": "Gibt die aktuelle IP-Adresse frei",
+            "C": "Zeigt die IP-Konfiguration",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wofür steht die Abkürzung VLAN?",
+            "A": "Virtual Local Access Network",
+            "B": "Virtual LAN",
+            "C": "Very Large Area Network",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein typisches Merkmal eines Switches?",
+            "A": "Arbeitet auf OSI-Schicht 1",
+            "B": "Leitet Datenpakete gezielt an MAC-Adressen weiter",
+            "C": "Teilt IP-Adressen zu",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welches Protokoll wird typischerweise für E-Mail-Versand verwendet?",
+            "A": "SMTP",
+            "B": "IMAP",
+            "C": "FTP",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was beschreibt ein Patchmanagement?",
+            "A": "Installation von Hardware",
+            "B": "Verwaltung und Verteilung von Softwareupdates",
+            "C": "Backup-Erstellung",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was macht ein DHCP-Server?",
+            "A": "Überwacht den Netzwerkverkehr",
+            "B": "Vergibt automatisch IP-Adressen im Netzwerk",
+            "C": "Filtert Spam-Mails",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was beschreibt der Begriff 'Spoofing' in der IT-Sicherheit?",
+            "A": "Verschlüsselung von Daten",
+            "B": "Manipulation der Identität eines Geräts oder Benutzers",
+            "C": "Löschen von Systemdateien",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist eine DMZ (Demilitarisierte Zone) in Netzwerken?",
+            "A": "Ein Bereich ohne Internetzugriff",
+            "B": "Ein abgeschotteter Netzwerkbereich für öffentlich erreichbare Server",
+            "C": "Ein isoliertes WLAN-Netz für Gäste",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Schicht des OSI-Modells ist für die Wegwahl (Routing) zuständig?",
+            "A": "Transportschicht",
+            "B": "Sicherungsschicht",
+            "C": "Vermittlungsschicht",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wofür steht die Abkürzung HTTPS?",
+            "A": "Hypertext Transfer Protocol Secure",
+            "B": "Hyper Transfer Text Protocol Standard",
+            "C": "High Transfer Protocol Secure",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist das Ziel eines Load Balancers?",
+            "A": "Erhöht die Geschwindigkeit von Backups",
+            "B": "Verteilt Anfragen auf mehrere Server",
+            "C": "Reduziert Stromverbrauch im Rechenzentrum",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was beschreibt das Prinzip 'Defense in Depth'?",
+            "A": "Verzicht auf Firewalls",
+            "B": "Einzelne, nicht verbundene Sicherheitsmaßnahmen",
+            "C": "Mehrere aufeinander abgestimmte Sicherheitsschichten",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Aussage trifft auf IPv6 zu?",
+            "A": "Verwendet 32-Bit-Adressen",
+            "B": "Ist kompatibel mit IPv4 ohne Übergänge",
+            "C": "Verwendet 128-Bit-Adressen",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein Vorteil von SSDs gegenüber HDDs?",
+            "A": "Geringerer Stromverbrauch und schnellere Zugriffszeiten",
+            "B": "Günstiger in der Anschaffung",
+            "C": "Höhere Speicherkapazität pro Euro",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was macht das Kommando 'ping' unter Windows oder Linux?",
+            "A": "Ermittelt die CPU-Auslastung",
+            "B": "Prüft die Erreichbarkeit eines Ziels im Netzwerk",
+            "C": "Startet den Netzwerkdienst neu",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein typisches Merkmal eines Routers?",
+            "A": "Leitet Datenpakete basierend auf IP-Adressen weiter",
+            "B": "Arbeitet ausschließlich auf OSI-Schicht 1",
+            "C": "Speichert Daten lokal auf dem Gerät",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Aufgabe hat ein Firewall?",
+            "A": "Erhöht die Bandbreite des Netzwerks",
+            "B": "Filtert unerwünschten Netzwerkverkehr",
+            "C": "Erstellt Backups von Daten",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Funktion erfüllt ein Proxy-Server?",
+            "A": "Übersetzt Domainnamen in IP-Adressen",
+            "B": "Zwischenspeicherung und Weiterleitung von Anfragen",
+            "C": "Direkte Weiterleitung von TCP-Paketen",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein Vorteil einer VLAN-Struktur?",
+            "A": "Höherer Stromverbrauch zur Trennung",
+            "B": "Logische Netztrennung unabhängig von physikalischer Struktur",
+            "C": "Mehr Bandbreite durch virtuelle Tunnel",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was bedeutet die Abkürzung IP im Netzwerkbereich?",
+            "A": "Internet Provider",
+            "B": "Internet Protocol",
+            "C": "Internal Port",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche IP-Adresse gehört zum privaten Adressbereich?",
+            "A": "192.168.0.1",
+            "B": "8.8.8.8",
+            "C": "172.32.0.1",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist das Ziel der Netzsegmentierung?",
+            "A": "Mehr Drucker zu verbinden",
+            "B": "Fehlerhafte Pakete automatisch zu löschen",
+            "C": "Netzwerke in kleinere, sicherere Bereiche aufzuteilen",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Aussage beschreibt ein Backup-Inkrement?",
+            "A": "Ein vollständiges Backup aller Daten",
+            "B": "Eine Sicherung aller Daten seit dem letzten vollständigen Backup",
+            "C": "Eine Live-Wiederherstellung der Daten",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist ein typischer Vorteil von Cloud-Speicherlösungen?",
+            "A": "Physische Kontrolle über das Speichermedium",
+            "B": "Zugriff von überall mit Internetverbindung",
+            "C": "Keine Internetverbindung notwendig",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welche Maßnahme erhöht die Verfügbarkeit eines Servers?",
+            "A": "Monatliche Neustarts",
+            "B": "USV (unterbrechungsfreie Stromversorgung)",
+            "C": "Höhere Bildschirmauflösung",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was bedeutet redundante Stromversorgung bei Servern?",
+            "A": "Zwei Netzteile für erhöhte Ausfallsicherheit",
+            "B": "Ein stromsparender Servermodus",
+            "C": "Eine Steckdosenleiste mit Überspannungsschutz",
+            "richtigeAntwort": "A",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Wofür steht die Abkürzung MAC-Adresse?",
+            "A": "Memory Access Code",
+            "B": "Media Access Control",
+            "C": "Main Application Controller",
+            "richtigeAntwort": "B",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Was ist das Ziel eines Systemmonitorings?",
+            "A": "Software zu installieren",
+            "B": "Hardware zu registrieren",
+            "C": "Systemzustände automatisch zu überwachen",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        },
+        {
+            "frage": "Welches Gerät verbindet zwei Netzwerke mit unterschiedlichen IP-Adressbereichen?",
+            "A": "Switch",
+            "B": "Repeater",
+            "C": "Router",
+            "richtigeAntwort": "C",
+            "kategorie": "default"
+        }
+    ]
+}
