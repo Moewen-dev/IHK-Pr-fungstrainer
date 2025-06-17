@@ -509,6 +509,8 @@ def Admin():
 
     label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold"))
     label.pack(pady=100)
+    fragen_import = ttk.Button(button_rahmen, text="Frage hinzufügen", command=lambda: manuell_fragen(con, cur))
+    fragen_import.pack(pady=30, padx=30)
     fragen_import = ttk.Button(button_rahmen, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.pack(pady=30, padx=30)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
