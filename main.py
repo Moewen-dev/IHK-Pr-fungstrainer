@@ -105,7 +105,7 @@ def manuell_fragen(con, cur):
             return
         add_frage(con, cur, frage, A, B, C, antwort)
         add_window.destroy()
-        messagebox.showinfo("Erfolg", "Frage erfolgreich hinzugefügt.")
+        messagebox.showinfo("Erfolg", f'Frage "{frage}" erfolgreich hinzugefügt.')
 
     save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
     save_btn.pack(pady=20)
