@@ -548,22 +548,23 @@ def Admin():
         messagebox.showerror("Keine Admin-Berechtigung", "Bitte melden Sie sich mit einem Admin-Konto an, um den Adminbereich zu nutzen.")
         return
     clear_inhalt()
+
     admin_frame = ttk.Frame(inhalt_frame)
     admin_frame.pack(fill="both", expand=True)
-
-    button_rahmen = ttk.LabelFrame(inhalt_frame)
-    button_rahmen.place(x=170, y=200)
-
     label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold"))
-    label.pack(pady=100)
+    label.pack(pady=40)
+    button_rahmen = ttk.LabelFrame(admin_frame, text="Fragenverwaltung")
+    button_rahmen.pack(pady=20, padx=20)
+
     fragen_add = ttk.Button(button_rahmen, text="Frage hinzufügen", command=lambda: manuell_fragen(con, cur))
-    fragen_add.pack(pady=30, padx=30)
+    fragen_add.grid(column=0, row=0, padx=10, pady=10)
     fragen_import = ttk.Button(button_rahmen, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
-    fragen_import.pack(pady=30, padx=30)
+    fragen_import.grid(column=1, row=0, padx=10, pady=10)
+
     fragen_export = ttk.Button(button_rahmen, text="Fragen exportieren", command=lambda: export_fragen(cur))
-    fragen_export.pack(pady=30, padx=30)
+    fragen_export.grid(column=0, row=1, padx=10, pady=10)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
-    fragen_delete.pack(pady=30, padx=30)
+    fragen_delete.grid(column=1, row=1, padx=10, pady=10)
 
 # Login Funktion
 def login(cur, username, pw_hash):
