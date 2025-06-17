@@ -3,7 +3,6 @@ import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from tkinter import ttk
-from tkinter import font
 from ttkthemes import ThemedTk
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
@@ -90,7 +89,7 @@ def del_frage(con, cur):
         del_window.destroy()
     
     confirm_btn = ttk.Button(del_window, text="Löschen", command=delete_selected)
-    confirm_btn.pack(side="bottom", pady=10)
+    confirm_btn.pack(side="bottom", padx=10)
 
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
