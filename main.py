@@ -141,6 +141,124 @@ def manuell_fragen(con, cur):
     save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
     save_btn.pack(pady=20)
 
+# Fragen bearbeiten
+def edit_fragen(con, cur):
+    edit_window = tk.Toplevel(bg="#d8d8d8")
+    edit_window.title("Fragen bearbeiten")
+    edit_window.geometry("500x600")
+
+    # Header für das Bearbeitungsfenster
+    header = ttk.Label(
+        edit_window,
+        text="Klicke auf eine Frage, um sie zu bearbeiten:",
+        font=("Arial", 12, "bold"),
+        background="#d8d8d8"
+    )
+    header.pack(pady=10)
+
+    # Container für Scrollbar und Canvas
+    container = ttk.Frame(edit_window)
+    container.pack(fill="both", expand=True, padx=10, pady=10)
+
+    canvas = tk.Canvas(container, borderwidth=0, background="#d8d8d8", highlightthickness=0)
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scroll_frame = ttk.Frame(canvas)
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
+    canvas.pack(side="left", fill="both", expand=True)
+    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    def on_frame_configure(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+    scroll_frame.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+
+    # Funktion zum Bearbeiten einer Frage
+    def frage_bearbeiten_fenster(frage):
+        frage_edit = tk.Toplevel()
+        frage_edit.title("Frage bearbeiten")
+        frage_edit.geometry("500x500")
+
+        eingabe_rahmen = ttk.LabelFrame(frage_edit, text="Frage bearbeiten")
+        eingabe_rahmen.pack(padx=20, pady=20, fill="both", expand=True)
+
+        # Eingabe für Frage
+        ttk.Label(eingabe_rahmen, text="Frage:").grid(row=0, column=0, columnspan=2, sticky="w", padx=10, pady=(10, 0))
+        frage_entry = ttk.Entry(eingabe_rahmen, width=50)
+        frage_entry.insert(0, frage.frage)
+        frage_entry.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+
+        antwort_var = tk.StringVar(value=frage.antwort)
+
+        # Antwort A
+        ttk.Label(eingabe_rahmen, text="Antwort A:").grid(row=2, column=0, sticky="w", padx=10, pady=(10, 0))
+        a_entry = ttk.Entry(eingabe_rahmen, width=40)
+        a_entry.insert(0, frage.A)
+        a_entry.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        a_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="A")
+        a_radio.grid(row=3, column=1, padx=10, sticky="w")
+
+        # Antwort B
+        ttk.Label(eingabe_rahmen, text="Antwort B:").grid(row=4, column=0, sticky="w", padx=10, pady=(10, 0))
+        b_entry = ttk.Entry(eingabe_rahmen, width=40)
+        b_entry.insert(0, frage.B)
+        b_entry.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+        b_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="B")
+        b_radio.grid(row=5, column=1, padx=10, sticky="w")
+
+        # Antwort C
+        ttk.Label(eingabe_rahmen, text="Antwort C:").grid(row=6, column=0, sticky="w", padx=10, pady=(10, 0))
+        c_entry = ttk.Entry(eingabe_rahmen, width=40)
+        c_entry.insert(0, frage.C)
+        c_entry.grid(row=7, column=0, padx=10, pady=5, sticky="w")
+        c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
+        c_radio.grid(row=7, column=1, padx=10, sticky="w")
+
+        # Speichern-Button
+        def speichern():
+            neue_frage = frage_entry.get()
+            neue_A = a_entry.get()
+            neue_B = b_entry.get()
+            neue_C = c_entry.get()
+            neue_antwort = antwort_var.get()
+
+            cur.execute("""
+                UPDATE fragen
+                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?
+                WHERE id = ?
+            """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, frage.id))
+            con.commit()
+
+            messagebox.showinfo("Erfolg", "Frage erfolgreich aktualisiert.")
+            frage_edit.destroy()
+            edit_fragen(con, cur)  # aktualisiertes Fenster erneut laden
+
+        speichern_btn = ttk.Button(frage_edit, text="Änderungen speichern", command=speichern)
+        speichern_btn.pack(pady=20)
+
+
+    # Frage-Liste aus DB holen
+    fragen = get_fragen(cur)
+
+    # Keine Fragen in der DB
+    if not fragen:
+        ttk.Label(scroll_frame, text="Keine Fragen in der Datenbank.", foreground="red").pack(pady=20)
+        return
+
+    # Buttons für jede Frage erstellen
+    for frage in fragen:
+        try:
+            text = frage.frage.strip()
+            if len(text) > 80:
+                text = text[:77] + "..."
+
+            btn = ttk.Button(scroll_frame, text=text, command=lambda f=frage: frage_bearbeiten_fenster(f))
+            btn.pack(fill="x", padx=10, pady=5)
+        except Exception as e:
+            print(f"Fehler beim Anzeigen einer Frage: {e}")
+
 def del_frage(con, cur):
     # Hier werden alle Fragen angezeigt. Anschließend kann man mehrere auswählen und anschließend löschen
     del_window = tk.Toplevel(bg="#d8d8d8")  # Die Hintergrundfarbe wird Festgelegt
