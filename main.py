@@ -634,11 +634,13 @@ def Admin():
     fragen_add.grid(column=0, row=0, padx=10, pady=10)
     fragen_import = ttk.Button(button_rahmen, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.grid(column=1, row=0, padx=10, pady=10)
+    fragen_edit = ttk.Button(button_rahmen, text="Fragen bearbeiten", command=lambda: edit_fragen(con, cur))
+    fragen_edit.grid(column=0, row=1, padx=10, pady=10)
 
     fragen_export = ttk.Button(button_rahmen, text="Fragen exportieren", command=lambda: export_fragen(cur))
-    fragen_export.grid(column=0, row=1, padx=10, pady=10)
+    fragen_export.grid(column=1, row=1, padx=10, pady=10)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
-    fragen_delete.grid(column=1, row=1, padx=10, pady=10)
+    fragen_delete.grid(column=0, row=2, padx=10, pady=10)
 
 # Login Funktion
 def login(cur, username, pw_hash):
