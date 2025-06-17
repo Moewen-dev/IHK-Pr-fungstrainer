@@ -459,6 +459,8 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
             user.pruefungen_total += 1
         else:
             user.pruefungen_total += 1
+            
+        user.stat_pruefungen.append([prozent_anzahl, current_datetime()])
         
         noten_label = ttk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
         noten_label.pack(pady=100)
