@@ -430,15 +430,18 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
         Startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=Startseite)
         Startbtn.place(x=200, y=550)
         
-    else:
-        Fertig_label = ttk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
-        Fertig_label.pack(pady=50)
+    else: # Wenn alle Fragen beantwortet wurden, wird ein Rahmen mit der Option angezeigt, was als nächstes getan werden soll
+        fertig_rahmen = ttk.LabelFrame(prüfungs_frame, text="Was möchtest du als Nächstes tun?")
+        fertig_rahmen.pack(pady=50, padx=20)
 
-        statbtn = ttk.Button(prüfungs_frame, text="Zurück zur Startseite", command=Menu)
-        statbtn.pack(padx=25)
+        fertig_label = ttk.Label(fertig_rahmen, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!", font=("arial", 14, "bold"))
+        fertig_label.grid(column=0, row=0, columnspan=2, pady=(10, 20))
 
-        wiederholenbtn = ttk.Button(prüfungs_frame, text="Nochmal alle Fragen durch gehen", command=lambda:Lernmodus())
-        wiederholenbtn.pack(pady=25)
+        statbtn = ttk.Button(fertig_rahmen, text="Zurück zur Startseite", command=Menu)
+        statbtn.grid(column=0, row=1, padx=10, pady=10)
+
+        wiederholenbtn = ttk.Button(fertig_rahmen, text="Nochmal alle Fragen durchgehen", command=lambda: Lernmodus())
+        wiederholenbtn.grid(column=1, row=1, padx=10, pady=10)
 
 #Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
 def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen):
@@ -640,11 +643,13 @@ def Admin():
     fragen_add.grid(column=0, row=0, padx=10, pady=10)
     fragen_import = ttk.Button(button_rahmen, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
     fragen_import.grid(column=1, row=0, padx=10, pady=10)
+    fragen_edit = ttk.Button(button_rahmen, text="Fragen bearbeiten", command=lambda: edit_fragen(con, cur))
+    fragen_edit.grid(column=0, row=1, padx=10, pady=10)
 
     fragen_export = ttk.Button(button_rahmen, text="Fragen exportieren", command=lambda: export_fragen(cur))
-    fragen_export.grid(column=0, row=1, padx=10, pady=10)
+    fragen_export.grid(column=1, row=1, padx=10, pady=10)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
-    fragen_delete.grid(column=1, row=1, padx=10, pady=10)
+    fragen_delete.grid(column=0, row=2, padx=10, pady=10)
 
 # Login Funktion
 def login(cur, username, pw_hash):
