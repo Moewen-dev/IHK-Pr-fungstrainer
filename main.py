@@ -23,13 +23,16 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     stat_fragen_richtig TEXT,
     stat_fragen_falsch TEXT);"""]
 
+# Datenbank Dateiname
 db_name = "data.db"
 
 def add_frage(con, cur, frage, A, B, C, antwort):
+    # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort) VALUES (?, ?, ?, ?, ?)", (frage, A, B, C, antwort))
     con.commit()
 
 def get_fragen(cur):
+    # Fragen aus der Datenbank holen
     cur.execute("SELECT * FROM fragen")
     db_data = cur.fetchall()
     fragen = []
@@ -39,6 +42,7 @@ def get_fragen(cur):
     return fragen
 
 def import_fragen(con, cur, filename):
+    # Fragen aus einer JSON Datei Importieren
     try:
         with open(filename, "r", encoding="utf-8") as f:
             neue_fragen = json.load(f)
@@ -46,10 +50,11 @@ def import_fragen(con, cur, filename):
         db_fragen = get_fragen(cur)
         for item in neue_fragen["fragen"]:
             fragen.append(Frage(0, item["frage"], item["A"], item["B"], item["C"], item["richtigeAntwort"]))
-        if db_fragen == []:
+        if db_fragen == []:         # Wenn keine Fragen in der Datenbank sind, füge einfach die ganze Datei an Fragen ein.
             for neue_frage in fragen:
                 add_frage(con, cur, neue_frage.frage, neue_frage.A, neue_frage.B, neue_frage.C, neue_frage.antwort)
-        else:
+        else:                       # Wenn Fragen vorhanden sind, prüfen, ob die zu importierenden schon vorhanden sind und füge nur die hinzu,
+                                    # die noch nicht in der Datenbank sind
             db_fragen_liste = []
             for db_frage in db_fragen:
                 db_fragen_liste.append(db_frage.frage)
@@ -60,6 +65,7 @@ def import_fragen(con, cur, filename):
         print(f"Error: {e}")
 
 def export_fragen(cur):
+    # Fragen werden hier in eine JSON Datei exportiert, dies dient dazu evtl jemanden seine Fragen zu schicken oder sich selber verschiedene Fragensätze zu speichern
     try:
         fragen = get_fragen(cur)
         to_export = {"fragen": []}
@@ -72,6 +78,7 @@ def export_fragen(cur):
         messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
 
 def manuell_fragen(con, cur):
+    # Hier werden manuell Fragen erstellt und in der Datenbank gespeichert
     add_window = tk.Toplevel()
     add_window.title("Frage hinzufügen")
     add_window.geometry("400x500")
@@ -105,19 +112,22 @@ def manuell_fragen(con, cur):
             return
         add_frage(con, cur, frage, A, B, C, antwort)
         add_window.destroy()
-        messagebox.showinfo("Erfolg", f'Frage "{frage}" erfolgreich hinzugefügt.')
+        messagebox.showinfo("Erfolg", f"Frage \"{frage}\" erfolgreich hinzugefügt.")
 
     save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
     save_btn.pack(pady=20)
 
 def del_frage(con, cur):
-    del_window = tk.Toplevel(bg="#d8d8d8")
-    del_window.title("Fragen löschen")
-    del_window.geometry("500x600")
+    # Hier werden alle Fragen angezeigt. Anschließend kann man mehrere auswählen und anschließend löschen
+    del_window = tk.Toplevel(bg="#d8d8d8")  # Die Hintergrundfarbe wird Festgelegt
+    del_window.title("Fragen löschen")        # Der Fenstertitel wird Festgelegt
+    del_window.geometry("500x600")            # Die Fenstergröße wird Festgelegt
 
+    # Es wird die Überschrift erstellt
     header = ttk.Label(del_window, text="Wähle die Fragen aus, die du löschen möchtest:", font=("Arial", 12, "bold"), background="#d8d8d8")
     header.pack(pady=10)
-
+    
+    # Es wird ein Rahmen erstellt
     container = ttk.Frame(del_window)
     container.pack(fill="both", expand=True, padx=10, pady=10)
 
@@ -172,7 +182,6 @@ def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
 
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
-#root = tk.Tk()
 root = ThemedTk(theme="scidgreen")
 root.title("IHK Prüfungs Trainer")
 root.geometry("500x600")
@@ -202,9 +211,9 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
-# Verbessert
 def Prüfungsmodus():
-    if user.user_id == 0:
+    # Hier wird das Prüfungsmodus Fenster erstellt
+    if user.user_id == 0:       # Als erster wird überprüft ob der User angemeldet ist. Wenn nicht wird er zurück zur Startseite geschickt.
         messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich an, um den Prüfungsmodus zu nutzen.")
         Startseite()
         return
@@ -694,10 +703,6 @@ def main(con, cur):
     # Benutzer Initialisieren
     global user
     user = User(0, 0, 0, 0, 0, 0)
-    
-    # Style Theme
-    #style = ttk.Style()
-    #style.theme_use('classic')
     
     # Tastenkürzel
     root.bind("<Escape>", end_fullscreen)
