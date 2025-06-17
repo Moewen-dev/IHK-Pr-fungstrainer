@@ -274,14 +274,20 @@ def Lernmodus():
     # Auswahl anzeigen
     wahl_var = tk.BooleanVar(value=True)
 
-    gesamtfragen_btn = ttk.Radiobutton(inhalt_frame, text="Willst du alle Fragen lernen?", variable=wahl_var, value=True)
-    gesamtfragen_btn.pack(pady=10)
+    button_rahmen = ttk.LabelFrame(inhalt_frame, text="Lernmodus Auswahl")
+    button_rahmen.place(x=60, y=150)
 
-    falsche_fragen_btn = ttk.Radiobutton(inhalt_frame, text="Nur die Falschen wiederholen?", variable=wahl_var, value=False)
-    falsche_fragen_btn.pack(pady=10)
+    label = ttk.Label(button_rahmen, text="Welche Fragen möchtest du lernen?", font=("arial", 12, "bold"))
+    label.grid(column=0, row=0, columnspan=2, pady=(10, 20), padx=10)
 
-    weiter_btn = ttk.Button(inhalt_frame, text="Weiter mit der Auswahl", command=lambda: starte_fragen(wahl_var.get()))
-    weiter_btn.pack(pady=20)
+    gesamtfragen_btn = ttk.Radiobutton(button_rahmen, text="Alle Fragen lernen", variable=wahl_var, value=True)
+    gesamtfragen_btn.grid(column=0, row=1, sticky=(tk.W), padx=10, pady=5)
+
+    falsche_fragen_btn = ttk.Radiobutton(button_rahmen, text="Nur falsche Fragen wiederholen", variable=wahl_var, value=False)
+    falsche_fragen_btn.grid(column=0, row=2, sticky=(tk.W), padx=10, pady=5)
+
+    weiter_btn = ttk.Button(button_rahmen, text="Weiter", command=lambda: starte_fragen(wahl_var.get()))
+    weiter_btn.grid(column=0, row=3, pady=20, padx=10)
 
 def starte_fragen(wahl):
     clear_inhalt()
