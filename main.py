@@ -1,4 +1,4 @@
-import sqlite3, sys, json, random, hashlib
+import sqlite3, sys, json, random, hashlib, datetime
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
@@ -145,6 +145,9 @@ def del_frage(con, cur):
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
+
+def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
+    return datetime.datetime.now().strftime(format)
 
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
