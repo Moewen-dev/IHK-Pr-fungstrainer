@@ -483,22 +483,26 @@ def Guiregister():
     clear_inhalt()
     register_frame = ttk.Frame(inhalt_frame)
     register_frame.pack(fill="both", expand=True)
-    label = ttk.Label(register_frame, text="Registrierbereich")
-    label.pack(pady=100)
-    
-    ttk.Label(register_frame, text="Benutzername:").pack(pady=(10, 0))
-    username_entry = ttk.Entry(register_frame)
-    username_entry.pack(pady=5)
-    
-    ttk.Label(register_frame, text="Passwort:").pack(pady=(10, 0))
-    password_entry = ttk.Entry(register_frame, show="*")
-    password_entry.pack(pady=5)
-    
+
+    button_rahmen = ttk.LabelFrame(register_frame, text="Registrierung")
+    button_rahmen.place(x=100, y=100)
+
+    label = ttk.Label(button_rahmen, text="Benutzerkonto erstellen", font=("arial", 15, "bold"))
+    label.grid(column=0, row=0, columnspan=2, pady=(10, 20), padx=10)
+
+    ttk.Label(button_rahmen, text="Benutzername:").grid(column=0, row=1, sticky=tk.W, padx=10, pady=5)
+    username_entry = ttk.Entry(button_rahmen)
+    username_entry.grid(column=1, row=1, padx=10, pady=5)
+
+    ttk.Label(button_rahmen, text="Passwort:").grid(column=0, row=2, sticky=tk.W, padx=10, pady=5)
+    password_entry = ttk.Entry(button_rahmen, show="*")
+    password_entry.grid(column=1, row=2, padx=10, pady=5)
+
     is_admin = tk.IntVar()
-    ttk.Label(register_frame, text="Admin: ").pack(pady=(10, 0))
-    is_admin_entry = ttk.Checkbutton(register_frame, text="Admin", variable=is_admin)
-    is_admin_entry.pack(pady=5)
-    
+    ttk.Label(button_rahmen, text="Adminrechte:").grid(column=0, row=3, sticky=tk.W, padx=10, pady=5)
+    is_admin_entry = ttk.Checkbutton(button_rahmen, text="Admin", variable=is_admin)
+    is_admin_entry.grid(column=1, row=3, padx=10, pady=5)
+
     def handle_register():
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
@@ -506,8 +510,8 @@ def Guiregister():
         messagebox.showinfo("Erfolg", f"Benutzer erfolgreich registriert. Ihr Benutzername lautet: {username}")
         Guilogin()
         
-    registerbtn = ttk.Button(register_frame, text="Register", command=handle_register)
-    registerbtn.pack(pady=20)
+    registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=handle_register)
+    registerbtn.grid(column=0, row=4, columnspan=2, pady=20)
     
 # Admin Bereich
 def Admin():
