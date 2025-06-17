@@ -325,7 +325,7 @@ def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
 root = ThemedTk(theme="scidgreen")
-root.title("IHK Prüfungs Trainer")
+root.title("Prüfungstrainer")
 root.geometry("500x600")
 
 inhalt_frame = ttk.Frame(root, padding=(3,3,12,12))
@@ -600,7 +600,7 @@ def Startseite():
         clear_inhalt()
         start_frame = ttk.Frame(inhalt_frame)
         start_frame.pack(fill="both", expand=True)
-        label = ttk.Label(start_frame, text="Willkommen \n zum IHK Prüfungstrainer!", font=("arial", 30, "bold"))
+        label = ttk.Label(start_frame, text="Willkommen \n zum Prüfungstrainer!", font=("arial", 30, "bold"))
         label.place(x=0, y=0)
 
         button_rahmen = ttk.LabelFrame(start_frame, text="Benutzerzugang")
@@ -622,10 +622,10 @@ def Menu():
     button_rahmen.place(x=60, y=150)
 
     menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
-    label = ttk.Label(button_rahmen, text="Willkommen!\nIm IHK Prüfungs trainer\nWas möchtest du Machen?", font=("arial", 15, "bold"))
+    label = ttk.Label(button_rahmen, text="Willkommen!\nIm Prüfungstrainer\nWie möchtest du fortfahren?", font=("arial", 15, "bold"))
     label.grid(column=0, row=0, columnspan=3, sticky=(tk.N), padx=5, pady=5)
     
-    Lernbtn = ttk.Button(button_rahmen, text="Weiter Lernen", command=Lernmodus)
+    Lernbtn = ttk.Button(button_rahmen, text="Weiterlernen", command=Lernmodus)
     Lernbtn.grid(column=0, row=1, sticky=(tk.S, tk.W), padx=5, pady=10) # type: ignore
 
     Prüfungsbtn = ttk.Button(button_rahmen, text="Zur Prüfungssimulation", command=Prüfungsmodus)
