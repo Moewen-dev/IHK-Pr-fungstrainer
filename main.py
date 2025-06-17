@@ -668,7 +668,7 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
         frageC = ttk.Radiobutton(button_rahmen, text=aktuelle_frage.C, variable=auswahl, value="C")
         frageC.grid(row=2, column=0, pady=10, padx=20)
 
-        submit_btn = ttk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen))
+        submit_btn = ttk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame))
         submit_btn.grid(row=5, column=0)
         
         Startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=Startseite)
