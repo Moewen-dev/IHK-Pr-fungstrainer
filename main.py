@@ -135,7 +135,7 @@ def manuell_fragen(con, cur):
         else:
             Admin()
 
-    ttk.Button(add_window, text="Frage speichern", command=save_frage)
+    save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
     save_btn.pack(pady=20)
 
 def del_frage(con, cur):
