@@ -77,44 +77,65 @@ def export_fragen(cur):
     except:
         messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
 
+# Manuell eine einzelne Frage hinzufügen
 def manuell_fragen(con, cur):
-    # Hier werden manuell Fragen erstellt und in der Datenbank gespeichert
+    # Neues Fenster öffnen
     add_window = tk.Toplevel()
     add_window.title("Frage hinzufügen")
-    add_window.geometry("400x500")
+    add_window.geometry("500x600")
 
-    ttk.Label(add_window, text="Frage:").pack(pady=(10, 0))
-    frage_entry = ttk.Entry(add_window, width=50)
-    frage_entry.pack(pady=5)
+    eingabe_rahmen = ttk.LabelFrame(add_window, text="Frage erstellen")
+    eingabe_rahmen.pack(padx=20, pady=20, fill="both", expand=True)
 
-    ttk.Label(add_window, text="Antwort A:").pack(pady=(10, 0))
-    a_entry = ttk.Entry(add_window, width=50)
-    a_entry.pack(pady=5)
-    ttk.Label(add_window, text="Antwort B:").pack(pady=(10, 0))
-    b_entry = ttk.Entry(add_window, width=50)
-    b_entry.pack(pady=5)
-    ttk.Label(add_window, text="Antwort C:").pack(pady=(10, 0))
-    c_entry = ttk.Entry(add_window, width=50)
-    c_entry.pack(pady=5)
+    # Wie lautet die Frage?
+    ttk.Label(eingabe_rahmen, text="Frage:").grid(row=0, column=0, columnspan=2, sticky="w", padx=10, pady=(10, 0))
+    frage_entry = ttk.Entry(eingabe_rahmen, width=50)
+    frage_entry.grid(row=1, column=0, padx=10, pady=5)
 
-    ttk.Label(add_window, text="Richtige Antwort (A, B oder C):").pack(pady=(10, 0))
-    antwort_entry = ttk.Entry(add_window, width=5)
-    antwort_entry.pack(pady=5)
+    # Stndardmäßig Antwort A als richtig markieren
+    antwort_var = tk.StringVar(value="A")
 
+    # Antwort A definieren
+    ttk.Label(eingabe_rahmen, text="Antwort A:").grid(row=2, column=0, sticky="w", padx=10, pady=(10, 0))
+    a_entry = ttk.Entry(eingabe_rahmen, width=40)
+    a_entry.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    a_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="A")
+    a_radio.grid(row=3, column=1, padx=10, sticky="w")
+
+    # Antwort B definieren
+    ttk.Label(eingabe_rahmen, text="Antwort B:").grid(row=4, column=0, sticky="w", padx=10, pady=(10, 0))
+    b_entry = ttk.Entry(eingabe_rahmen, width=40)
+    b_entry.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+    b_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="B")
+    b_radio.grid(row=5, column=1, padx=10, sticky="w")
+
+    # Antwort C definieren
+    ttk.Label(eingabe_rahmen, text="Antwort C:").grid(row=6, column=0, sticky="w", padx=10, pady=(10, 0))
+    c_entry = ttk.Entry(eingabe_rahmen, width=40)
+    c_entry.grid(row=7, column=0, padx=10, pady=5, sticky="w")
+    c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
+    c_radio.grid(row=7, column=1, padx=10, sticky="w")
+
+    # Frage speichern und Feedback
     def save_frage():
         frage = frage_entry.get()
         A = a_entry.get()
         B = b_entry.get()
         C = c_entry.get()
-        antwort = antwort_entry.get().upper()
-        if antwort not in ["A", "B", "C"]:
-            messagebox.showerror("Fehler", "Die richtige Antwort muss A, B oder C sein.")
-            return
-        add_frage(con, cur, frage, A, B, C, antwort)
-        add_window.destroy()
-        messagebox.showinfo("Erfolg", f"Frage \"{frage}\" erfolgreich hinzugefügt.")
+        antwort = antwort_var.get()
 
-    save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
+        # Frage wird gespeichert
+        add_frage(con, cur, frage, A, B, C, antwort)
+        messagebox.showinfo("Erfolg", f'Frage "{frage}" erfolgreich hinzugefügt.')
+        add_window.destroy()
+
+        # Weitere Frage hinzufügen oder zurück zum Adminbereich?
+        if messagebox.askyesno("Fragen hinzufügen", "Möchtest du eine weitere Frage hinzufügen?"):
+            manuell_fragen(con, cur)
+        else:
+            Admin()
+
+    ttk.Button(add_window, text="Frage speichern", command=save_frage)
     save_btn.pack(pady=20)
 
 def del_frage(con, cur):
