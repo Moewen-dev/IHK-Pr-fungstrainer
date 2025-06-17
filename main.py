@@ -129,7 +129,7 @@ def manuell_fragen(con, cur):
 
         # Frage wird gespeichert
         add_frage(con, cur, frage, A, B, C, antwort)
-        messagebox.showinfo("Erfolg", f'Frage "{frage}" erfolgreich hinzugefügt.')
+        messagebox.showinfo("Erfolg", f"Frage \"{frage}\" erfolgreich hinzugefügt.")
         add_window.destroy()
 
         # Weitere Frage hinzufügen oder zurück zum Adminbereich?
@@ -159,11 +159,13 @@ def edit_fragen(con, cur):
     # Container für Scrollbar und Canvas
     container = ttk.Frame(edit_window)
     container.pack(fill="both", expand=True, padx=10, pady=10)
-
+    
+    # Canvas und Scrollbar für die Frage-Liste
     canvas = tk.Canvas(container, borderwidth=0, background="#d8d8d8", highlightthickness=0)
     scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
     scroll_frame = ttk.Frame(canvas)
 
+    # Scrollbar und Canvas konfigurieren
     canvas.configure(yscrollcommand=scrollbar.set)
     scrollbar.pack(side="right", fill="y")
     canvas.pack(side="left", fill="both", expand=True)
@@ -176,7 +178,9 @@ def edit_fragen(con, cur):
     scroll_frame.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
 
     # Funktion zum Bearbeiten einer Frage
-    def frage_bearbeiten_fenster(frage):
+    def frage_bearbeiten_fenster(frage, edit_window):
+        edit_window.destroy()  # Aktuelles Fenster schließen
+        # Neues Fenster für die Bearbeitung der Frage
         frage_edit = tk.Toplevel()
         frage_edit.title("Frage bearbeiten")
         frage_edit.geometry("500x500")
@@ -190,6 +194,7 @@ def edit_fragen(con, cur):
         frage_entry.insert(0, frage.frage)
         frage_entry.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="w")
 
+        # Standardmäßig die aktuelle Antwort als richtig markieren
         antwort_var = tk.StringVar(value=frage.antwort)
 
         # Antwort A
@@ -218,26 +223,28 @@ def edit_fragen(con, cur):
 
         # Speichern-Button
         def speichern():
-            neue_frage = frage_entry.get()
-            neue_A = a_entry.get()
-            neue_B = b_entry.get()
-            neue_C = c_entry.get()
-            neue_antwort = antwort_var.get()
+            neue_frage = frage_entry.get() # Frage aktualisieren
+            neue_A = a_entry.get() # Antwort A aktualisieren
+            neue_B = b_entry.get() # Antwort B aktualisieren
+            neue_C = c_entry.get() # Antwort C aktualisieren
+            neue_antwort = antwort_var.get() # Richtige Antwort aktualisieren
 
             cur.execute("""
                 UPDATE fragen
                 SET frage = ?, A = ?, B = ?, C = ?, antwort = ?
                 WHERE id = ?
             """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, frage.id))
-            con.commit()
+            con.commit() # Änderungen speichern
 
-            messagebox.showinfo("Erfolg", "Frage erfolgreich aktualisiert.")
+            messagebox.showinfo("Erfolg", f'Frage \"{neue_frage}\" erfolgreich aktualisiert.') # Feedback geben
             frage_edit.destroy()
-            edit_fragen(con, cur)  # aktualisiertes Fenster erneut laden
+            fortfahren = messagebox.askyesno("Bestätigung", "Möchtest du weitere Fragen bearbeiten?") # Sollen weitere Fragen bearbeitet werden?
+            if not fortfahren: # Wenn nicht, dann zurück zum Adminbereich
+                return
+            edit_fragen(con, cur)  # aktualisierte Bearbeitungsliste erneut laden
 
         speichern_btn = ttk.Button(frage_edit, text="Änderungen speichern", command=speichern)
         speichern_btn.pack(pady=20)
-
 
     # Frage-Liste aus DB holen
     fragen = get_fragen(cur)
@@ -254,9 +261,9 @@ def edit_fragen(con, cur):
             if len(text) > 80:
                 text = text[:77] + "..."
 
-            btn = ttk.Button(scroll_frame, text=text, command=lambda f=frage: frage_bearbeiten_fenster(f))
+            btn = ttk.Button(scroll_frame, text=frage.frage, command=lambda f=frage: frage_bearbeiten_fenster(f, edit_window)) # Button zum Bearbeiten der Frage
             btn.pack(fill="x", padx=10, pady=5)
-        except Exception as e:
+        except Exception as e: # Fehler beim Anzeigen einer Frage
             print(f"Fehler beim Anzeigen einer Frage: {e}")
 
 def del_frage(con, cur):
@@ -600,7 +607,7 @@ def Startseite():
         clear_inhalt()
         start_frame = ttk.Frame(inhalt_frame)
         start_frame.pack(fill="both", expand=True)
-        label = ttk.Label(start_frame, text="Willkommen \n zum Prüfungstrainer!", font=("arial", 30, "bold"))
+        label = ttk.Label(start_frame, text="Willkommen\nzum Prüfungstrainer!", font=("arial", 30, "bold"))
         label.place(x=0, y=0)
 
         button_rahmen = ttk.LabelFrame(start_frame, text="Benutzerzugang")
