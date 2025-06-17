@@ -1,9 +1,8 @@
-import sqlite3, sys, json, random, hashlib
+import sqlite3, sys, json, random, hashlib, datetime
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from tkinter import ttk
-from tkinter import font
 from ttkthemes import ThemedTk
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
@@ -20,15 +19,23 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     pw_hash TEXT NOT NULL,
     fragen_total INTEGER,
     fragen_richtig INTEGER,
-    fragen_falsch TEXT);"""]
+    fragen_falsch TEXT,
+    stat_fragen_richtig TEXT,
+    stat_fragen_falsch TEXT,
+    pruefungen_total INT,
+    pruefungen_bestanden INT,
+    stat_pruefungen TEXT);"""]
 
+# Datenbank Dateiname
 db_name = "data.db"
 
 def add_frage(con, cur, frage, A, B, C, antwort):
+    # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort) VALUES (?, ?, ?, ?, ?)", (frage, A, B, C, antwort))
     con.commit()
-
+    
 def get_fragen(cur):
+    # Fragen aus der Datenbank holen
     cur.execute("SELECT * FROM fragen")
     db_data = cur.fetchall()
     fragen = []
@@ -38,6 +45,7 @@ def get_fragen(cur):
     return fragen
 
 def import_fragen(con, cur, filename):
+    # Fragen aus einer JSON Datei Importieren
     try:
         with open(filename, "r", encoding="utf-8") as f:
             neue_fragen = json.load(f)
@@ -45,10 +53,11 @@ def import_fragen(con, cur, filename):
         db_fragen = get_fragen(cur)
         for item in neue_fragen["fragen"]:
             fragen.append(Frage(0, item["frage"], item["A"], item["B"], item["C"], item["richtigeAntwort"]))
-        if db_fragen == []:
+        if db_fragen == []:         # Wenn keine Fragen in der Datenbank sind, füge einfach die ganze Datei an Fragen ein.
             for neue_frage in fragen:
                 add_frage(con, cur, neue_frage.frage, neue_frage.A, neue_frage.B, neue_frage.C, neue_frage.antwort)
-        else:
+        else:                       # Wenn Fragen vorhanden sind, prüfen, ob die zu importierenden schon vorhanden sind und füge nur die hinzu,
+                                    # die noch nicht in der Datenbank sind
             db_fragen_liste = []
             for db_frage in db_fragen:
                 db_fragen_liste.append(db_frage.frage)
@@ -58,53 +67,276 @@ def import_fragen(con, cur, filename):
     except TypeError as e:
         print(f"Error: {e}")
 
-def del_frage(con, cur):
-    del_window = tk.Toplevel()
-    del_window.title("Fragen Löschen")
-    del_window.geometry("500x600")
-    
-    canvas = tk.Canvas(del_window)
-    scrollbar = ttk.Scrollbar(del_window, orient="vertical", command=canvas.yview)
-    scroll_frame = ttk.Frame(canvas)
-    
-    def configure_scroll_region(event):
-        canvas.configure(scrollregion=canvas.bbox("all"))
-        
-    scroll_frame.bind("<Configure>", configure_scroll_region)
-    canvas.configure(yscrollcommand=scrollbar.set)
-    canvas.pack(side="left", fill="both", expand=True)
-    scrollbar.pack(side="right", fill="y")
-    canvas.create_window((0,0), window=scroll_frame, anchor="nw")
-    
-    fragen = get_fragen(cur)
-    
-    for i, frage in enumerate(fragen):
-        checkbox = ttk.Checkbutton(scroll_frame, text=frage.frage, variable=frage.delete)
-        checkbox.pack(pady=5, padx=10, anchor="w")
-    
-    def delete_selected():
+def export_fragen(cur):
+    # Fragen werden hier in eine JSON Datei exportiert, dies dient dazu evtl jemanden seine Fragen zu schicken oder sich selber verschiedene Fragensätze zu speichern
+    try:
+        fragen = get_fragen(cur)
+        to_export = {"fragen": []}
         for frage in fragen:
-            if frage.delete.get():
-                cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
-                con.commit()
-        del_window.destroy()
+            to_export["fragen"].append(frage.export())
+        with open("fragen_export.json", "wt", encoding="utf-8") as file:
+            file.write(json.dumps(to_export, ensure_ascii=False))
+        messagebox.showinfo("Fragen export", "Fragen erfolgreich exportiert")
+    except:
+        messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
+
+# Manuell eine einzelne Frage hinzufügen
+def manuell_fragen(con, cur):
+    # Neues Fenster öffnen
+    add_window = tk.Toplevel()
+    add_window.title("Frage hinzufügen")
+    add_window.geometry("500x600")
+
+    eingabe_rahmen = ttk.LabelFrame(add_window, text="Frage erstellen")
+    eingabe_rahmen.pack(padx=20, pady=20, fill="both", expand=True)
+
+    # Wie lautet die Frage?
+    ttk.Label(eingabe_rahmen, text="Frage:").grid(row=0, column=0, columnspan=2, sticky="w", padx=10, pady=(10, 0))
+    frage_entry = ttk.Entry(eingabe_rahmen, width=50)
+    frage_entry.grid(row=1, column=0, padx=10, pady=5)
+
+    # Stndardmäßig Antwort A als richtig markieren
+    antwort_var = tk.StringVar(value="A")
+
+    # Antwort A definieren
+    ttk.Label(eingabe_rahmen, text="Antwort A:").grid(row=2, column=0, sticky="w", padx=10, pady=(10, 0))
+    a_entry = ttk.Entry(eingabe_rahmen, width=40)
+    a_entry.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    a_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="A")
+    a_radio.grid(row=3, column=1, padx=10, sticky="w")
+
+    # Antwort B definieren
+    ttk.Label(eingabe_rahmen, text="Antwort B:").grid(row=4, column=0, sticky="w", padx=10, pady=(10, 0))
+    b_entry = ttk.Entry(eingabe_rahmen, width=40)
+    b_entry.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+    b_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="B")
+    b_radio.grid(row=5, column=1, padx=10, sticky="w")
+
+    # Antwort C definieren
+    ttk.Label(eingabe_rahmen, text="Antwort C:").grid(row=6, column=0, sticky="w", padx=10, pady=(10, 0))
+    c_entry = ttk.Entry(eingabe_rahmen, width=40)
+    c_entry.grid(row=7, column=0, padx=10, pady=5, sticky="w")
+    c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
+    c_radio.grid(row=7, column=1, padx=10, sticky="w")
+
+    # Frage speichern und Feedback
+    def save_frage():
+        frage = frage_entry.get()
+        A = a_entry.get()
+        B = b_entry.get()
+        C = c_entry.get()
+        antwort = antwort_var.get()
+
+        # Frage wird gespeichert
+        add_frage(con, cur, frage, A, B, C, antwort)
+        messagebox.showinfo("Erfolg", f"Frage \"{frage}\" erfolgreich hinzugefügt.")
+        add_window.destroy()
+
+        # Weitere Frage hinzufügen oder zurück zum Adminbereich?
+        if messagebox.askyesno("Fragen hinzufügen", "Möchtest du eine weitere Frage hinzufügen?"):
+            manuell_fragen(con, cur)
+        else:
+            Admin()
+
+    save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
+    save_btn.pack(pady=20)
+
+# Fragen bearbeiten
+def edit_fragen(con, cur):
+    edit_window = tk.Toplevel(bg="#d8d8d8")
+    edit_window.title("Fragen bearbeiten")
+    edit_window.geometry("500x600")
+
+    # Header für das Bearbeitungsfenster
+    header = ttk.Label(
+        edit_window,
+        text="Klicke auf eine Frage, um sie zu bearbeiten:",
+        font=("Arial", 12, "bold"),
+        background="#d8d8d8"
+    )
+    header.pack(pady=10)
+
+    # Container für Scrollbar und Canvas
+    container = ttk.Frame(edit_window)
+    container.pack(fill="both", expand=True, padx=10, pady=10)
     
-    confirm_btn = ttk.Button(del_window, text="Löschen", command=delete_selected)
-    confirm_btn.pack(side="bottom", pady=10)
+    # Canvas und Scrollbar für die Frage-Liste
+    canvas = tk.Canvas(container, borderwidth=0, background="#d8d8d8", highlightthickness=0)
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scroll_frame = ttk.Frame(canvas)
+
+    # Scrollbar und Canvas konfigurieren
+    canvas.configure(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
+    canvas.pack(side="left", fill="both", expand=True)
+    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    def on_frame_configure(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+    scroll_frame.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+
+    # Funktion zum Bearbeiten einer Frage
+    def frage_bearbeiten_fenster(frage, edit_window):
+        edit_window.destroy()  # Aktuelles Fenster schließen
+        # Neues Fenster für die Bearbeitung der Frage
+        frage_edit = tk.Toplevel()
+        frage_edit.title("Frage bearbeiten")
+        frage_edit.geometry("500x500")
+
+        eingabe_rahmen = ttk.LabelFrame(frage_edit, text="Frage bearbeiten")
+        eingabe_rahmen.pack(padx=20, pady=20, fill="both", expand=True)
+
+        # Eingabe für Frage
+        ttk.Label(eingabe_rahmen, text="Frage:").grid(row=0, column=0, columnspan=2, sticky="w", padx=10, pady=(10, 0))
+        frage_entry = ttk.Entry(eingabe_rahmen, width=50)
+        frage_entry.insert(0, frage.frage)
+        frage_entry.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+
+        # Standardmäßig die aktuelle Antwort als richtig markieren
+        antwort_var = tk.StringVar(value=frage.antwort)
+
+        # Antwort A
+        ttk.Label(eingabe_rahmen, text="Antwort A:").grid(row=2, column=0, sticky="w", padx=10, pady=(10, 0))
+        a_entry = ttk.Entry(eingabe_rahmen, width=40)
+        a_entry.insert(0, frage.A)
+        a_entry.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+        a_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="A")
+        a_radio.grid(row=3, column=1, padx=10, sticky="w")
+
+        # Antwort B
+        ttk.Label(eingabe_rahmen, text="Antwort B:").grid(row=4, column=0, sticky="w", padx=10, pady=(10, 0))
+        b_entry = ttk.Entry(eingabe_rahmen, width=40)
+        b_entry.insert(0, frage.B)
+        b_entry.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+        b_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="B")
+        b_radio.grid(row=5, column=1, padx=10, sticky="w")
+
+        # Antwort C
+        ttk.Label(eingabe_rahmen, text="Antwort C:").grid(row=6, column=0, sticky="w", padx=10, pady=(10, 0))
+        c_entry = ttk.Entry(eingabe_rahmen, width=40)
+        c_entry.insert(0, frage.C)
+        c_entry.grid(row=7, column=0, padx=10, pady=5, sticky="w")
+        c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
+        c_radio.grid(row=7, column=1, padx=10, sticky="w")
+
+        # Speichern-Button
+        def speichern():
+            neue_frage = frage_entry.get() # Frage aktualisieren
+            neue_A = a_entry.get() # Antwort A aktualisieren
+            neue_B = b_entry.get() # Antwort B aktualisieren
+            neue_C = c_entry.get() # Antwort C aktualisieren
+            neue_antwort = antwort_var.get() # Richtige Antwort aktualisieren
+
+            cur.execute("""
+                UPDATE fragen
+                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?
+                WHERE id = ?
+            """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, frage.id))
+            con.commit() # Änderungen speichern
+
+            messagebox.showinfo("Erfolg", f'Frage \"{neue_frage}\" erfolgreich aktualisiert.') # Feedback geben
+            frage_edit.destroy()
+            fortfahren = messagebox.askyesno("Bestätigung", "Möchtest du weitere Fragen bearbeiten?") # Sollen weitere Fragen bearbeitet werden?
+            if not fortfahren: # Wenn nicht, dann zurück zum Adminbereich
+                return
+            edit_fragen(con, cur)  # aktualisierte Bearbeitungsliste erneut laden
+
+        speichern_btn = ttk.Button(frage_edit, text="Änderungen speichern", command=speichern)
+        speichern_btn.pack(pady=20)
+
+    # Frage-Liste aus DB holen
+    fragen = get_fragen(cur)
+
+    # Keine Fragen in der DB
+    if not fragen:
+        ttk.Label(scroll_frame, text="Keine Fragen in der Datenbank.", foreground="red").pack(pady=20)
+        return
+
+    # Buttons für jede Frage erstellen
+    for frage in fragen:
+        try:
+            text = frage.frage.strip()
+            if len(text) > 80:
+                text = text[:77] + "..."
+
+            btn = ttk.Button(scroll_frame, text=frage.frage, command=lambda f=frage: frage_bearbeiten_fenster(f, edit_window)) # Button zum Bearbeiten der Frage
+            btn.pack(fill="x", padx=10, pady=5)
+        except Exception as e: # Fehler beim Anzeigen einer Frage
+            print(f"Fehler beim Anzeigen einer Frage: {e}")
+
+def del_frage(con, cur):
+    # Hier werden alle Fragen angezeigt. Anschließend kann man mehrere auswählen und anschließend löschen
+    del_window = tk.Toplevel(bg="#d8d8d8")  # Die Hintergrundfarbe wird Festgelegt
+    del_window.title("Fragen löschen")        # Der Fenstertitel wird Festgelegt
+    del_window.geometry("500x600")            # Die Fenstergröße wird Festgelegt
+
+    # Es wird die Überschrift erstellt
+    header = ttk.Label(del_window, text="Wähle die Fragen aus, die du löschen möchtest:", font=("Arial", 12, "bold"), background="#d8d8d8")
+    header.pack(pady=10)
+    
+    # Es wird ein Rahmen erstellt
+    container = ttk.Frame(del_window)
+    container.pack(fill="both", expand=True, padx=10, pady=10)
+
+    canvas = tk.Canvas(container, borderwidth=0, background="#d8d8d8", highlightthickness=0)
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+    scroll_frame = ttk.Frame(canvas, style="TFrame")
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+    scrollbar.pack(side="right", fill="y")
+    canvas.pack(side="left", fill="both", expand=True)
+    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    def on_frame_configure(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    scroll_frame.bind_all("<MouseWheel>", _on_mousewheel)
+
+    fragen = get_fragen(cur)
+    for frage in fragen:
+        checkbox = ttk.Checkbutton(scroll_frame, text=frage.frage, variable=frage.delete)
+        checkbox.pack(anchor="w", padx=10, pady=5)
+
+    def delete_selected():
+        auszuwählen = [frage for frage in fragen if frage.delete.get()]
+        if not auszuwählen:
+            messagebox.showwarning("Keine Auswahl", "Bitte wähle mindestens eine Frage aus.")
+            del_window.lift()
+            del_window.focus_force()
+            return
+        fortfahren = messagebox.askyesno("Bestätigung", "Möchtest du die ausgewählten Fragen wirklich löschen?")
+        if not fortfahren:
+            return
+        for frage in auszuwählen:
+            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
+        con.commit()
+        messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
+        del_window.destroy()
+
+    ttk.Button(del_window, text="Ausgewählte Fragen löschen", command=delete_selected).pack(pady=15)
 
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
 
+def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
+    return datetime.datetime.now().strftime(format)
+
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
-#root = tk.Tk()
 root = ThemedTk(theme="scidgreen")
-root.title("IHK Prüfungs Trainer")
+root.title("Prüfungstrainer")
 root.geometry("500x600")
 
 inhalt_frame = ttk.Frame(root, padding=(3,3,12,12))
-inhalt_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+inhalt_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
 
 root.columnconfigure(0, weight=1)
 root.rowconfigure(0, weight=1)
@@ -128,9 +360,9 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
-# Verbessert
 def Prüfungsmodus():
-    if user.user_id == 0:
+    # Hier wird das Prüfungsmodus Fenster erstellt
+    if user.user_id == 0:       # Als erster wird überprüft ob der User angemeldet ist. Wenn nicht wird er zurück zur Startseite geschickt.
         messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich an, um den Prüfungsmodus zu nutzen.")
         Startseite()
         return
@@ -220,6 +452,12 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
             case _:
                 note = f"6 - {prozent_anzahl:.2f}%"
 
+        if prozent_anzahl >= 50:
+            user.pruefungen_bestanden += 1
+            user.pruefungen_total += 1
+        else:
+            user.pruefungen_total += 1
+        
         noten_label = ttk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
         noten_label.pack(pady=100)
 
@@ -228,11 +466,13 @@ def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_inde
     if aktuelle_frage.antwort == auswahl.get():
         user.fragen_richtig += 1
         user.fragen_total += 1
+        user.stat_fragen_richtig.append([aktuelle_frage.id, current_datetime()])
 
         if aktuelle_frage.id in user.fragen_falsch:     
              user.fragen_falsch.remove(aktuelle_frage.id)
     else:
         user.fragen_total += 1
+        user.stat_fragen_falsch.append([aktuelle_frage.id, current_datetime()])
         if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
         falsche_Prüfungsfragen += 1
@@ -250,14 +490,20 @@ def Lernmodus():
     # Auswahl anzeigen
     wahl_var = tk.BooleanVar(value=True)
 
-    gesamtfragen_btn = ttk.Radiobutton(inhalt_frame, text="Willst du alle Fragen lernen?", variable=wahl_var, value=True)
-    gesamtfragen_btn.pack(pady=10)
+    button_rahmen = ttk.LabelFrame(inhalt_frame, text="Lernmodus Auswahl")
+    button_rahmen.place(x=60, y=150)
 
-    falsche_fragen_btn = ttk.Radiobutton(inhalt_frame, text="Nur die Falschen wiederholen?", variable=wahl_var, value=False)
-    falsche_fragen_btn.pack(pady=10)
+    label = ttk.Label(button_rahmen, text="Welche Fragen möchtest du lernen?", font=("arial", 12, "bold"))
+    label.grid(column=0, row=0, columnspan=2, pady=(10, 20), padx=10)
 
-    weiter_btn = ttk.Button(inhalt_frame, text="Weiter mit der Auswahl", command=lambda: starte_fragen(wahl_var.get()))
-    weiter_btn.pack(pady=20)
+    gesamtfragen_btn = ttk.Radiobutton(button_rahmen, text="Alle Fragen lernen", variable=wahl_var, value=True)
+    gesamtfragen_btn.grid(column=0, row=1, sticky=(tk.W), padx=10, pady=5)
+
+    falsche_fragen_btn = ttk.Radiobutton(button_rahmen, text="Nur falsche Fragen wiederholen", variable=wahl_var, value=False)
+    falsche_fragen_btn.grid(column=0, row=2, sticky=(tk.W), padx=10, pady=5)
+
+    weiter_btn = ttk.Button(button_rahmen, text="Weiter", command=lambda: starte_fragen(wahl_var.get()))
+    weiter_btn.grid(column=0, row=3, pady=20, padx=10)
 
 def starte_fragen(wahl):
     clear_inhalt()
@@ -336,15 +582,18 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
         Startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=Startseite)
         Startbtn.place(x=200, y=550)
         
-    else:
-        Fertig_label = ttk.Label(prüfungs_frame, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!")
-        Fertig_label.pack(pady=50)
+    else: # Wenn alle Fragen beantwortet wurden, wird ein Rahmen mit der Option angezeigt, was als nächstes getan werden soll
+        fertig_rahmen = ttk.LabelFrame(prüfungs_frame, text="Was möchtest du als Nächstes tun?")
+        fertig_rahmen.pack(pady=50, padx=20)
 
-        statbtn = ttk.Button(prüfungs_frame, text="Zurück zur Startseite", command=Menu)
-        statbtn.pack(padx=25)
+        fertig_label = ttk.Label(fertig_rahmen, text="Herzlichen Glückwunsch!\nDu hast alle Fragen beantwortet!", font=("arial", 14, "bold"))
+        fertig_label.grid(column=0, row=0, columnspan=2, pady=(10, 20))
 
-        wiederholenbtn = ttk.Button(prüfungs_frame, text="Nochmal alle Fragen durch gehen", command=lambda:Lernmodus())
-        wiederholenbtn.pack(pady=25)
+        statbtn = ttk.Button(fertig_rahmen, text="Zurück zur Startseite", command=Menu)
+        statbtn.grid(column=0, row=1, padx=10, pady=10)
+
+        wiederholenbtn = ttk.Button(fertig_rahmen, text="Nochmal alle Fragen durchgehen", command=lambda: Lernmodus())
+        wiederholenbtn.grid(column=1, row=1, padx=10, pady=10)
 
 #Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
 def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen):
@@ -357,6 +606,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         r_label.pack(pady=50)
         user.fragen_richtig += 1
         user.fragen_total += 1
+        user.stat_fragen_richtig.append([aktuelle_frage.id, current_datetime()])
 
         if aktuelle_frage.id in user.fragen_falsch:
             user.fragen_falsch.remove(aktuelle_frage.id)
@@ -368,6 +618,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
         l_antwort = ttk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
         user.fragen_total += 1
+        user.stat_fragen_falsch.append([aktuelle_frage.id, current_datetime()])
         if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
 
@@ -383,7 +634,7 @@ def Startseite():
         clear_inhalt()
         start_frame = ttk.Frame(inhalt_frame)
         start_frame.pack(fill="both", expand=True)
-        label = ttk.Label(start_frame, text="Willkommen \n zum IHK Prüfungstrainer!", font=("arial", 30, "bold"))
+        label = ttk.Label(start_frame, text="Willkommen\nzum Prüfungstrainer!", font=("arial", 30, "bold"))
         label.place(x=0, y=0)
 
         button_rahmen = ttk.LabelFrame(start_frame, text="Benutzerzugang")
@@ -404,19 +655,55 @@ def Menu():
     button_rahmen = ttk.LabelFrame(inhalt_frame, text="Auswahl")
     button_rahmen.place(x=60, y=150)
 
-    menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
-    label = ttk.Label(button_rahmen, text="Willkommen!\nIm IHK Prüfungs trainer\nWas möchtest du Machen?", font=("arial", 15, "bold"))
+    menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
+    label = ttk.Label(button_rahmen, text="Willkommen!\nIm Prüfungstrainer\nWie möchtest du fortfahren?", font=("arial", 15, "bold"))
     label.grid(column=0, row=0, columnspan=3, sticky=(tk.N), padx=5, pady=5)
     
-    Lernbtn = ttk.Button(button_rahmen, text="Weiter Lernen", command=Lernmodus)
-    Lernbtn.grid(column=0, row=1, sticky=(tk.S, tk.W), padx=5, pady=10)
+    Lernbtn = ttk.Button(button_rahmen, text="Weiterlernen", command=Lernmodus)
+    Lernbtn.grid(column=0, row=1, sticky=(tk.S, tk.W), padx=5, pady=10) # type: ignore
 
     Prüfungsbtn = ttk.Button(button_rahmen, text="Zur Prüfungssimulation", command=Prüfungsmodus)
     Prüfungsbtn.grid(column=1, row=1, sticky=(tk.S), padx=5, pady=10)
     
+    Statistikbtn = ttk.Button(button_rahmen, text="Statistik", command=Statistik)
+    Statistikbtn.grid(column=2, row=1, sticky=(tk.E), padx=5, pady=10)
+    
     if user.is_admin == 1:
         Adminbtn = ttk.Button(button_rahmen, text="Adminbereich", command=Admin)
-        Adminbtn.grid(column=2, row=1, sticky=(tk.S, tk.E), padx=5, pady=10)
+        Adminbtn.grid(column=3, row=1, sticky=(tk.S, tk.E), padx=5, pady=10) # type: ignore
+
+def Statistik():
+    clear_inhalt()
+    statistik_frame = ttk.Frame(inhalt_frame)
+    statistik_frame.pack(fill="both", expand=True)
+    
+    label = ttk.Label(statistik_frame, text="Statistiken", font=("arial", 15, "bold"))
+    label.grid(column=0, row=0, sticky=(tk.N))
+    
+    text = ttk.Label(statistik_frame, text="Fragen Beantwortet insgesamt:", padding=(5,5,10,10))
+    text.grid(column=0, row=1, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(statistik_frame, text=user.fragen_total, padding=(5,5,10,10))
+    text.grid(column=1, row=1, sticky=(tk.W)) # type: ignore
+    
+    text = ttk.Label(statistik_frame, text="Fragen Beantwortet Falsch:", padding=(5,5,10,10))
+    text.grid(column=0, row=2, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(statistik_frame, text=len(user.fragen_falsch), padding=(5,5,10,10))
+    text.grid(column=1, row=2, sticky=(tk.W)) # type: ignore
+    
+    text = ttk.Label(statistik_frame, text="Fragen Beantwortet Richtig:", padding=(5,5,10,10))
+    text.grid(column=0, row=3, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(statistik_frame, text=user.fragen_richtig, padding=(5,5,10,10))
+    text.grid(column=1, row=3, sticky=(tk.W)) # type: ignore
+    
+    text = ttk.Label(statistik_frame, text="Falsche Fragen:", padding=(5,5,10,10))
+    text.grid(column=0, row=4)
+    
+    i = 5
+    fragen = get_fragen(cur)
+    for item in user.stat_fragen_falsch:
+        text = ttk.Label(statistik_frame, text=f"Uhrzeit: {item[1]} Frage: {fragen[item[0]].frage}")
+        text.grid(column=0, row=i, columnspan=2, sticky=(tk.W))
+        i += 1
 
 # Login
 def Guilogin():
@@ -454,22 +741,26 @@ def Guiregister():
     clear_inhalt()
     register_frame = ttk.Frame(inhalt_frame)
     register_frame.pack(fill="both", expand=True)
-    label = ttk.Label(register_frame, text="Registrierbereich")
-    label.pack(pady=100)
-    
-    ttk.Label(register_frame, text="Benutzername:").pack(pady=(10, 0))
-    username_entry = ttk.Entry(register_frame)
-    username_entry.pack(pady=5)
-    
-    ttk.Label(register_frame, text="Passwort:").pack(pady=(10, 0))
-    password_entry = ttk.Entry(register_frame, show="*")
-    password_entry.pack(pady=5)
-    
+
+    button_rahmen = ttk.LabelFrame(register_frame, text="Registrierung")
+    button_rahmen.place(x=100, y=100)
+
+    label = ttk.Label(button_rahmen, text="Benutzerkonto erstellen", font=("arial", 15, "bold"))
+    label.grid(column=0, row=0, columnspan=2, pady=(10, 20), padx=10)
+
+    ttk.Label(button_rahmen, text="Benutzername:").grid(column=0, row=1, sticky=tk.W, padx=10, pady=5)
+    username_entry = ttk.Entry(button_rahmen)
+    username_entry.grid(column=1, row=1, padx=10, pady=5)
+
+    ttk.Label(button_rahmen, text="Passwort:").grid(column=0, row=2, sticky=tk.W, padx=10, pady=5)
+    password_entry = ttk.Entry(button_rahmen, show="*")
+    password_entry.grid(column=1, row=2, padx=10, pady=5)
+
     is_admin = tk.IntVar()
-    ttk.Label(register_frame, text="Admin: ").pack(pady=(10, 0))
-    is_admin_entry = ttk.Checkbutton(register_frame, text="Admin", variable=is_admin)
-    is_admin_entry.pack(pady=5)
-    
+    ttk.Label(button_rahmen, text="Adminrechte:").grid(column=0, row=3, sticky=tk.W, padx=10, pady=5)
+    is_admin_entry = ttk.Checkbutton(button_rahmen, text="Admin", variable=is_admin)
+    is_admin_entry.grid(column=1, row=3, padx=10, pady=5)
+
     def handle_register():
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
@@ -477,31 +768,40 @@ def Guiregister():
         messagebox.showinfo("Erfolg", f"Benutzer erfolgreich registriert. Ihr Benutzername lautet: {username}")
         Guilogin()
         
-    registerbtn = ttk.Button(register_frame, text="Register", command=handle_register)
-    registerbtn.pack(pady=20)
+    registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=handle_register)
+    registerbtn.grid(column=0, row=4, columnspan=2, pady=20)
     
 # Admin Bereich
 def Admin():
-    if user.user_id == 0:
+    if user.user_id == 0: # Ist der User nicht angemeldet, wird er zurück zur Startseite geschickt
         Startseite()
         messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich als Admin an, um den Adminbereich zu nutzen.")
         return
-    elif user.is_admin != 1:
+    elif user.is_admin != 1: # Ist der User kein Admin, wird er nicht weitergeleitet und erhält eine Fehlermeldung
         messagebox.showerror("Keine Admin-Berechtigung", "Bitte melden Sie sich mit einem Admin-Konto an, um den Adminbereich zu nutzen.")
         return
     clear_inhalt()
-    admin_frame = ttk.Frame(inhalt_frame)
+
+    admin_frame = ttk.Frame(inhalt_frame) # Admin Frame wird erstellt
     admin_frame.pack(fill="both", expand=True)
+    label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold")) # Admin Label wird erstellt
+    label.pack(pady=40)
+    button_rahmen = ttk.LabelFrame(admin_frame, text="Fragenverwaltung")
+    button_rahmen.pack(pady=20, padx=20)
 
-    button_rahmen = ttk.LabelFrame(inhalt_frame)
-    button_rahmen.place(x=170, y=200)
-
-    label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold"))
-    label.pack(pady=100)
+    # Buttons für die Fragenverwaltung
+    # Frage einzeln einfügen, Fragen importieren, Fragen exportieren, Fragen löschen
+    fragen_add = ttk.Button(button_rahmen, text="Frage hinzufügen", command=lambda: manuell_fragen(con, cur))
+    fragen_add.grid(column=0, row=0, padx=10, pady=10)
     fragen_import = ttk.Button(button_rahmen, text="Fragen importieren", command=lambda: import_fragen(con, cur, openfile()))
-    fragen_import.pack(pady=30, padx=30)
+    fragen_import.grid(column=1, row=0, padx=10, pady=10)
+    fragen_edit = ttk.Button(button_rahmen, text="Fragen bearbeiten", command=lambda: edit_fragen(con, cur))
+    fragen_edit.grid(column=0, row=1, padx=10, pady=10)
+
+    fragen_export = ttk.Button(button_rahmen, text="Fragen exportieren", command=lambda: export_fragen(cur))
+    fragen_export.grid(column=1, row=1, padx=10, pady=10)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
-    fragen_delete.pack(pady=30, padx=30)
+    fragen_delete.grid(column=0, row=2, padx=10, pady=10)
 
 # Login Funktion
 def login(cur, username, pw_hash):
@@ -524,8 +824,16 @@ def login(cur, username, pw_hash):
                 user.fragen_total = 0
             if data[6] != None:
                 user.fragen_falsch = json.loads(data[6])
-            else:
-                user.fragen_falsch = []
+            if data[7] != None:
+                user.stat_fragen_richtig = json.loads(data[7])
+            if data[8] != None:
+                user.stat_fragen_falsch = json.loads(data[8])
+            if data[9] != None:
+                user.pruefungen_total = data[9]
+            if data[10] != None:
+                user.pruefungen_bestanden = data[10]
+            if data[11] != None:
+                user.stat_pruefungen = json.loads(data[11])
             return True
     return False
 
@@ -553,6 +861,15 @@ class Frage:
     def __repr__(self):
         return f"\"ID: {self.id}\""
     
+    def export(self):
+        return {
+            "frage" : self.frage,
+            "A" : self.A,
+            "B" : self.B,
+            "C" : self.C,
+            "richtigeAntwort" : self.antwort
+            }
+    
 class User:
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
         self.user_id = user_id
@@ -562,21 +879,30 @@ class User:
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
         self.fragen_falsch = []
+        self.stat_fragen_falsch = []            # nur für Statistiken
+        self.stat_fragen_richtig = []           # nur für Statistiken
+        self.pruefungen_total = 0
+        self.pruefungen_bestanden = 0
+        self.stat_pruefungen = []               # Liste [Note, Datum+Uhrzeit] Index 0 von dieser liste = erste Prüfung
     
     # Speicher aktuellen Datenstand in die Datenbank 
     def save(self):
-        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ? WHERE user_id = ?"
-        cur.execute(save_statement, (self.fragen_total, self.fragen_richtig, json.dumps(self.fragen_falsch, indent=None), self.user_id))
+        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ?, pruefungen_total = ?, pruefungen_bestanden = ?, stat_pruefungen = ? WHERE user_id = ?"
+        cur.execute(save_statement, (self.fragen_total, 
+                                     self.fragen_richtig, 
+                                     json.dumps(self.fragen_falsch, indent=None), 
+                                     json.dumps(self.stat_fragen_richtig, indent=None), 
+                                     json.dumps(self.stat_fragen_falsch),
+                                     self.pruefungen_total,
+                                     self.pruefungen_bestanden,
+                                     json.dumps(self.stat_pruefungen), 
+                                     self.user_id))
         con.commit()
         
 def main(con, cur):
     # Benutzer Initialisieren
     global user
     user = User(0, 0, 0, 0, 0, 0)
-    
-    # Style Theme
-    #style = ttk.Style()
-    #style.theme_use('classic')
     
     # Tastenkürzel
     root.bind("<Escape>", end_fullscreen)
