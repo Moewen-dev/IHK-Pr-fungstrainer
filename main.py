@@ -11,7 +11,8 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     A TEXT NOT NULL,
     B TEXT NOT NULL,
     C TEXT NOT NULL,
-    antwort INTEGER NOT NULL);""",
+    antwort INTEGER NOT NULL,
+    kategorie TEXT NOT NULL);""",
     """CREATE TABLE IF NOT EXISTS userdata (
     user_id INTEGER PRIMARY KEY,
     is_admin INTEGER NOT NULL,
@@ -29,9 +30,9 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
 # Datenbank Dateiname
 db_name = "data.db"
 
-def add_frage(con, cur, frage, A, B, C, antwort):
+def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # default kategorie falls keine spezifiziert
     # Frage in die Datenbank hinzufügen
-    cur.execute("INSERT INTO fragen (frage, A, B, C, antwort) VALUES (?, ?, ?, ?, ?)", (frage, A, B, C, antwort))
+    cur.execute("INSERT INTO fragen (frage, A, B, C, antwort, kategorie) VALUES (?, ?, ?, ?, ?, ?)", (frage, A, B, C, antwort, kategorie))
     con.commit()
     
 def get_fragen(cur):
@@ -40,7 +41,7 @@ def get_fragen(cur):
     db_data = cur.fetchall()
     fragen = []
     for data in db_data:
-        frage = Frage(data[0], data[1], data[2], data[3], data[4], data[5])
+        frage = Frage(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
         fragen.append(frage)
     return fragen
 
@@ -52,10 +53,10 @@ def import_fragen(con, cur, filename):
         fragen = []
         db_fragen = get_fragen(cur)
         for item in neue_fragen["fragen"]:
-            fragen.append(Frage(0, item["frage"], item["A"], item["B"], item["C"], item["richtigeAntwort"]))
+            fragen.append(Frage(0, item["frage"], item["A"], item["B"], item["C"], item["richtigeAntwort"], item["kategorie"]))
         if db_fragen == []:         # Wenn keine Fragen in der Datenbank sind, füge einfach die ganze Datei an Fragen ein.
             for neue_frage in fragen:
-                add_frage(con, cur, neue_frage.frage, neue_frage.A, neue_frage.B, neue_frage.C, neue_frage.antwort)
+                add_frage(con, cur, neue_frage.frage, neue_frage.A, neue_frage.B, neue_frage.C, neue_frage.antwort, neue_frage.kategorie)
         else:                       # Wenn Fragen vorhanden sind, prüfen, ob die zu importierenden schon vorhanden sind und füge nur die hinzu,
                                     # die noch nicht in der Datenbank sind
             db_fragen_liste = []
@@ -63,7 +64,7 @@ def import_fragen(con, cur, filename):
                 db_fragen_liste.append(db_frage.frage)
             for frage in fragen:
                 if frage.frage not in db_fragen_liste:
-                    add_frage(con, cur, frage.frage, frage.A, frage.B, frage.C, frage.antwort)
+                    add_frage(con, cur, frage.frage, frage.A, frage.B, frage.C, frage.antwort, frage.kategorie)
     except TypeError as e:
         print(f"Error: {e}")
 
@@ -126,9 +127,10 @@ def manuell_fragen(con, cur):
         B = b_entry.get()
         C = c_entry.get()
         antwort = antwort_var.get()
+        kategorie = "default" # bitte noch anpassen @Fabian
 
         # Frage wird gespeichert
-        add_frage(con, cur, frage, A, B, C, antwort)
+        add_frage(con, cur, frage, A, B, C, antwort, kategorie)
         messagebox.showinfo("Erfolg", f"Frage \"{frage}\" erfolgreich hinzugefügt.")
         add_window.destroy()
 
@@ -596,7 +598,7 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
         wiederholenbtn.grid(column=1, row=1, padx=10, pady=10)
 
 #Hier wird die abgegebene Antwort überprüft und jenachdem auch das angezeigt
-def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame, alle_fragen):
+def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
         
@@ -848,13 +850,14 @@ def abmelden():
         messagebox.showwarning("Abmeldung nicht möglich", "Sie sind nicht angemeldet.")
 
 class Frage:
-    def __init__(self, id, frage, A, B, C, antwort):
+    def __init__(self, id, frage, A, B, C, antwort, kategorie="default"):
         self.id = id
         self.frage = frage
         self.A = A
         self.B = B
         self.C = C
         self.antwort = antwort
+        self.kategorie = kategorie
         self.delete = tk.BooleanVar()
     
     # gebe nur ID aus wenn mit repr(Frage) gecallt für Debug 
@@ -867,7 +870,8 @@ class Frage:
             "A" : self.A,
             "B" : self.B,
             "C" : self.C,
-            "richtigeAntwort" : self.antwort
+            "richtigeAntwort" : self.antwort,
+            "kategorie" : self.kategorie
             }
     
 class User:
