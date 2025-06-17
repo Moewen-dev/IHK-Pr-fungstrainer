@@ -57,6 +57,45 @@ def import_fragen(con, cur, filename):
     except TypeError as e:
         print(f"Error: {e}")
 
+def manuell_fragen(con, cur):
+    add_window = tk.Toplevel()
+    add_window.title("Frage hinzufügen")
+    add_window.geometry("400x500")
+
+    ttk.Label(add_window, text="Frage:").pack(pady=(10, 0))
+    frage_entry = ttk.Entry(add_window, width=50)
+    frage_entry.pack(pady=5)
+
+    ttk.Label(add_window, text="Antwort A:").pack(pady=(10, 0))
+    a_entry = ttk.Entry(add_window, width=50)
+    a_entry.pack(pady=5)
+    ttk.Label(add_window, text="Antwort B:").pack(pady=(10, 0))
+    b_entry = ttk.Entry(add_window, width=50)
+    b_entry.pack(pady=5)
+    ttk.Label(add_window, text="Antwort C:").pack(pady=(10, 0))
+    c_entry = ttk.Entry(add_window, width=50)
+    c_entry.pack(pady=5)
+
+    ttk.Label(add_window, text="Richtige Antwort (A, B oder C):").pack(pady=(10, 0))
+    antwort_entry = ttk.Entry(add_window, width=5)
+    antwort_entry.pack(pady=5)
+
+    def save_frage():
+        frage = frage_entry.get()
+        A = a_entry.get()
+        B = b_entry.get()
+        C = c_entry.get()
+        antwort = antwort_entry.get().upper()
+        if antwort not in ["A", "B", "C"]:
+            messagebox.showerror("Fehler", "Die richtige Antwort muss A, B oder C sein.")
+            return
+        add_frage(con, cur, frage, A, B, C, antwort)
+        add_window.destroy()
+        messagebox.showinfo("Erfolg", "Frage erfolgreich hinzugefügt.")
+
+    save_btn = ttk.Button(add_window, text="Frage speichern", command=save_frage)
+    save_btn.pack(pady=20)
+
 def del_frage(con, cur):
     del_window = tk.Toplevel()
     del_window.title("Fragen Löschen")
