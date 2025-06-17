@@ -438,7 +438,7 @@ def Prüfungsmodus():
                                 text="Dies ist der Prüfungsmodus.\nDu wirst 30 Fragen erhalten, welche zufällig aus allen Fragen genommen werden.\nDas Ergebnis was du erziehlst hast, erhälst du wenn du alle Fragen beatnwortet hast.")
     Begrüßungs_label.grid(row=0, column=0, pady=50)
 
-    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüpfung(prüfungs_frame))
+    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüfung(prüfungs_frame))
     Start_Btn.grid(row=1, column=0, pady=50)
 
 # Funktion: Starte_Prüfung
