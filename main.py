@@ -468,9 +468,45 @@ def Menu():
     Prüfungsbtn = ttk.Button(button_rahmen, text="Zur Prüfungssimulation", command=Prüfungsmodus)
     Prüfungsbtn.grid(column=1, row=1, sticky=(tk.S), padx=5, pady=10)
     
+    Statistikbtn = ttk.Button(button_rahmen, text="Statistik", command=Statistik)
+    Statistikbtn.grid(column=2, row=1, sticky=(tk.E), padx=5, pady=10)
+    
     if user.is_admin == 1:
         Adminbtn = ttk.Button(button_rahmen, text="Adminbereich", command=Admin)
-        Adminbtn.grid(column=2, row=1, sticky=(tk.S, tk.E), padx=5, pady=10) # type: ignore
+        Adminbtn.grid(column=3, row=1, sticky=(tk.S, tk.E), padx=5, pady=10) # type: ignore
+
+def Statistik():
+    clear_inhalt()
+    statistik_frame = ttk.Frame(inhalt_frame)
+    statistik_frame.pack(fill="both", expand=True)
+    
+    label = ttk.Label(statistik_frame, text="Statistiken", font=("arial", 15, "bold"))
+    label.grid(column=0, row=0, sticky=(tk.N))
+    
+    text = ttk.Label(statistik_frame, text="Fragen Beantwortet insgesamt:", padding=(5,5,10,10))
+    text.grid(column=0, row=1, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(statistik_frame, text=user.fragen_total, padding=(5,5,10,10))
+    text.grid(column=1, row=1, sticky=(tk.W)) # type: ignore
+    
+    text = ttk.Label(statistik_frame, text="Fragen Beantwortet Falsch:", padding=(5,5,10,10))
+    text.grid(column=0, row=2, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(statistik_frame, text=len(user.fragen_falsch), padding=(5,5,10,10))
+    text.grid(column=1, row=2, sticky=(tk.W)) # type: ignore
+    
+    text = ttk.Label(statistik_frame, text="Fragen Beantwortet Richtig:", padding=(5,5,10,10))
+    text.grid(column=0, row=3, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(statistik_frame, text=user.fragen_richtig, padding=(5,5,10,10))
+    text.grid(column=1, row=3, sticky=(tk.W)) # type: ignore
+    
+    text = ttk.Label(statistik_frame, text="Falsche Fragen:", padding=(5,5,10,10))
+    text.grid(column=0, row=4)
+    
+    i = 5
+    fragen = get_fragen(cur)
+    for item in user.stat_fragen_falsch:
+        text = ttk.Label(statistik_frame, text=f"Uhrzeit: {item[1]} Frage: {fragen[item[0]].frage}")
+        text.grid(column=0, row=i, columnspan=2, sticky=(tk.W))
+        i += 1
 
 # Login
 def Guilogin():
