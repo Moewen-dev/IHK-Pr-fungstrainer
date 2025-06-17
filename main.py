@@ -109,7 +109,7 @@ def manuell_fragen(con, cur):
     save_btn.pack(pady=20)
 
 def del_frage(con, cur):
-    del_window = tk.Toplevel()
+    del_window = tk.Toplevel(background="#d8d8d8")
     del_window.title("Fragen Löschen")
     del_window.geometry("500x600")
     
