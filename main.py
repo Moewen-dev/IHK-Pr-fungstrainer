@@ -150,7 +150,7 @@ def manuell_fragen(con, cur):
     c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
     c_radio.grid(row=7, column=1, padx=10, sticky="w")
 
-    # Kategorie (nur Eingabefeld, kein Dropdown)
+    # Kategorie (nur Eingabefeld, eventuell später als Dropdown?)
     ttk.Label(eingabe_rahmen, text="Kategorie:").grid(row=8, column=0, sticky="w", padx=10, pady=(10, 0))
     kat_entry = ttk.Entry(eingabe_rahmen, width=40)
     kat_entry.grid(row=9, column=0, padx=10, pady=5, sticky="w")
@@ -262,13 +262,19 @@ def edit_fragen(con, cur):
         c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
         c_radio.grid(row=7, column=1, padx=10, sticky="w")
 
+        # Kategorie (Später als Dropdown?)
+        ttk.Label(eingabe_rahmen, text="Kategorie:").grid(row=8, column=0, columnspan=2, sticky="w", padx=10, pady=(10, 0))
+        kat_entry = ttk.Entry(eingabe_rahmen, width=50)
+        kat_entry.insert(0, frage.kategorie)
+        kat_entry.grid(row=9, column=0, columnspan=2, padx=10, pady=5, sticky="w")
+
         # Speichern-Button
         def speichern():
             neue_frage = frage_entry.get() # Frage aktualisieren
             neue_A = a_entry.get() # Antwort A aktualisieren
             neue_B = b_entry.get() # Antwort B aktualisieren
             neue_C = c_entry.get() # Antwort C aktualisieren
-            neue_antwort = antwort_var.get() # Richtige Antwort aktualisieren
+            neue_antwort = kat_entry.get() # Richtige Antwort aktualisieren
 
             cur.execute("""
                 UPDATE fragen
