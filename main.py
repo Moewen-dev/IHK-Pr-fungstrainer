@@ -472,14 +472,19 @@ def Starte_Prüfung(prüfungs_frame):
     if len(fragen) >= 1:
         prüfungsfragen = random.sample(fragen, 30)
     else:
-        Fehler_label = ttk.Label(prüfungs_frame,
-                                 text="Fehler! Es gibt nicht genug Fragen. Importieren sie welche, oder wenden sie sich einen Administrator!")
-        weiterleit_Btn = ttk.Button(prüfungs_frame,
-                                    text="Fragen Importieren",
-                                    command=lambda: Admin())
-        weiterleit_Btn.grid(row=2, column=0, pady=50)
+        fehler_rahmen = ttk.LabelFrame(prüfungs_frame, text="Fehlermeldung", padding=(10, 10))
+        fehler_rahmen.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
-        Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+        fehler_label = ttk.Label(
+            fehler_rahmen, text="Fehler! Es gibt nicht genug Fragen.\nImportieren Sie welche oder wenden Sie sich an einen Administrator!", foreground="red", wraplength=300, justify="center")
+
+        fehler_label.grid(row=0, column=0, padx=10, pady=(0, 10))
+        
+        weiterleit_btn = ttk.Button(fehler_rahmen, text="Fragen importieren", command=lambda: Admin())
+        weiterleit_btn.grid(row=1, column=0, pady=10, sticky="ew")
+        
+        startseite_btn = ttk.Button(fehler_rahmen, text="Zurück zur Startseite", command=lambda: Startseite())
+        startseite_btn.grid(row=2, column=0, pady=10, sticky="ew")
         return
 
     frage_index = 0
