@@ -93,16 +93,19 @@ def import_fragen(con, cur, filename):
 #   cur: Datenbankcursor
 def export_fragen(cur):
     # Fragen werden hier in eine JSON Datei exportiert, dies dient dazu evtl jemanden seine Fragen zu schicken oder sich selber verschiedene Fragensätze zu speichern
-    try:
-        fragen = get_fragen(cur)
-        to_export = {"fragen": []}
-        for frage in fragen:
-            to_export["fragen"].append(frage.export())
-        with open("fragen_export.json", "wt", encoding="utf-8") as file:
-            file.write(json.dumps(to_export, ensure_ascii=False))
-        messagebox.showinfo("Fragen export", "Fragen erfolgreich exportiert")
-    except:
-        messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
+    if messagebox.askyesno("Fragen exportieren", "Möchtest du deine gespeicherte Fragen exportieren?"):
+        try:
+            fragen = get_fragen(cur)
+            to_export = {"fragen": []}
+            for frage in fragen:
+                to_export["fragen"].append(frage.export())
+            with open("fragen_export.json", "wt", encoding="utf-8") as file:
+                file.write(json.dumps(to_export, ensure_ascii=False))
+            messagebox.showinfo("Fragen export", "Fragen erfolgreich exportiert")
+        except:
+            messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
+    else:
+        Admin()
 
 # Funktion: manuell_fragen
 # Öffnet ein Fenster, um eine einzelne Frage manuell hinzuzufügen.
@@ -123,7 +126,7 @@ def manuell_fragen(con, cur):
     frage_entry = ttk.Entry(eingabe_rahmen, width=50)
     frage_entry.grid(row=1, column=0, padx=10, pady=5)
 
-    # Stndardmäßig Antwort A als richtig markieren
+    # Standardmäßig Antwort A als richtig markieren
     antwort_var = tk.StringVar(value="A")
 
     # Antwort A definieren
@@ -147,6 +150,11 @@ def manuell_fragen(con, cur):
     c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
     c_radio.grid(row=7, column=1, padx=10, sticky="w")
 
+    # Kategorie (nur Eingabefeld, kein Dropdown)
+    ttk.Label(eingabe_rahmen, text="Kategorie:").grid(row=8, column=0, sticky="w", padx=10, pady=(10, 0))
+    kat_entry = ttk.Entry(eingabe_rahmen, width=40)
+    kat_entry.grid(row=9, column=0, padx=10, pady=5, sticky="w")
+
     # Frage speichern und Feedback
     def save_frage():
         frage = frage_entry.get()
@@ -154,11 +162,11 @@ def manuell_fragen(con, cur):
         B = b_entry.get()
         C = c_entry.get()
         antwort = antwort_var.get()
-        kategorie = "default" # bitte noch anpassen @Fabian
+        kat = kat_entry.get() 
 
         # Frage wird gespeichert
-        add_frage(con, cur, frage, A, B, C, antwort, kategorie)
-        messagebox.showinfo("Erfolg", f"Frage \"{frage}\" erfolgreich hinzugefügt.")
+        add_frage(con, cur, frage, A, B, C, antwort, kat)
+        messagebox.showinfo("Erfolg", f"Frage \"{frage}\" erfolgreich unter \"{kat}\" hinzugefügt.")
         add_window.destroy()
 
         # Weitere Frage hinzufügen oder zurück zum Adminbereich?
@@ -671,8 +679,12 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
         submit_btn = ttk.Button(prüfungs_frame,text="Antwort absenden",command=lambda: frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame))
         submit_btn.grid(row=5, column=0)
         
-        Startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=Startseite)
-        Startbtn.place(x=200, y=550)
+        def wirklich_Startseite():
+            if messagebox.askyesno("Zurück zur Startseite", "Möchtest du wirklich zur Startseite zurückkehren?"):
+                Startseite()
+
+        Startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=wirklich_Startseite)
+        Startbtn.grid(row=10, column=0, pady=20)
         
     else: # Wenn alle Fragen beantwortet wurden, wird ein Rahmen mit der Option angezeigt, was als nächstes getan werden soll
         fertig_rahmen = ttk.LabelFrame(prüfungs_frame, text="Was möchtest du als Nächstes tun?")
@@ -819,7 +831,7 @@ def Guilogin():
     label = ttk.Label(login_frame, text="Loginbereich", font=("arial", 30, "bold"))
     label.pack(pady=100)
     
-    button_rahmen = ttk.LabelFrame(login_frame)
+    button_rahmen = ttk.LabelFrame(login_frame, text="Anmelden")
     button_rahmen.place(x=170, y=180)
 
     ttk.Label(button_rahmen, text="Benutzername:").pack(pady=(10, 0))
@@ -841,6 +853,10 @@ def Guilogin():
     
     loginbtn = ttk.Button(button_rahmen, text="Login", command=handle_login)
     loginbtn.pack(pady=20, padx=40)
+    
+    # Register-Button außerhalb des Rahmens
+    register_label = ttk.Button(login_frame, text="Noch kein Konto?", command=Guiregister)
+    register_label.place(x=185, y=390) 
 
 # Funktion: Guiregister
 # Zeigt das Registrierungsfenster an und verarbeitet die Eingaben, um einen neuen Benutzer anzulegen.
@@ -878,6 +894,9 @@ def Guiregister():
     registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=handle_register)
     registerbtn.grid(column=0, row=4, columnspan=2, pady=20)
     
+    loginbtn = ttk.Button(register_frame, text="Bereits registriert?", command=Guilogin)
+    loginbtn.place(x=175, y=370)
+    
 # Funktion: Admin
 # Zeigt den Adminbereich an, in dem Fragen verwaltet (hinzufügen, importieren, bearbeiten, exportieren, löschen) werden können.
 def Admin():
@@ -910,6 +929,9 @@ def Admin():
     fragen_export.grid(column=1, row=1, padx=10, pady=10)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
     fragen_delete.grid(column=0, row=2, padx=10, pady=10)
+    
+    Startbtn = ttk.Button(admin_frame, text="Startseite", command=Startseite)
+    Startbtn.pack(pady=20)
 
 # Funktion: login
 # Überprüft die Anmeldedaten eines Benutzers und lädt die zugehörigen Daten, falls diese korrekt sind.
