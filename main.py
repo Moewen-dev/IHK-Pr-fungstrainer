@@ -84,8 +84,11 @@ def import_fragen(con, cur, filename):
             for frage in fragen:
                 if frage.frage not in db_fragen_liste:
                     add_frage(con, cur, frage.frage, frage.A, frage.B, frage.C, frage.antwort, frage.kategorie)
+
+        messagebox.showinfo("Erfolg", 'Fragen wurden erfolgreich Importiert!') # MessageBox nahc erfolgreichem Fragenimport
     except TypeError as e:
         print(f"Error: {e}")
+        messagebox.showinfo("Fehler", 'Fragen wurden nicht Importiert!\n\nPrüfe ob die .json Datei dem korrekten Format entspricht!') # MessageBox nahc erfolgreichem Fragenimport
 
 # Funktion: export_fragen
 # Exportiert alle Fragen aus der Datenbank in eine JSON-Datei.
