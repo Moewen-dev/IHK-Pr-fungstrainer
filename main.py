@@ -762,15 +762,16 @@ def Startseite():
         clear_inhalt()
         start_frame = ttk.Frame(inhalt_frame)
         start_frame.pack(fill="both", expand=True)
-        label = ttk.Label(start_frame, text="Willkommen\nzum Prüfungstrainer!", font=("arial", 30, "bold"))
-        label.place(x=0, y=0)
-
-        button_rahmen = ttk.LabelFrame(start_frame, text="Benutzerzugang")
-        button_rahmen.place(x=170, y=180)
-
+        
+        center_frame = ttk.Frame(start_frame) # Frame für zentrierten Inhalt
+        center_frame.place(relx=0.5, rely=0.5, anchor="center")  # Zentriert in start_frame
+        label = ttk.Label(center_frame, text="Willkommen\nzum Prüfungstrainer!", font=("arial", 30, "bold"), justify="center")
+        label.pack(pady=(0, 20))  # Abstand unter dem Text
+        button_rahmen = ttk.LabelFrame(center_frame, text="Benutzerzugang") # Rahmen definieren
+        button_rahmen.pack()
+        # Buttons für Login und Registrierung
         Loginbtn = ttk.Button(button_rahmen, text="Login", command=Guilogin)
         Loginbtn.pack(pady=20, padx=40)
-        
         Registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=Guiregister)
         Registerbtn.pack(pady=20, padx=40)
     else:
