@@ -386,6 +386,11 @@ def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
 
+# Funktion: Existiert der  Benutzername bereits?
+def username_exists(con, cur, username): # Überprüft, ob der Benutzername bereits in der Datenbank existiert
+    cur.execute("SELECT COUNT(*) FROM userdata WHERE username = ?", (username,))
+    return cur.fetchone()[0] > 0
+
 # Funktion: current_datetime
 # Liefert das aktuelle Datum und die aktuelle Uhrzeit im angegebenen Format.
 # Benötigt:
@@ -886,30 +891,41 @@ def Guiregister():
 
     label = ttk.Label(button_rahmen, text="Benutzerkonto erstellen", font=("arial", 15, "bold"))
     label.grid(column=0, row=0, columnspan=2, pady=(10, 20), padx=10)
-
+    # Eingabefeld für den Benutzernamen
     ttk.Label(button_rahmen, text="Benutzername:").grid(column=0, row=1, sticky=tk.W, padx=10, pady=5)
     username_entry = ttk.Entry(button_rahmen)
     username_entry.grid(column=1, row=1, padx=10, pady=5)
-
+    # Eingabefeld für das Passwort
     ttk.Label(button_rahmen, text="Passwort:").grid(column=0, row=2, sticky=tk.W, padx=10, pady=5)
     password_entry = ttk.Entry(button_rahmen, show="*")
     password_entry.grid(column=1, row=2, padx=10, pady=5)
-
+    # Checkbox für Adminrechte
+    # Standardmäßig ist der Benutzer kein Admin
     is_admin = tk.IntVar()
     ttk.Label(button_rahmen, text="Adminrechte:").grid(column=0, row=3, sticky=tk.W, padx=10, pady=5)
     is_admin_entry = ttk.Checkbutton(button_rahmen, text="Admin", variable=is_admin)
     is_admin_entry.grid(column=1, row=3, padx=10, pady=5)
 
-    def handle_register():
-        username = username_entry.get()
-        pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
-        add_user(con, cur, is_admin.get(), username, pw_hash)
+    def handle_register(): # Verarbeitet die Registrierung eines neuen Benutzers
+        username = username_entry.get().strip()
+        password = password_entry.get()
+
+        if not username or not password:
+            messagebox.showwarning("Fehler", "Benutzername und Passwort dürfen nicht leer sein.")
+            return
+
+        if username_exists(con, cur, username): # Überprüft, ob der Benutzername bereits existiert
+            messagebox.showerror("Fehler", "Benutzername existiert bereits. Bitte wählen Sie einen anderen.")
+            return
+
+        pw_hash = hashlib.sha256(password.encode()).hexdigest() # Hashing des Passworts
+        add_user(con, cur, is_admin.get(), username, pw_hash) # Fügt den neuen Benutzer in die Datenbank ein
         messagebox.showinfo("Erfolg", f"Benutzer erfolgreich registriert. Ihr Benutzername lautet: {username}")
         Guilogin()
-        
+
     registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=handle_register)
     registerbtn.grid(column=0, row=4, columnspan=2, pady=20)
-    
+
     loginbtn = ttk.Button(register_frame, text="Bereits registriert?", command=Guilogin)
     loginbtn.place(x=175, y=370)
     
