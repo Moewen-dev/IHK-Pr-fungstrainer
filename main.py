@@ -444,7 +444,13 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
-#def 
+#Nicht Fertig
+
+def Fragen_Analyse():
+
+    fragen = get_fragen(cur)
+
+    
 
 # Funktion: Prüfungsmodus
 # Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
@@ -466,7 +472,7 @@ def Prüfungsmodus():
             "Das Ergebnis, das du erzielt hast,\nerhältst du, wenn du alle Fragen beantwortet hast.")
     Begrüßungs_label.pack(padx=20, pady=20)
 
-    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüfung(prüfungs_frame))
+    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Fragen_Analyse())
     Start_Btn.grid(row=1, column=0, pady=50)
 
 # Funktion: Starte_Prüfung
@@ -480,7 +486,7 @@ def Starte_Prüfung(prüfungs_frame):
 
     fragen = get_fragen(cur)
     if len(fragen) >= 1:
-        prüfungsfragen = random.sample(fragen, 30)
+        prüfungsfragen = Fragen_Analyse()
     else:
         fehler_rahmen = ttk.LabelFrame(prüfungs_frame, text="Fehlermeldung", padding=(10, 10))
         fehler_rahmen.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
@@ -1069,7 +1075,7 @@ class User:
         self.pw_hash = pw_hash
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
-        self.fragen_falsch = []
+        self.fragen_falsch = {}
         self.stat_fragen_falsch = []            # nur für Statistiken
         self.stat_fragen_richtig = []           # nur für Statistiken
         self.pruefungen_total = 0
