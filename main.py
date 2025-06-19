@@ -441,6 +441,8 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
+#def 
+
 # Funktion: Prüfungsmodus
 # Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
 def Prüfungsmodus():
@@ -566,7 +568,10 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
         user.save()
         
         noten_label = ttk.Label(prüfungs_frame, text=(f"Deine Note beträgt: {note}"))
-        noten_label.pack(pady=100)
+        noten_label.grid(row=0, column=0, pady=20)
+
+        weiterleit_Btn = ttk.Button(prüfungs_frame, text="Zurück zur Startseite", command=lambda: Startseite())
+        weiterleit_Btn.grid(row=1, column=0, pady=20)
 
 # Funktion: prüffrage_überprüfen
 # Überprüft die abgegebene Antwort im Prüfungsmodus und aktualisiert die Benutzerstatistik.
