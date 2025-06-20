@@ -25,7 +25,9 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     stat_fragen_falsch TEXT,
     pruefungen_total INT,
     pruefungen_bestanden INT,
-    stat_pruefungen TEXT);"""]
+    stat_pruefungen TEXT,
+    alzeit_fragen_falsch,
+    alzeit_fragen_richtig);"""]
 
 # Datenbank Dateiname
 db_name = "data.db"
@@ -603,6 +605,7 @@ def openfile():
 def Fragen_Analyse():
 
     fragen = get_fragen(cur)
+
     
 
 # Funktion: Prüfungsmodus
@@ -747,17 +750,29 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
 def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
 
     if aktuelle_frage.antwort == auswahl.get():
-        user.fragen_richtig += 1
-        user.fragen_total += 1
+
+        if aktuelle_frage.id in user.alzeit_fragen_richtig:
+            user.alzeit_fragen_richtig[aktuelle_frage.id] += 1
+        else:
+            user.alzeit_fragen_richtig[aktuelle_frage.id] = 1
+
         user.stat_fragen_richtig.append([aktuelle_frage.id, current_datetime()])
 
-        if aktuelle_frage.id in user.fragen_falsch:     
-             user.fragen_falsch.remove(aktuelle_frage.id)
-    else:
         user.fragen_total += 1
-        user.stat_fragen_falsch.append([aktuelle_frage.id, current_datetime()])
+
+    else:
+
+        if aktuelle_frage.id in user.alzeit_fragen_falsch:
+            user.alzeit_fragen_falsch[aktuelle_frage.id] += 1
+        else:
+            user.alzeit_fragen_falsch[aktuelle_frage.id] = 1
+
         if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
+
+        user.stat_fragen_falsch.append([aktuelle_frage.id, current_datetime()])
+
+        user.fragen_total += 1
         falsche_Prüfungsfragen += 1
 
     user.save()
@@ -904,21 +919,37 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
 
         r_label = ttk.Label(prüfungs_frame, text="Das war Richtig!")
         r_label.pack(pady=50)
-        user.fragen_richtig += 1
-        user.fragen_total += 1
-        user.stat_fragen_richtig.append([aktuelle_frage.id, current_datetime()])
+
+        if aktuelle_frage.id in user.alzeit_fragen_richtig:
+            user.alzeit_fragen_richtig[aktuelle_frage.id] += 1
+        else:
+            user.alzeit_fragen_richtig[aktuelle_frage.id] = 1
 
         if aktuelle_frage.id in user.fragen_falsch:
             user.fragen_falsch.remove(aktuelle_frage.id)
+
+        user.fragen_total += 1
+
+        user.stat_fragen_richtig.append([aktuelle_frage.id, current_datetime()])
+
     else:
         f_antwort = ttk.Label(prüfungs_frame, text="Die Antwort war nicht richtig! Die Richtige Antwort ist:")
         f_antwort.pack(pady=50)
 
         richtige_antwort_text = getattr(aktuelle_frage, aktuelle_frage.antwort)
+
         l_antwort = ttk.Label(prüfungs_frame, text=richtige_antwort_text)
         l_antwort.pack(pady=10)
+
         user.fragen_total += 1
+
         user.stat_fragen_falsch.append([aktuelle_frage.id, current_datetime()])
+
+        if aktuelle_frage.id in user.alzeit_fragen_falsch:
+            user.alzeit_fragen_falsch[aktuelle_frage.id] += 1
+        else:
+            user.alzeit_fragen_falsch[aktuelle_frage.id] =1
+
         if aktuelle_frage.id not in user.fragen_falsch:
             user.fragen_falsch.append(aktuelle_frage.id)
 
@@ -999,7 +1030,7 @@ def Statistik():
     
     text = ttk.Label(statistik_frame, text="Fragen Beantwortet Richtig:", padding=(5,5,10,10))
     text.grid(column=0, row=3, sticky=(tk.W, tk.S)) # type: ignore
-    text = ttk.Label(statistik_frame, text=user.fragen_richtig, padding=(5,5,10,10))
+    #text = ttk.Label(statistik_frame, text=user.fragen_richtig, padding=(5,5,10,10))
     text.grid(column=1, row=3, sticky=(tk.W)) # type: ignore
     
     text = ttk.Label(statistik_frame, text="Falsche Fragen:", padding=(5,5,10,10))
@@ -1151,9 +1182,9 @@ def login(cur, username, pw_hash):
             user.pw_hash = pw_hash
             user.username = username
             if data[5] != None:
-                user.fragen_richtig = json.loads(data[5])
+                user.fragen_richtig = data[5]
             else:
-                user.fragen_richtig = {}
+                user.fragen_richtig = 0
             if data[4] != None:
                 user.fragen_total = data[4]
             else:
@@ -1170,6 +1201,10 @@ def login(cur, username, pw_hash):
                 user.pruefungen_bestanden = data[10]
             if data[11] != None:
                 user.stat_pruefungen = json.loads(data[11])
+            if data[12] != None:
+                user.alzeit_fragen_falsch = json.loads(data[12])
+            if data[13] != None:
+                user.alzeit_fragen_richtig = json.loads(data[13])
             return True
     return False
 
@@ -1227,17 +1262,19 @@ class User:
         self.username: str = username
         self.pw_hash = pw_hash
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
-        self.fragen_richtig: dict = fragen_richtig    # anzahl richtig beantworteter Fragen
+        self.fragen_richtig: int = fragen_richtig    # anzahl richtig beantworteter Fragen
         self.fragen_falsch = []
         self.stat_fragen_falsch = []            # nur für Statistiken
         self.stat_fragen_richtig = []           # nur für Statistiken
         self.pruefungen_total = 0
         self.pruefungen_bestanden = 0
         self.stat_pruefungen = []               # Liste [Note, Datum+Uhrzeit] Index 0 von dieser liste = erste Prüfung
+        self.alzeit_fragen_falsch = {}              
+        self.alzeit_fragen_richtig = {}
     
     # Speicher aktuellen Datenstand in die Datenbank 
     def save(self):
-        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ?, pruefungen_total = ?, pruefungen_bestanden = ?, stat_pruefungen = ? WHERE user_id = ?"
+        save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ?, pruefungen_total = ?, pruefungen_bestanden = ?, stat_pruefungen = ?, alzeit_fragen_falsch = ?, alzeit_fragen_richtig = ? WHERE user_id = ?"
         cur.execute(save_statement, (self.fragen_total, 
                                      json.dumps(self.fragen_richtig, indent=None), 
                                      json.dumps(self.fragen_falsch, indent=None), 
@@ -1245,7 +1282,9 @@ class User:
                                      json.dumps(self.stat_fragen_falsch, indent=None),
                                      self.pruefungen_total,
                                      self.pruefungen_bestanden,
-                                     json.dumps(self.stat_pruefungen, indent=None), 
+                                     json.dumps(self.stat_pruefungen, indent=None),
+                                     json.dumps(self.alzeit_fragen_falsch, indent=None),
+                                     json.dumps(self.alzeit_fragen_richtig, indent=None),
                                      self.user_id))
         con.commit()
         
