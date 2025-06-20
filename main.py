@@ -503,43 +503,29 @@ def KontoEinstellungen():
 
     # Fenster für Kontolöschung
     def open_delete_account_window():
-        win_del_acc = tk.Toplevel()
-        win_del_acc.title("Konto löschen")
-        win_del_acc.geometry("500x600")
+        root = tk.Tk()
+        root.withdraw()  # Hauptfenster ausblenden
 
-        frame = ttk.Frame(win_del_acc)
-        frame.pack(fill="both", expand=True)
+        confirmed = messagebox.askyesno(
+            "Konto löschen",
+            "Sind Sie sicher, dass Sie Ihr Konto dauerhaft löschen möchten?\nDies kann nicht rückgängig gemacht werden.")
 
-        ttk.Label(frame, text="Konto löschen", font=("arial", 30, "bold")).pack(pady=30)
+        if not confirmed:
+            return
+        try:
+            remove_user_data(con, cur, user.user_id)
+            messagebox.showinfo("Erfolg", "Konto erfolgreich gelöscht.")
+            logout_user()
+            Startseite()
+        except Exception as e:
+            messagebox.showerror("Fehler", f"Beim Löschen des Kontos ist ein Fehler aufgetreten: {e}")
 
-        def confirm_delete(): # Funktion zum Bestätigen der Kontolöschung
-            confirmed = messagebox.askyesno(
-                "Konto löschen",
-                "Sind Sie sicher, dass Sie Ihr Konto dauerhaft löschen möchten?\nDies kann nicht rückgängig gemacht werden.",
-                parent=win_del_acc)
-            if not confirmed:
-                return
-            try: # Versuch, das Konto zu löschen
-                remove_user_data(con, cur, user.user_id)
-                messagebox.showinfo("Erfolg", "Konto erfolgreich gelöscht.", parent=win_del_acc)
-                logout_user()
-                win_del_acc.destroy()
-                Startseite()
-            except Exception as e:
-                messagebox.showerror("Fehler", f"Beim Löschen des Kontos ist ein Fehler aufgetreten: {e}", parent=win_del_acc)
+    def logout_user(): # Funktion zum Abmelden des Benutzers
+        user.user_id = 0
 
-        def logout_user(): # Funktion zum Abmelden des Benutzers
-            user.user_id = 0
-
-        def remove_user_data(con, cur, user_id): # Hilfsfunktion zum Entfernen der Benutzerdaten aus der Datenbank
-            cur.execute("DELETE FROM userdata WHERE user_id = ?", (user_id,))
-            con.commit()
-
-        button_rahmen = ttk.LabelFrame(frame, text="Aktion bestätigen")
-        button_rahmen.pack(pady=10, padx=20)
-
-        ttk.Button(button_rahmen, text="Konto löschen", command=confirm_delete).grid(row=0, column=0, padx=10, pady=10)
-        ttk.Button(button_rahmen, text="Abbrechen", command=win_del_acc.destroy).grid(row=0, column=1, padx=10, pady=10)
+    def remove_user_data(con, cur, user_id): # Hilfsfunktion zum Entfernen der Benutzerdaten aus der Datenbank
+        cur.execute("DELETE FROM userdata WHERE user_id = ?", (user_id,))
+        con.commit()
 
     # Einstellungen-Rahmen 
     einstellungen_rahmen = ttk.LabelFrame(konto_frame, text="Einstellungen")
