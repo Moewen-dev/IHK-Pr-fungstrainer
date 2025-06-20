@@ -630,7 +630,7 @@ def Fragen_Analyse():
 
     fragen = get_fragen(cur)
 
-    alle_fragen_IDs = [str(i.id) for i in fragen] # Was macht das?
+    alle_fragen_IDs = [str(i.id) for i in fragen] # Was macht das? -> Es loopt durch fragen und fügt jede frage.id in die alle_fragen_ids liste als string hinzu
 
     falsch_prozent = random.randint(50, 75)
 
