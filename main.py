@@ -612,7 +612,6 @@ def openfile():
 def Fragen_Analyse():
 
     fragen = get_fragen(cur)
-
     
 
 # Funktion: Prüfungsmodus
@@ -1238,7 +1237,7 @@ class User:
         self.pw_hash = pw_hash
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
-        self.fragen_falsch = {}
+        self.fragen_falsch = []
         self.stat_fragen_falsch = []            # nur für Statistiken
         self.stat_fragen_richtig = []           # nur für Statistiken
         self.pruefungen_total = 0
