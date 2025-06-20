@@ -817,7 +817,7 @@ def starte_fragen(wahl):
         else:
             Fehler_label = ttk.Label(prüfungs_frame,
                                     text="Fehler! Es gibt nicht genug Fragen. Importieren sie welche, oder wenden sie sich einen Administrator!")
-            Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+            Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
 
             weiterleit_Btn = ttk.Button(prüfungs_frame,
                                         text="Fragen Importieren",
