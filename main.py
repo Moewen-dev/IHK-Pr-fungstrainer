@@ -454,7 +454,7 @@ def KontoEinstellungen():
                 messagebox.showerror("Fehler", "Die Passwörter stimmen nicht überein.", parent=win_change_pw)
                 return
             new_pw_hash = hashlib.sha256(new_pw.encode()).hexdigest()
-            update_password(con, cur, user.user_id, new_pw_hash)
+            update_password(con, cur, user_id, new_pw_hash)
             messagebox.showinfo("Erfolg", "Passwort erfolgreich geändert.", parent=win_change_pw)
             win_change_pw.destroy()
 
@@ -1078,8 +1078,8 @@ def Guilogin():
     
     # Register-Button außerhalb des Rahmens
     register_label = ttk.Button(login_frame, text="Noch kein Konto?", command=Guiregister)
-    register_label.place(x=185, y=390) 
-
+    register_label.place(x=195, y=395) 
+    
 # Funktion: Guiregister
 # Zeigt das Registrierungsfenster an und verarbeitet die Eingaben, um einen neuen Benutzer anzulegen.
 def Guiregister():
