@@ -553,7 +553,7 @@ def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
 
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
-root = ThemedTk(theme="scidgreen")
+root = ThemedTk(theme="breeze")
 root.title("Prüfungstrainer")
 root.geometry("500x600")
 
