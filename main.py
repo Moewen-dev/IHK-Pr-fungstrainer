@@ -559,7 +559,7 @@ def Log(level, message):
 
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
-root = ThemedTk(theme="scidgreen")
+root = ThemedTk(theme="breeze")
 root.title("Prüfungstrainer")
 root.geometry("500x600")
 
@@ -1054,16 +1054,16 @@ def Guilogin():
     
     button_rahmen = ttk.LabelFrame(login_frame, text="Anmelden")
     button_rahmen.place(x=170, y=180)
-
+    # Eingabefeld für den Benutzernamen
     ttk.Label(button_rahmen, text="Benutzername:").pack(pady=(10, 0))
     username_entry = ttk.Entry(button_rahmen)
     username_entry.pack(pady=0)
-    
+    # Passwort-Eingabefeld
     ttk.Label(button_rahmen, text="Passwort:").pack(pady=(10, 0))
     password_entry = ttk.Entry(button_rahmen, show="*")
     password_entry.pack(pady=0)
     
-    def handle_login():
+    def handle_login(): # Verarbeitet die Login-Eingaben und meldet den Benutzer an, wenn die Anmeldedaten korrekt sind.
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
         if login(cur, username, pw_hash):
