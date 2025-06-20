@@ -45,6 +45,13 @@ def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # defaul
     # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort, kategorie) VALUES (?, ?, ?, ?, ?, ?)", (frage, A, B, C, antwort, kategorie))
     con.commit()
+    Log(f"Frage in Datenbank hinzugefügt:")
+    Log(f"Frage:        {frage}")
+    Log(f"Antowrt A:    {A}")
+    Log(f"Antowrt B:    {B}")
+    Log(f"Antowrt C:    {C}")
+    Log(f"Richtig:      {antwort}")
+    Log(f"Kategorie:    {kategorie}")
 
 # Funktion: get_fragen
 # Ruft alle Fragen aus der Datenbank ab und wandelt sie in Frage-Objekte um.
@@ -87,10 +94,12 @@ def import_fragen(con, cur, filename):
                 if frage.frage not in db_fragen_liste:
                     add_frage(con, cur, frage.frage, frage.A, frage.B, frage.C, frage.antwort, frage.kategorie)
 
-        messagebox.showinfo("Erfolg", 'Fragen wurden erfolgreich Importiert!') # MessageBox nahc erfolgreichem Fragenimport
+        messagebox.showinfo("Erfolg", 'Fragen wurden erfolgreich Importiert!') # MessageBox nach erfolgreichem Fragenimport
+        Log(f"Fragen aus {filename} erfolgreich importiert")
     except TypeError as e:
         print(f"Error: {e}")
-        messagebox.showinfo("Fehler", 'Fragen wurden nicht Importiert!\n\nPrüfe ob die .json Datei dem korrekten Format entspricht!') # MessageBox nahc erfolgreichem Fragenimport
+        messagebox.showinfo("Fehler", 'Fragen wurden nicht Importiert!\n\nPrüfe ob die .json Datei dem korrekten Format entspricht!') # MessageBox wenn import Fehlgeschlagen
+        Log(f"Fragen aus {filename} konnten nicht importiert werden", 2)
 
 # Funktion: export_fragen
 # Exportiert alle Fragen aus der Datenbank in eine JSON-Datei.
@@ -107,8 +116,10 @@ def export_fragen(cur):
             with open("fragen_export.json", "wt", encoding="utf-8") as file:
                 file.write(json.dumps(to_export, ensure_ascii=False))
             messagebox.showinfo("Fragen export", "Fragen erfolgreich exportiert")
+            Log(f"Fragen in fragen_export.json exportiert")
         except:
             messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
+            Log(f"Fragen export nicht erfolgreich", 2)
     else:
         Admin()
 
@@ -279,16 +290,18 @@ def edit_fragen(con, cur):
             neue_A = a_entry.get() # Antwort A aktualisieren
             neue_B = b_entry.get() # Antwort B aktualisieren
             neue_C = c_entry.get() # Antwort C aktualisieren
-            neue_antwort = kat_entry.get() # Richtige Antwort aktualisieren
+            neue_antwort = antwort_var.get() # Richtige Antwort aktualisieren
+            neue_kat = kat_entry.get() # Richtige Kategorie aktualisieren
 
             cur.execute("""
                 UPDATE fragen
-                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?
+                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?, kategorie = ? 
                 WHERE id = ?
-            """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, frage.id))
+            """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, neue_kat, frage.id))
             con.commit() # Änderungen speichern
 
             messagebox.showinfo("Erfolg", f'Frage \"{neue_frage}\" erfolgreich aktualisiert.') # Feedback geben
+            Log(f"Frage {neue_frage} aktualisiert")
             frage_edit.destroy()
             fortfahren = messagebox.askyesno("Bestätigung", "Möchtest du weitere Fragen bearbeiten?") # Sollen weitere Fragen bearbeitet werden?
             if not fortfahren: # Wenn nicht, dann zurück zum Adminbereich
@@ -317,6 +330,7 @@ def edit_fragen(con, cur):
             btn.pack(fill="x", padx=10, pady=5)
         except Exception as e: # Fehler beim Anzeigen einer Frage
             print(f"Fehler beim Anzeigen einer Frage: {e}")
+            Log(f"Anzeigefehler einer Frage: {e}")
 
 # Funktion: del_frage
 # Zeigt ein Fenster, in dem mehrere Fragen ausgewählt und anschließend gelöscht werden können.
@@ -372,7 +386,8 @@ def del_frage(con, cur):
         if not fortfahren:
             return
         for frage in auszuwählen:
-            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
+            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id))
+            Log(f"Frage mit ID {frage.id} gelöscht")
         con.commit()
         messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
         del_window.destroy()
@@ -390,6 +405,7 @@ def del_frage(con, cur):
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
+    Log(f"Benutzer {username} erstellt. Admin {is_admin}")
 
 # Funktion: KontoEinstellungen
 # Diese Funktion ermöglicht es dem angemeldeten Benutzer, sein Passwort oder seinen Benutzernamen zu ändern
@@ -460,6 +476,7 @@ def KontoEinstellungen():
         def update_password(con, cur, user_id, pw_hash): # Hilfsfunktion zum Aktualisieren des Passwort-Hashes in der Datenbank
             cur.execute("UPDATE userdata SET pw_hash = ? WHERE user_id = ?", (pw_hash, user_id))
             con.commit()
+            Log(f"Passwort für {user.username} mit ID {user_id} geändert")
 
         ttk.Button(form_frame, text="Passwort ändern", command=handle_change_password).pack(pady=20)
         ttk.Button(frame, text="Abbrechen", command=win_change_pw.destroy).pack(pady=10)
@@ -487,18 +504,19 @@ def KontoEinstellungen():
             if not new_username:
                 messagebox.showerror("Fehler", "Der Benutzername darf nicht leer sein.", parent=win_change_user)
                 return
-            if username_exists(con, cur, new_username):
+            if username_exists(cur, new_username):
                 messagebox.showerror("Fehler", "Dieser Benutzername ist bereits vergeben.", parent=win_change_user)
                 return
-            update_username(con, cur, user.user_id, new_username)
+            update_username(con, cur, new_username)
             user.username = new_username  # Benutzerobjekt aktualisieren
             aktualisiere_kontoinformationen()  # Anzeige aktualisieren
             messagebox.showinfo("Erfolg", f"Benutzername erfolgreich zu \"{new_username}\" geändert.", parent=win_change_user)
             win_change_user.destroy()
 
-        def update_username(con, cur, user_id, new_username): # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank
-            cur.execute("UPDATE userdata SET username = ? WHERE user_id = ?", (new_username, user_id))
+        def update_username(con, cur, new_username): # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank
+            cur.execute("UPDATE userdata SET username = ? WHERE user_id = ?", (new_username, user.user_id))
             con.commit()
+            Log(f"Username bei Id {user.user_id} zu {new_username} geändert")
 
         ttk.Button(form_frame, text="Benutzername ändern", command=handle_change_username).pack(pady=20)
         ttk.Button(frame, text="Abbrechen", command=win_change_user.destroy).pack(pady=10)
@@ -529,6 +547,7 @@ def KontoEinstellungen():
     def remove_user_data(con, cur, user_id): # Hilfsfunktion zum Entfernen der Benutzerdaten aus der Datenbank
         cur.execute("DELETE FROM userdata WHERE user_id = ?", (user_id,))
         con.commit()
+        Log(f"Benutzer mit ID {user_id} entfernt")
 
     # Einstellungen-Rahmen 
     einstellungen_rahmen = ttk.LabelFrame(konto_frame, text="Einstellungen")
@@ -542,7 +561,7 @@ def KontoEinstellungen():
     ttk.Button(konto_frame, text="Startseite", command=Startseite).pack(pady=20)
 
 # Funktion: Existiert der  Benutzername bereits?
-def username_exists(con, cur, username): # Überprüft, ob der Benutzername bereits in der Datenbank existiert
+def username_exists(cur, username): # Überprüft, ob der Benutzername bereits in der Datenbank existiert
     cur.execute("SELECT COUNT(*) FROM userdata WHERE username = ?", (username,))
     return cur.fetchone()[0] > 0
 
@@ -554,8 +573,12 @@ def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
     return datetime.datetime.now().strftime(format)
 
 # Log funktion
-def Log(level, message):
-    pass
+def Log(message: str, level: int = 1):
+    log_level = {1 : "Info",
+                 2 : "Warn",
+                 3 : "Crit"}
+    with open(f"Log_{current_datetime("%d%m%Y")}.log", "a", encoding="utf-8") as logfile:
+        logfile.write(f"[{current_datetime()} - {log_level[level]}] {message}\n")
 
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
@@ -580,6 +603,7 @@ inhalt_frame.rowconfigure(1, weight=3)
 #   event: (Optionales) Ereignisobjekt
 def toggle_fullscreen(event=None):
     root.attributes("-fullscreen", not root.attributes("-fullscreen"))
+    Log(f"Fullscreen Toggled")
 
 # Funktion: end_fullscreen
 # Beendet den Vollbildmodus.
@@ -742,7 +766,7 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
             user.pruefungen_total += 1
         else:
             user.pruefungen_total += 1
-            
+        
         user.stat_pruefungen.append([prozent_anzahl, current_datetime()])
 
         user.save()
@@ -1092,8 +1116,8 @@ def Guilogin():
     
     # Register-Button außerhalb des Rahmens
     register_label = ttk.Button(login_frame, text="Noch kein Konto?", command=Guiregister)
-    register_label.place(x=185, y=390) 
-
+    register_label.place(x=195, y=395) 
+    
 # Funktion: Guiregister
 # Zeigt das Registrierungsfenster an und verarbeitet die Eingaben, um einen neuen Benutzer anzulegen.
 def Guiregister():
@@ -1129,7 +1153,7 @@ def Guiregister():
             messagebox.showwarning("Fehler", "Benutzername und Passwort dürfen nicht leer sein.")
             return
 
-        if username_exists(con, cur, username): # Überprüft, ob der Benutzername bereits existiert
+        if username_exists(cur, username): # Überprüft, ob der Benutzername bereits existiert
             messagebox.showerror("Fehler", "Benutzername existiert bereits. Bitte wählen Sie einen anderen.")
             return
 
@@ -1330,7 +1354,7 @@ def main(con, cur):
 
     # Kontoeinstellungen
     account_menu = tk.Menu(menubar, tearoff=0)
-    account_menu.add_command(label="Benutzerkonto", command=lambda: KontoEinstellungen())
+    account_menu.add_command(label="Kontoeinstellungen", command=lambda: KontoEinstellungen())
     menubar.add_cascade(label="Konto", menu=account_menu)
 
     theme_menu = tk.Menu(menubar, tearoff=0)
