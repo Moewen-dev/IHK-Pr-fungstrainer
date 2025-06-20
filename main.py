@@ -279,13 +279,14 @@ def edit_fragen(con, cur):
             neue_A = a_entry.get() # Antwort A aktualisieren
             neue_B = b_entry.get() # Antwort B aktualisieren
             neue_C = c_entry.get() # Antwort C aktualisieren
-            neue_antwort = kat_entry.get() # Richtige Antwort aktualisieren
+            neue_antwort = antwort_var.get() # Richtige Antwort aktualisieren
+            neue_kat = kat_entry.get() # Richtige Kategorie aktualisieren
 
             cur.execute("""
                 UPDATE fragen
-                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?
+                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?, kategorie = ? 
                 WHERE id = ?
-            """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, frage.id))
+            """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, neue_kat, frage.id))
             con.commit() # Änderungen speichern
 
             messagebox.showinfo("Erfolg", f'Frage \"{neue_frage}\" erfolgreich aktualisiert.') # Feedback geben
