@@ -204,7 +204,6 @@ def edit_fragen(con, cur):
     edit_window.title("Fragen bearbeiten")
     edit_window.geometry("500x600")
 
-    # Header für das Bearbeitungsfenster
     header = ttk.Label(
         edit_window,
         text="Klicke auf eine Frage, um sie zu bearbeiten:",
@@ -213,31 +212,41 @@ def edit_fragen(con, cur):
     )
     header.pack(pady=10)
 
-    # Container für Scrollbar und Canvas
+    # Container
     container = ttk.Frame(edit_window)
     container.pack(fill="both", expand=True, padx=10, pady=10)
-    
-    # Canvas und Scrollbar für die Frage-Liste
-    canvas = tk.Canvas(container, borderwidth=0, background="#d8d8d8", highlightthickness=0)
-    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-    scroll_frame = ttk.Frame(canvas)
 
-    # Scrollbar und Canvas konfigurieren
+    # Canvas + Scrollbar
+    canvas = tk.Canvas(container, background="#d8d8d8", highlightthickness=0)
+    scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
     canvas.configure(yscrollcommand=scrollbar.set)
+
     scrollbar.pack(side="right", fill="y")
     canvas.pack(side="left", fill="both", expand=True)
-    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
 
+    scroll_frame = ttk.Frame(canvas)
+    canvas_window = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    # Events & Scrollhandling
     def on_frame_configure(event):
         canvas.configure(scrollregion=canvas.bbox("all"))
 
-    scroll_frame.bind("<Configure>", on_frame_configure)
-    scroll_frame.bind_all("<MouseWheel>", lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+    def on_canvas_configure(event):
+        canvas.itemconfig(canvas_window, width=event.width)
 
-    # Funktion zum Bearbeiten einer Frage
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    scroll_frame.bind("<Configure>", on_frame_configure)
+    canvas.bind("<Configure>", on_canvas_configure)
+    scroll_frame.bind("<Enter>", lambda e: scroll_frame.bind_all("<MouseWheel>", _on_mousewheel))
+    scroll_frame.bind("<Leave>", lambda e: scroll_frame.unbind_all("<MouseWheel>"))
+
+
+    # Frage-Bearbeitungsfenster
     def frage_bearbeiten_fenster(frage, edit_window):
-        edit_window.destroy()  # Aktuelles Fenster schließen
-        # Neues Fenster für die Bearbeitung der Frage
+        edit_window.destroy()
+
         frage_edit = tk.Toplevel()
         frage_edit.title("Frage bearbeiten")
         frage_edit.geometry("500x500")
@@ -245,13 +254,11 @@ def edit_fragen(con, cur):
         eingabe_rahmen = ttk.LabelFrame(frage_edit, text="Frage bearbeiten")
         eingabe_rahmen.pack(padx=20, pady=20, fill="both", expand=True)
 
-        # Eingabe für Frage
         ttk.Label(eingabe_rahmen, text="Frage:").grid(row=0, column=0, columnspan=2, sticky="w", padx=10, pady=(10, 0))
         frage_entry = ttk.Entry(eingabe_rahmen, width=50)
         frage_entry.insert(0, frage.frage)
         frage_entry.grid(row=1, column=0, columnspan=2, padx=10, pady=5, sticky="w")
 
-        # Standardmäßig die aktuelle Antwort als richtig markieren
         antwort_var = tk.StringVar(value=frage.antwort)
 
         # Antwort A
@@ -278,59 +285,56 @@ def edit_fragen(con, cur):
         c_radio = ttk.Radiobutton(eingabe_rahmen, text="Richtig", variable=antwort_var, value="C")
         c_radio.grid(row=7, column=1, padx=10, sticky="w")
 
-        # Kategorie (Später als Dropdown?)
+        # Kategorie
         ttk.Label(eingabe_rahmen, text="Kategorie:").grid(row=8, column=0, columnspan=2, sticky="w", padx=10, pady=(10, 0))
         kat_entry = ttk.Entry(eingabe_rahmen, width=50)
         kat_entry.insert(0, frage.kategorie)
         kat_entry.grid(row=9, column=0, columnspan=2, padx=10, pady=5, sticky="w")
 
-        # Speichern-Button
         def speichern():
-            neue_frage = frage_entry.get() # Frage aktualisieren
-            neue_A = a_entry.get() # Antwort A aktualisieren
-            neue_B = b_entry.get() # Antwort B aktualisieren
-            neue_C = c_entry.get() # Antwort C aktualisieren
-            neue_antwort = antwort_var.get() # Richtige Antwort aktualisieren
-            neue_kat = kat_entry.get() # Richtige Kategorie aktualisieren
+            neue_frage = frage_entry.get()
+            neue_A = a_entry.get()
+            neue_B = b_entry.get()
+            neue_C = c_entry.get()
+            neue_antwort = antwort_var.get()
+            neue_kat = kat_entry.get()
 
             cur.execute("""
                 UPDATE fragen
-                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?, kategorie = ? 
+                SET frage = ?, A = ?, B = ?, C = ?, antwort = ?, kategorie = ?
                 WHERE id = ?
             """, (neue_frage, neue_A, neue_B, neue_C, neue_antwort, neue_kat, frage.id))
-            con.commit() # Änderungen speichern
+            con.commit()
 
-            messagebox.showinfo("Erfolg", f'Frage \"{neue_frage}\" erfolgreich aktualisiert.') # Feedback geben
+            messagebox.showinfo("Erfolg", f'Frage "{neue_frage}" erfolgreich aktualisiert.')
             Log(f"Frage {neue_frage} aktualisiert")
             frage_edit.destroy()
-            fortfahren = messagebox.askyesno("Bestätigung", "Möchtest du weitere Fragen bearbeiten?") # Sollen weitere Fragen bearbeitet werden?
-            if not fortfahren: # Wenn nicht, dann zurück zum Adminbereich
-                return
-            edit_fragen(con, cur)  # aktualisierte Bearbeitungsliste erneut laden
+
+            if messagebox.askyesno("Bestätigung", "Möchtest du weitere Fragen bearbeiten?"):
+                edit_fragen(con, cur)
 
         speichern_btn = ttk.Button(frage_edit, text="Änderungen speichern", command=speichern)
         speichern_btn.pack(pady=20)
 
-    # Frage-Liste aus DB holen
+    # Fragen aus DB anzeigen
     fragen = get_fragen(cur)
 
-    # Keine Fragen in der DB
     if not fragen:
         ttk.Label(scroll_frame, text="Keine Fragen in der Datenbank.", foreground="red").pack(pady=20)
         return
 
-    # Buttons für jede Frage erstellen
     for frage in fragen:
         try:
             text = frage.frage.strip()
             if len(text) > 80:
                 text = text[:77] + "..."
 
-            btn = ttk.Button(scroll_frame, text=frage.frage, command=lambda f=frage: frage_bearbeiten_fenster(f, edit_window)) # Button zum Bearbeiten der Frage
+            btn = ttk.Button(scroll_frame, text=text, command=lambda f=frage: frage_bearbeiten_fenster(f, edit_window))
             btn.pack(fill="x", padx=10, pady=5)
         except Exception as e: # Fehler beim Anzeigen einer Frage
             print(f"Fehler beim Anzeigen einer Frage: {e}")
             Log(f"Anzeigefehler einer Frage: {e}")
+
 
 # Funktion: del_frage
 # Zeigt ein Fenster, in dem mehrere Fragen ausgewählt und anschließend gelöscht werden können.
@@ -347,28 +351,35 @@ def del_frage(con, cur):
     header = ttk.Label(del_window, text="Wähle die Fragen aus, die du löschen möchtest:", font=("Arial", 12, "bold"), background="#d8d8d8")
     header.pack(pady=10)
     
-    # Es wird ein Rahmen erstellt
+    # Container
     container = ttk.Frame(del_window)
     container.pack(fill="both", expand=True, padx=10, pady=10)
 
-    canvas = tk.Canvas(container, borderwidth=0, background="#d8d8d8", highlightthickness=0)
+    # Canvas + Scrollbar
+    canvas = tk.Canvas(container, background="#d8d8d8", highlightthickness=0)
     scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-    scroll_frame = ttk.Frame(canvas, style="TFrame")
-
     canvas.configure(yscrollcommand=scrollbar.set)
+
     scrollbar.pack(side="right", fill="y")
     canvas.pack(side="left", fill="both", expand=True)
-    canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
 
+    scroll_frame = ttk.Frame(canvas)
+    canvas_window = canvas.create_window((0, 0), window=scroll_frame, anchor="nw")
+
+    # Events & Scrollhandling
     def on_frame_configure(event):
         canvas.configure(scrollregion=canvas.bbox("all"))
 
-    scroll_frame.bind("<Configure>", on_frame_configure)
+    def on_canvas_configure(event):
+        canvas.itemconfig(canvas_window, width=event.width)
 
     def _on_mousewheel(event):
         canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
-    scroll_frame.bind_all("<MouseWheel>", _on_mousewheel)
+    scroll_frame.bind("<Configure>", on_frame_configure)
+    canvas.bind("<Configure>", on_canvas_configure)
+    scroll_frame.bind("<Enter>", lambda e: scroll_frame.bind_all("<MouseWheel>", _on_mousewheel))
+    scroll_frame.bind("<Leave>", lambda e: scroll_frame.unbind_all("<MouseWheel>"))
 
     fragen = get_fragen(cur)
     for frage in fragen:
