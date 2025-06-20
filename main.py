@@ -1138,7 +1138,7 @@ def Guiregister():
             messagebox.showwarning("Fehler", "Benutzername und Passwort dürfen nicht leer sein.")
             return
 
-        if username_exists(con, cur, username): # Überprüft, ob der Benutzername bereits existiert
+        if username_exists(cur, username): # Überprüft, ob der Benutzername bereits existiert
             messagebox.showerror("Fehler", "Benutzername existiert bereits. Bitte wählen Sie einen anderen.")
             return
 
