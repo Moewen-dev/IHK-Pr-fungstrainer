@@ -43,7 +43,7 @@ def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # defaul
     # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort, kategorie) VALUES (?, ?, ?, ?, ?, ?)", (frage, A, B, C, antwort, kategorie))
     con.commit()
-    
+
 # Funktion: get_fragen
 # Ruft alle Fragen aus der Datenbank ab und wandelt sie in Frage-Objekte um.
 # Benötigt:
@@ -550,6 +550,10 @@ def username_exists(con, cur, username): # Überprüft, ob der Benutzername bere
 #   format: Optionaler Formatstring (Standard "%d.%m.%Y %H:%M:%S")
 def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
     return datetime.datetime.now().strftime(format)
+
+# Log funktion
+def Log(level, message):
+    pass
 
 # Gui Funktionen
 # Hauptfenster und Inhalt vorbereiten
@@ -1216,14 +1220,14 @@ class Frage:
 class User:
     # __init__: Initialisiert ein User-Objekt.
     # Benötigt:
-    #   user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig
+    #   user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig    
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
         self.user_id = user_id
         self.is_admin = is_admin
         self.username: str = username
         self.pw_hash = pw_hash
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
-        self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
+        self.fragen_richtig: dict = fragen_richtig    # anzahl richtig beantworteter Fragen
         self.fragen_falsch = []
         self.stat_fragen_falsch = []            # nur für Statistiken
         self.stat_fragen_richtig = []           # nur für Statistiken
