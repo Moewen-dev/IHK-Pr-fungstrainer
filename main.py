@@ -504,17 +504,17 @@ def KontoEinstellungen():
             if not new_username:
                 messagebox.showerror("Fehler", "Der Benutzername darf nicht leer sein.", parent=win_change_user)
                 return
-            if username_exists(con, cur, new_username):
+            if username_exists(cur, new_username):
                 messagebox.showerror("Fehler", "Dieser Benutzername ist bereits vergeben.", parent=win_change_user)
                 return
-            update_username(con, cur, user_id, new_username)
+            update_username(con, cur, new_username)
             user.username = new_username  # Benutzerobjekt aktualisieren
             aktualisiere_kontoinformationen()  # Anzeige aktualisieren
             messagebox.showinfo("Erfolg", f"Benutzername erfolgreich zu \"{new_username}\" geändert.", parent=win_change_user)
             win_change_user.destroy()
 
-        def update_username(con, cur, user_id, new_username): # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank
-            cur.execute("UPDATE userdata SET username = ? WHERE user_id = ?", (new_username, user_id))
+        def update_username(con, cur, new_username): # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank
+            cur.execute("UPDATE userdata SET username = ? WHERE user_id = ?", (new_username, user.user_id))
             con.commit()
             Log(f"Username bei Id {user.user_id} zu {new_username} geändert")
 
