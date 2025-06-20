@@ -606,7 +606,22 @@ def Fragen_Analyse():
 
     fragen = get_fragen(cur)
 
+    alle_fragen_IDs = [str(i.id) for i in fragen] # Was macht das?
+
+    falsch_prozent = random.randint(50, 75)
+
+    anzahl_falsche_fragen = round(falsch_prozent /100 *30)
+    anzahl_richtige_fragen = 30 - anzahl_falsche_fragen
+
+    gewichtete_IDs = []
+
+    for i in alle_fragen_IDs:
+        falsche_beantwortet = user.alzeit_fragen_falsch.get(i, 0)
+        gewicht = 1 + falsche_beantwortet
+        gewichtete_IDs.append(gewicht)
+
     
+
 
 # Funktion: Prüfungsmodus
 # Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
