@@ -1283,6 +1283,11 @@ def main(con, cur):
     file_menu.add_command(label="Beenden", command=root.quit)
     menubar.add_cascade(label="Datei", menu=file_menu)
 
+    # Kontoeinstellungen
+    account_menu = tk.Menu(menubar, tearoff=0)
+    account_menu.add_command(label="Benutzerkonto", command=lambda: KontoEinstellungen())
+    menubar.add_cascade(label="Konto", menu=account_menu)
+
     theme_menu = tk.Menu(menubar, tearoff=0)
     theme_menu.add_command(label="Dark Mode", command=lambda: root.set_theme("equilux"))
     theme_menu.add_command(label="Light Mode", command=lambda: root.set_theme("breeze"))
