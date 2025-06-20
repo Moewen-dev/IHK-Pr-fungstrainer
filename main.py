@@ -389,6 +389,169 @@ def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
 
+# Funktion: KontoEinstellungen
+# Diese Funktion ermöglicht es dem angemeldeten Benutzer, sein Passwort oder seinen Benutzernamen zu ändern
+# oder das Konto vollständig zu löschen. Falls der Benutzer nicht angemeldet ist (user_id == 0),
+# wird er zur Startseite weitergeleitet.
+def KontoEinstellungen():
+    if user.user_id == 0:
+        Startseite()
+        messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich an, um Ihre Kontoeinstellungen zu ändern.")
+        return
+
+    clear_inhalt()
+    konto_frame = ttk.Frame(inhalt_frame)
+    konto_frame.pack(fill="both", expand=True)
+
+    # Titel der Seite
+    ttk.Label(konto_frame, text="Kontoeinstellungen", font=("arial", 30, "bold")).pack(pady=40)
+
+    # Benutzerinfo-Rahmen (enthält Benutzernamen)
+    benutzerinfo_rahmen = ttk.LabelFrame(konto_frame, text="Benutzerinfo")
+    benutzerinfo_rahmen.pack(pady=10, padx=20)
+
+    benutzername_label = ttk.Label(benutzerinfo_rahmen, font=("Arial", 10))
+    benutzername_label.pack(padx=10, pady=10)
+
+    # Funktion zur Aktualisierung der Benutzeranzeige
+    def aktualisiere_kontoinformationen():
+        benutzername_label.config(text=f"Angemeldet als: {user.username}")
+
+    aktualisiere_kontoinformationen() # Ruft die Aktualisierung der Kontoinformationen auf
+
+    # Fenster für Passwortänderung
+    def open_change_password_window():
+        win_change_pw = tk.Toplevel()
+        win_change_pw.title("Passwort ändern")
+        win_change_pw.geometry("500x600")
+
+        frame = ttk.Frame(win_change_pw)
+        frame.pack(fill="both", expand=True)
+
+        ttk.Label(frame, text="Passwort ändern", font=("arial", 30, "bold")).pack(pady=40)
+
+        form_frame = ttk.LabelFrame(frame, text="Neues Passwort")
+        form_frame.pack(pady=20, padx=20)
+
+        ttk.Label(form_frame, text="Neues Passwort:").pack(pady=(10, 0))
+        new_pw_entry = ttk.Entry(form_frame, show="*")
+        new_pw_entry.pack(pady=5, padx=10)
+
+        ttk.Label(form_frame, text="Neues Passwort bestätigen:").pack(pady=(10, 0))
+        confirm_pw_entry = ttk.Entry(form_frame, show="*")
+        confirm_pw_entry.pack(pady=5, padx=10)
+
+        def handle_change_password(): # Funktion zum Verarbeiten der Passwortänderung
+            new_pw = new_pw_entry.get()
+            confirm_pw = confirm_pw_entry.get()
+            if not new_pw:
+                messagebox.showerror("Fehler", "Das Passwort darf nicht leer sein.", parent=win_change_pw)
+                return
+            if new_pw != confirm_pw:
+                messagebox.showerror("Fehler", "Die Passwörter stimmen nicht überein.", parent=win_change_pw)
+                return
+            new_pw_hash = hashlib.sha256(new_pw.encode()).hexdigest()
+            update_password(con, cur, user.user_id, new_pw_hash)
+            messagebox.showinfo("Erfolg", "Passwort erfolgreich geändert.", parent=win_change_pw)
+            win_change_pw.destroy()
+
+        def update_password(con, cur, user_id, pw_hash): # Hilfsfunktion zum Aktualisieren des Passwort-Hashes in der Datenbank
+            cur.execute("UPDATE userdata SET pw_hash = ? WHERE user_id = ?", (pw_hash, user_id))
+            con.commit()
+
+        ttk.Button(form_frame, text="Passwort ändern", command=handle_change_password).pack(pady=20)
+        ttk.Button(frame, text="Abbrechen", command=win_change_pw.destroy).pack(pady=10)
+
+    # Fenster für Benutzername-Änderung
+    def open_change_username_window():
+        win_change_user = tk.Toplevel()
+        win_change_user.title("Benutzername ändern")
+        win_change_user.geometry("500x600")
+
+        frame = ttk.Frame(win_change_user)
+        frame.pack(fill="both", expand=True)
+
+        ttk.Label(frame, text="Benutzername ändern", font=("arial", 30, "bold")).pack(pady=40)
+
+        form_frame = ttk.LabelFrame(frame, text="Neuer Benutzername")
+        form_frame.pack(pady=20, padx=20)
+
+        ttk.Label(form_frame, text="Neuer Benutzername:").pack(pady=(10, 0))
+        new_username_entry = ttk.Entry(form_frame)
+        new_username_entry.pack(pady=5, padx=10)
+
+        def handle_change_username(): # Funktion zum Verarbeiten der Benutzernamen-Änderung
+            new_username = new_username_entry.get().strip()
+            if not new_username:
+                messagebox.showerror("Fehler", "Der Benutzername darf nicht leer sein.", parent=win_change_user)
+                return
+            if username_exists(con, cur, new_username):
+                messagebox.showerror("Fehler", "Dieser Benutzername ist bereits vergeben.", parent=win_change_user)
+                return
+            update_username(con, cur, user.user_id, new_username)
+            user.username = new_username  # Benutzerobjekt aktualisieren
+            aktualisiere_kontoinformationen()  # Anzeige aktualisieren
+            messagebox.showinfo("Erfolg", f"Benutzername erfolgreich zu \"{new_username}\" geändert.", parent=win_change_user)
+            win_change_user.destroy()
+
+        def update_username(con, cur, user_id, new_username): # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank
+            cur.execute("UPDATE userdata SET username = ? WHERE user_id = ?", (new_username, user_id))
+            con.commit()
+
+        ttk.Button(form_frame, text="Benutzername ändern", command=handle_change_username).pack(pady=20)
+        ttk.Button(frame, text="Abbrechen", command=win_change_user.destroy).pack(pady=10)
+
+    # Fenster für Kontolöschung
+    def open_delete_account_window():
+        win_del_acc = tk.Toplevel()
+        win_del_acc.title("Konto löschen")
+        win_del_acc.geometry("500x600")
+
+        frame = ttk.Frame(win_del_acc)
+        frame.pack(fill="both", expand=True)
+
+        ttk.Label(frame, text="Konto löschen", font=("arial", 30, "bold")).pack(pady=30)
+
+        def confirm_delete(): # Funktion zum Bestätigen der Kontolöschung
+            confirmed = messagebox.askyesno(
+                "Konto löschen",
+                "Sind Sie sicher, dass Sie Ihr Konto dauerhaft löschen möchten?\nDies kann nicht rückgängig gemacht werden.",
+                parent=win_del_acc)
+            if not confirmed:
+                return
+            try: # Versuch, das Konto zu löschen
+                remove_user_data(con, cur, user.user_id)
+                messagebox.showinfo("Erfolg", "Konto erfolgreich gelöscht.", parent=win_del_acc)
+                logout_user()
+                win_del_acc.destroy()
+                Startseite()
+            except Exception as e:
+                messagebox.showerror("Fehler", f"Beim Löschen des Kontos ist ein Fehler aufgetreten: {e}", parent=win_del_acc)
+
+        def logout_user(): # Funktion zum Abmelden des Benutzers
+            user.user_id = 0
+
+        def remove_user_data(con, cur, user_id): # Hilfsfunktion zum Entfernen der Benutzerdaten aus der Datenbank
+            cur.execute("DELETE FROM userdata WHERE user_id = ?", (user_id,))
+            con.commit()
+
+        button_rahmen = ttk.LabelFrame(frame, text="Aktion bestätigen")
+        button_rahmen.pack(pady=10, padx=20)
+
+        ttk.Button(button_rahmen, text="Konto löschen", command=confirm_delete).grid(row=0, column=0, padx=10, pady=10)
+        ttk.Button(button_rahmen, text="Abbrechen", command=win_del_acc.destroy).grid(row=0, column=1, padx=10, pady=10)
+
+    # Einstellungen-Rahmen 
+    einstellungen_rahmen = ttk.LabelFrame(konto_frame, text="Einstellungen")
+    einstellungen_rahmen.pack(pady=20, padx=20)
+
+    ttk.Button(einstellungen_rahmen, text="Passwort ändern", command=open_change_password_window).grid(column=0, row=0, padx=10, pady=10)
+    ttk.Button(einstellungen_rahmen, text="Benutzername ändern", command=open_change_username_window).grid(column=1, row=0, padx=10, pady=10)
+    ttk.Button(einstellungen_rahmen, text="Konto löschen", command=open_delete_account_window).grid(column=0, row=1, padx=10, pady=10)
+
+    # Zurück zur Startseite
+    ttk.Button(konto_frame, text="Startseite", command=Startseite).pack(pady=20)
+
 # Funktion: Existiert der  Benutzername bereits?
 def username_exists(con, cur, username): # Überprüft, ob der Benutzername bereits in der Datenbank existiert
     cur.execute("SELECT COUNT(*) FROM userdata WHERE username = ?", (username,))
