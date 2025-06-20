@@ -612,7 +612,20 @@ def openfile():
 def Fragen_Analyse():
 
     fragen = get_fragen(cur)
-    
+
+    falsche_fragen = user.fragen_falsch
+
+    falsche_fragen.sort
+
+    anzahl_falsche_fragen = {}
+
+    for frage in falsche_fragen:
+        if frage in anzahl_falsche_fragen:
+            anzahl_falsche_fragen[frage] += 1
+        else:
+            anzahl_falsche_fragen[frage] = 1
+
+        print(anzahl_falsche_fragen)
 
 # Funktion: Prüfungsmodus
 # Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
@@ -817,7 +830,7 @@ def starte_fragen(wahl):
         else:
             Fehler_label = ttk.Label(prüfungs_frame,
                                     text="Fehler! Es gibt nicht genug Fragen. Importieren sie welche, oder wenden sie sich einen Administrator!")
-            Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W))
+            Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
 
             weiterleit_Btn = ttk.Button(prüfungs_frame,
                                         text="Fragen Importieren",
