@@ -1234,7 +1234,7 @@ class User:
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
         self.user_id = user_id
         self.is_admin = is_admin
-        self.username = username
+        self.username: str = username
         self.pw_hash = pw_hash
         self.fragen_total = fragen_total        # anzahl insgesamt beantworteter Fragen
         self.fragen_richtig = fragen_richtig    # anzahl richtig beantworteter Fragen
