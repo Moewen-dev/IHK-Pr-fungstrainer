@@ -504,20 +504,21 @@ def KontoEinstellungen():
     # Fenster für Kontolöschung
     def open_delete_account_window():
         root = tk.Tk()
-        root.withdraw()  # Hauptfenster ausblenden
+        root.withdraw()  
 
         confirmed = messagebox.askyesno(
             "Konto löschen",
-            "Sind Sie sicher, dass Sie Ihr Konto dauerhaft löschen möchten?\nDies kann nicht rückgängig gemacht werden.")
+            "Sind Sie sicher, dass Sie Ihr Konto dauerhaft löschen möchten?\nDies kann nicht rückgängig gemacht werden."
+        )
 
-        if not confirmed:
+        if not confirmed: # Wenn der Benutzer die Löschung nicht bestätigt, wird das Fenster geschlossen
             return
-        try:
+        try: # Versuche, das Konto zu löschen
             remove_user_data(con, cur, user.user_id)
             messagebox.showinfo("Erfolg", "Konto erfolgreich gelöscht.")
             logout_user()
             Startseite()
-        except Exception as e:
+        except Exception as e: # Wenn ein Fehler auftritt, wird eine Fehlermeldung angezeigt
             messagebox.showerror("Fehler", f"Beim Löschen des Kontos ist ein Fehler aufgetreten: {e}")
 
     def logout_user(): # Funktion zum Abmelden des Benutzers
