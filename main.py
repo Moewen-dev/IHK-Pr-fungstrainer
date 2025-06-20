@@ -4,6 +4,8 @@ from tkinter.filedialog import askopenfilename
 from tkinter import messagebox
 from tkinter import ttk
 from ttkthemes import ThemedTk
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     id INTEGER PRIMARY KEY,
@@ -1062,39 +1064,43 @@ def Menu():
 # Zeigt die Statistik des Benutzers an, z. B. Anzahl der beantworteten Fragen und falscher Fragen.
 def Statistik():
     clear_inhalt()
+    
     statistik_frame = ttk.Frame(inhalt_frame)
     statistik_frame.pack(fill="both", expand=True)
+    button_rahmen = ttk.LabelFrame(statistik_frame, text="Statistiken")
+    button_rahmen.grid(column=0, row=0, sticky=(tk.N, tk.W)) # type: ignore
     
-    label = ttk.Label(statistik_frame, text="Statistiken", font=("arial", 15, "bold"))
-    label.grid(column=0, row=0, sticky=(tk.N))
-    
-    text = ttk.Label(statistik_frame, text="Fragen Beantwortet insgesamt:", padding=(5,5,10,10))
+    text = ttk.Label(button_rahmen, text="Fragen Beantwortet insgesamt:", padding=(5,5,10,10))
     text.grid(column=0, row=1, sticky=(tk.W, tk.S)) # type: ignore
-    text = ttk.Label(statistik_frame, text=user.fragen_total, padding=(5,5,10,10))
+    text = ttk.Label(button_rahmen, text=user.fragen_total, padding=(5,5,10,10))
     text.grid(column=1, row=1, sticky=(tk.W)) # type: ignore
     
-    text = ttk.Label(statistik_frame, text="Fragen Beantwortet Falsch:", padding=(5,5,10,10))
+    text = ttk.Label(button_rahmen, text="Fragen Beantwortet Falsch:", padding=(5,5,10,10))
     text.grid(column=0, row=2, sticky=(tk.W, tk.S)) # type: ignore
-    text = ttk.Label(statistik_frame, text=len(user.fragen_falsch), padding=(5,5,10,10))
+    text = ttk.Label(button_rahmen, text=len(user.stat_fragen_falsch), padding=(5,5,10,10))
     text.grid(column=1, row=2, sticky=(tk.W)) # type: ignore
     
-    text = ttk.Label(statistik_frame, text="Fragen Beantwortet Richtig:", padding=(5,5,10,10))
+    text = ttk.Label(button_rahmen, text="Fragen Beantwortet Richtig:", padding=(5,5,10,10))
     text.grid(column=0, row=3, sticky=(tk.W, tk.S)) # type: ignore
-    #text = ttk.Label(statistik_frame, text=user.fragen_richtig, padding=(5,5,10,10))
+    text = ttk.Label(button_rahmen, text=len(user.stat_fragen_richtig), padding=(5,5,10,10))
     text.grid(column=1, row=3, sticky=(tk.W)) # type: ignore
     
-    text = ttk.Label(statistik_frame, text="Falsche Fragen:", padding=(5,5,10,10))
-    text.grid(column=0, row=4)
-    
-    i = 5
-    fragen = get_fragen(cur)
-    for item in user.stat_fragen_falsch:
-        text = ttk.Label(statistik_frame, text=f"Uhrzeit: {item[1]} Frage: {fragen[item[0]].frage}")
-        text.grid(column=0, row=i, columnspan=2, sticky=(tk.W))
-        i += 1
+    labels = ['Richtig', 'Falsch']
+    sizes = [len(user.stat_fragen_richtig), len(user.stat_fragen_falsch)]
 
-# Funktion: Guilogin
-# Zeigt das Login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
+    # Matplotlib-Figur erstellen
+    fig = Figure(figsize=(3, 2), dpi=100)
+    ax = fig.add_subplot(111)
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Kreisförmig
+
+    # Canvas in Tkinter einbetten
+    canvas = FigureCanvasTkAgg(fig, master=statistik_frame)
+    canvas.draw()
+    canvas.get_tk_widget().grid(column=0, row=1, columnspan=2, pady=20) # type: ignore
+
+    # Funktion: Guilogin
+    # Zeigt das Login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
 def Guilogin():
     clear_inhalt()
     login_frame = ttk.Frame(inhalt_frame)
