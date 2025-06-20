@@ -1085,6 +1085,7 @@ def Statistik():
     text = ttk.Label(button_rahmen, text=len(user.stat_fragen_richtig), padding=(5,5,10,10))
     text.grid(column=1, row=3, sticky=(tk.W)) # type: ignore
     
+    #erstes diagram
     labels = ['Richtig', 'Falsch']
     sizes = [len(user.stat_fragen_richtig), len(user.stat_fragen_falsch)]
 
@@ -1098,6 +1099,51 @@ def Statistik():
     canvas = FigureCanvasTkAgg(fig, master=statistik_frame)
     canvas.draw()
     canvas.get_tk_widget().grid(column=0, row=1, columnspan=2, pady=20) # type: ignore
+
+    # Zweites Diagramm
+    button_rahmen1 = ttk.LabelFrame(statistik_frame, text="Statistiken")
+    button_rahmen1.grid(column=0, row=2, sticky=(tk.N, tk.W)) # type: ignore
+
+    richtig = []
+    falsch = []
+    daten = []
+    temp_date = ""
+    temp_richtig = 0
+    temp_falsch = 0
+
+    for each in User.stat_fragen_richtig:
+        if temp_date == each[0]:
+            daten.append(each[0])
+            richtig.append(temp_richtig)
+        else:
+            temp_date = each[0]
+            temp_richtig = temp_richtig + 1
+
+    for each in User.stat_fragen_falsch:
+        if temp_date == each[0]:
+            falsch.append(temp_falsch)
+        else:
+            temp_falsch = temp_falsch + 1
+
+    print(daten, richtig, falsch)
+
+
+    fig1 = Figure(figsize=(6, 4), dpi=100)
+    ax1 = fig.add_subplot(111)
+
+    ax1.set_title('Anzahl der Richtigen/Falschen Antworten pro Tag')
+    ax1.set_xlabel('Datum')
+    ax1.set_ylabel('Antworten')
+    ax1.plot(daten, richtig, color="green", label='Richtige Antworten')
+    ax1.plot(daten, falsch, color="red", label='Falsche Antworten')
+    ax1.legend()
+
+    canvas1 = FigureCanvasTkAgg(fig1, master=button_rahmen1)
+    canvas1.draw()
+    canvas1.get_tk_widget().grid(column=0, row=2, columnspan=2, pady=20)
+
+    Startbtn = ttk.Button(statistik_frame, text="Startseite", command=Startseite)
+    Startbtn.grid(column=0, row=4, sticky=(tk.S, tk.W),pady=20, padx=10) # type: ignore
 
     # Funktion: Guilogin
     # Zeigt das Login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
