@@ -19,7 +19,7 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     username TEXT NOT NULL,
     pw_hash TEXT NOT NULL,
     fragen_total INTEGER,
-    fragen_richtig INTEGER,
+    fragen_richtig TEXT,
     fragen_falsch TEXT,
     stat_fragen_richtig TEXT,
     stat_fragen_falsch TEXT,
@@ -612,20 +612,7 @@ def openfile():
 def Fragen_Analyse():
 
     fragen = get_fragen(cur)
-
-    falsche_fragen = user.fragen_falsch
-
-    falsche_fragen.sort
-
-    anzahl_falsche_fragen = {}
-
-    for frage in falsche_fragen:
-        if frage in anzahl_falsche_fragen:
-            anzahl_falsche_fragen[frage] += 1
-        else:
-            anzahl_falsche_fragen[frage] = 1
-
-        print(anzahl_falsche_fragen)
+    
 
 # Funktion: Prüfungsmodus
 # Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
@@ -1040,34 +1027,35 @@ def Guilogin():
     clear_inhalt()
     login_frame = ttk.Frame(inhalt_frame)
     login_frame.pack(fill="both", expand=True)
-    title_label = ttk.Label(login_frame, text="Loginbereich", font=("Arial", 30, "bold"))
-    title_label.pack(pady=40)
+    label = ttk.Label(login_frame, text="Loginbereich", font=("arial", 30, "bold"))
+    label.pack(pady=100)
+    
     button_rahmen = ttk.LabelFrame(login_frame, text="Anmelden")
-    button_rahmen.pack(pady=20)
+    button_rahmen.place(x=170, y=180)
 
-    # Benutzernamen eingeben
-    ttk.Label(button_rahmen, text="Benutzername:").grid(column=0, row=1, sticky=tk.W, padx=10, pady=5)
+    ttk.Label(button_rahmen, text="Benutzername:").pack(pady=(10, 0))
     username_entry = ttk.Entry(button_rahmen)
-    username_entry.grid(column=1, row=1, padx=10, pady=5)
-
-    # Passwort eingeben
-    ttk.Label(button_rahmen, text="Passwort:").grid(column=0, row=2, sticky=tk.W, padx=10, pady=5)
+    username_entry.pack(pady=0)
+    
+    ttk.Label(button_rahmen, text="Passwort:").pack(pady=(10, 0))
     password_entry = ttk.Entry(button_rahmen, show="*")
-    password_entry.grid(column=1, row=2, padx=10, pady=5)
-
+    password_entry.pack(pady=0)
+    
     def handle_login():
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
         if login(cur, username, pw_hash):
             Menu()
+            return
         else:
             messagebox.showerror("Login fehlgeschlagen", "Benutzername oder Passwort ist falsch.")
-
+    
     loginbtn = ttk.Button(button_rahmen, text="Login", command=handle_login)
-    loginbtn.grid(column=0, row=3, columnspan=2, pady=15)
-
-    register_button = ttk.Button(login_frame, text="Noch kein Konto?", command=Guiregister)
-    register_button.place(x=185, y=315)
+    loginbtn.pack(pady=20, padx=40)
+    
+    # Register-Button außerhalb des Rahmens
+    register_label = ttk.Button(login_frame, text="Noch kein Konto?", command=Guiregister)
+    register_label.place(x=185, y=390) 
 
 # Funktion: Guiregister
 # Zeigt das Registrierungsfenster an und verarbeitet die Eingaben, um einen neuen Benutzer anzulegen.
@@ -1172,9 +1160,9 @@ def login(cur, username, pw_hash):
             user.pw_hash = pw_hash
             user.username = username
             if data[5] != None:
-                user.fragen_richtig = data[5]
+                user.fragen_richtig = json.loads(data[5])
             else:
-                user.fragen_richtig = 0
+                user.fragen_richtig = {}
             if data[4] != None:
                 user.fragen_total = data[4]
             else:
@@ -1260,13 +1248,13 @@ class User:
     def save(self):
         save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ?, pruefungen_total = ?, pruefungen_bestanden = ?, stat_pruefungen = ? WHERE user_id = ?"
         cur.execute(save_statement, (self.fragen_total, 
-                                     self.fragen_richtig, 
+                                     json.dumps(self.fragen_richtig, indent=None), 
                                      json.dumps(self.fragen_falsch, indent=None), 
                                      json.dumps(self.stat_fragen_richtig, indent=None), 
-                                     json.dumps(self.stat_fragen_falsch),
+                                     json.dumps(self.stat_fragen_falsch, indent=None),
                                      self.pruefungen_total,
                                      self.pruefungen_bestanden,
-                                     json.dumps(self.stat_pruefungen), 
+                                     json.dumps(self.stat_pruefungen, indent=None), 
                                      self.user_id))
         con.commit()
         
