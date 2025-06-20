@@ -1123,7 +1123,7 @@ def main(con, cur):
 
     theme_menu = tk.Menu(menubar, tearoff=0)
     theme_menu.add_command(label="Dark Mode", command=lambda: root.set_theme("equilux"))
-    theme_menu.add_command(label="Light Mode", command=lambda: root.set_theme("scidgreen"))
+    theme_menu.add_command(label="Light Mode", command=lambda: root.set_theme("breeze"))
     theme_menu.add_command(label="Holz Mode", command=lambda: root.set_theme("kroc"))
     menubar.add_cascade(label="Theme", menu=theme_menu)
 
