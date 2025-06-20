@@ -1339,7 +1339,7 @@ def main(con, cur):
 
     # Kontoeinstellungen
     account_menu = tk.Menu(menubar, tearoff=0)
-    account_menu.add_command(label="Benutzerkonto", command=lambda: KontoEinstellungen())
+    account_menu.add_command(label="Kontoeinstellungen", command=lambda: KontoEinstellungen())
     menubar.add_cascade(label="Konto", menu=account_menu)
 
     theme_menu = tk.Menu(menubar, tearoff=0)
