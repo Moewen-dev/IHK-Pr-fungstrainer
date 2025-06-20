@@ -469,7 +469,7 @@ def KontoEinstellungen():
                 messagebox.showerror("Fehler", "Die Passwörter stimmen nicht überein.", parent=win_change_pw)
                 return
             new_pw_hash = hashlib.sha256(new_pw.encode()).hexdigest()
-            update_password(con, cur, user_id, new_pw_hash)
+            update_password(con, cur, user.user_id, new_pw_hash)
             messagebox.showinfo("Erfolg", "Passwort erfolgreich geändert.", parent=win_change_pw)
             win_change_pw.destroy()
 
@@ -507,7 +507,7 @@ def KontoEinstellungen():
             if username_exists(con, cur, new_username):
                 messagebox.showerror("Fehler", "Dieser Benutzername ist bereits vergeben.", parent=win_change_user)
                 return
-            update_username(con, cur, user.user_id, new_username)
+            update_username(con, cur, user_id, new_username)
             user.username = new_username  # Benutzerobjekt aktualisieren
             aktualisiere_kontoinformationen()  # Anzeige aktualisieren
             messagebox.showinfo("Erfolg", f"Benutzername erfolgreich zu \"{new_username}\" geändert.", parent=win_change_user)
