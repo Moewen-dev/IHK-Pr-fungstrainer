@@ -719,7 +719,7 @@ def Fehlermeldung_zu_wenig_Gelernt(prüfungs_frame):
         widget.destroy()
 
     fehler_rahmen = ttk.LabelFrame(prüfungs_frame, text="Fehlermeldung", padding=(10, 10))
-    fehler_rahmen.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+    fehler_rahmen.place(y=160,x=80)
 
     fehler_label = ttk.Label(
         fehler_rahmen,
@@ -729,7 +729,7 @@ def Fehlermeldung_zu_wenig_Gelernt(prüfungs_frame):
         ),
         wraplength=300, justify="center"
     )
-    fehler_label.grid(row=0, column=0, padx=5, pady=5)
+    fehler_label.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
 
     lernen_btn = ttk.Button(
         fehler_rahmen,
