@@ -631,15 +631,12 @@ def openfile():
     filename = askopenfilename() 
     return filename
 
-#Nicht Fertig
-
 def Fragen_Analyse():
     fragen = get_fragen(cur)
     alle_fragen_IDs = [str(i.id) for i in fragen]
 
     falsch_prozent = random.randint(50, 75)
     anzahl_falsche_fragen = round(falsch_prozent / 100 * 30)
-    anzahl_richtige_fragen = 30 - anzahl_falsche_fragen
 
     falsche_fragen = user.alzeit_fragen_falsch
     gewichtete_IDs = []
@@ -653,9 +650,7 @@ def Fragen_Analyse():
 
     if not gewichtete_IDs:
         gewichtete_auswahl = []
-        anzahl_richtige_fragen = 30
-        anzahl_falsche_fragen = 0
-    elif len(gewichtete_IDs) < anzahl_falsche_fragen:
+    elif len(gewichtete_IDs) <= anzahl_falsche_fragen:
         gewichtete_auswahl = gewichtete_IDs.copy()
     else:
         gewichtete_auswahl = []
@@ -664,24 +659,31 @@ def Fragen_Analyse():
             if ziehung not in gewichtete_auswahl:
                 gewichtete_auswahl.append(ziehung)
 
+    gewichtete_auswahl = list(set(gewichtete_auswahl))
+    anzahl_falsche_fragen_effektiv = len(gewichtete_auswahl)
+    anzahl_richtige_fragen = 30 - anzahl_falsche_fragen_effektiv
+
     alle_fragen = list(set(alle_fragen_IDs) - set(gewichtete_auswahl))
 
-    if len(alle_fragen) < anzahl_richtige_fragen:
-        zufällige_auswahl = alle_fragen
+    if len(alle_fragen) <= anzahl_richtige_fragen:
+        zufällige_auswahl = alle_fragen.copy()
     else:
         zufällige_auswahl = random.sample(alle_fragen, anzahl_richtige_fragen)
 
     prüfungsmodus_fragen = gewichtete_auswahl + zufällige_auswahl
+    
+    if len(prüfungsmodus_fragen) < 30:
+        fehlende_anzahl = 30 - len(prüfungsmodus_fragen)
+        restliche_kandidaten = list(set(alle_fragen_IDs) - set(prüfungsmodus_fragen))
+        nachschub = random.sample(restliche_kandidaten, min(fehlende_anzahl, len(restliche_kandidaten)))
+        prüfungsmodus_fragen += nachschub
 
-    fragen = get_fragen(cur)
-    finale_fragen = []
+    finale_fragen = [i for i in fragen if str(i.id) in prüfungsmodus_fragen]
 
-    for i in fragen:
-        prüfungs_id = str(i.id)
-        if prüfungs_id in prüfungsmodus_fragen:
-            finale_fragen.append(i)
-
-    return finale_fragen
+    if len(finale_fragen) < 30:
+        print("Warnung: Weniger als 30 Fragen vorhanden!")
+    else:
+        return finale_fragen
 
 # Funktion: Prüfungsmodus
 # Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
@@ -706,34 +708,83 @@ def Prüfungsmodus():
     Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüfung(prüfungs_frame))
     Start_Btn.place(y=300,x=180)
 
-# Funktion: Starte_Prüfung
-# Löscht das Prüfungsfenster und startet die Prüfung mit 30 zufälligen Fragen.
-# Benötigt:
-#   prüfungs_frame: Das Frame, in dem die Prüfung stattfindet.
+weitermachen_var = tk.BooleanVar(value=False)
+
+def Fehlermeldung_zu_wenig_Gelernt(prüfungs_frame):
+    def weiter_trotz_warnung():
+        weitermachen_var.set(True)
+        Starte_Prüfung(prüfungs_frame)
+
+    for widget in prüfungs_frame.winfo_children():
+        widget.destroy()
+
+    fehler_rahmen = ttk.LabelFrame(prüfungs_frame, text="Fehlermeldung", padding=(10, 10))
+    fehler_rahmen.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+
+    fehler_label = ttk.Label(
+        fehler_rahmen,
+        text=(
+            "Sind Sie sich sicher, dass Sie eine Prüfung machen wollen?\n"
+            "Sie haben noch nicht genug gelernt. Gehen Sie zuerst in den Lernmodus."
+        ),
+        wraplength=300, justify="center"
+    )
+    fehler_label.grid(row=0, column=0, padx=5, pady=5)
+
+    lernen_btn = ttk.Button(
+        fehler_rahmen,
+        text="Fragen lernen",
+        command=Lernmodus
+    )
+    lernen_btn.grid(row=1, column=0, padx=10, pady=10)
+
+    prüfung_btn = ttk.Button(
+        fehler_rahmen,
+        text="Trotzdem mit der Prüfung fortfahren",
+        command=weiter_trotz_warnung
+    )
+    prüfung_btn.grid(row=2, column=0, padx=10, pady=10)
+
+
 def Starte_Prüfung(prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
     fragen = get_fragen(cur)
 
+    anzahl_falsch = sum(user.alzeit_fragen_falsch.values())
+    anzahl_richtig = sum(user.alzeit_fragen_richtig.values())
+
+    if not weitermachen_var.get():
+        if anzahl_falsch == 0 and anzahl_richtig == 0:
+            Fehlermeldung_zu_wenig_Gelernt(prüfungs_frame)
+            return
+        elif anzahl_falsch <= 25 and anzahl_richtig <= 60:
+            Fehlermeldung_zu_wenig_Gelernt(prüfungs_frame)
+            return
+
     if len(fragen) >= 1:
         prüfungsfragen = Fragen_Analyse()
+        weitermachen_var.set(False)
     else:
         fehler_rahmen = ttk.LabelFrame(prüfungs_frame, text="Fehlermeldung", padding=(10, 10))
         fehler_rahmen.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
         fehler_label = ttk.Label(
-            fehler_rahmen, text="Fehler! Es gibt nicht genug Fragen.\nImportieren Sie welche oder wenden Sie sich an einen Administrator!", foreground="red", wraplength=300, justify="center")
-
+            fehler_rahmen,
+            text="Fehler! Es gibt nicht genug Fragen.\nImportieren Sie welche oder wenden Sie sich an einen Administrator!",
+            foreground="red", wraplength=300, justify="center"
+        )
         fehler_label.grid(row=0, column=0, padx=10, pady=(0, 10))
-        
-        weiterleit_btn = ttk.Button(fehler_rahmen, text="Fragen importieren", command=lambda: Admin())
+
+        weiterleit_btn = ttk.Button(fehler_rahmen, text="Fragen importieren", command=Admin)
         weiterleit_btn.grid(row=1, column=0, pady=10, sticky="ew")
-        
-        startseite_btn = ttk.Button(fehler_rahmen, text="Zurück zur Startseite", command=lambda: Startseite())
+
+        startseite_btn = ttk.Button(fehler_rahmen, text="Zurück zur Startseite", command=Startseite)
         startseite_btn.grid(row=2, column=0, pady=10, sticky="ew")
         return
 
+    # Starte die Prüfungsanzeige
     frage_index = 0
     falsche_Prüfungsfragen = 0
 
@@ -755,7 +806,7 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
     if  frage_index < 30:
         aktuelle_frage = prüfungsfragen[frage_index]
 
-        progress = tk.IntVar(value=frage_index + 1)  # Fortschritt aktualisieren
+        progress = tk.IntVar(value=frage_index + 1)  
         progressbar = ttk.Progressbar(prüfungs_frame, maximum=30, variable=progress, length=400)
         progressbar.grid(row=0, column=0, padx=40, pady=5)
 
