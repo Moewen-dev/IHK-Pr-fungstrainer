@@ -1105,7 +1105,7 @@ def Statistik():
     temp_richtig = 0
     temp_falsch = 0
 
-    for each in User.stat_fragen_richtig:
+    for each in user.stat_fragen_richtig:
         if temp_date == each[0]:
             daten.append(each[0])
             richtig.append(temp_richtig)
@@ -1113,7 +1113,7 @@ def Statistik():
             temp_date = each[0]
             temp_richtig = temp_richtig + 1
 
-    for each in User.stat_fragen_falsch:
+    for each in user.stat_fragen_falsch:
         if temp_date == each[0]:
             falsch.append(temp_falsch)
         else:
