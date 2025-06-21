@@ -41,7 +41,7 @@ db_name = "data.db"
 #   cur: Datenbankcursor
 #   frage: Text der Frage
 #   A, B, C: Antwortmöglichkeiten
-#   antwort: Richtige Antwort (als Identifier)
+#   antwort: Richtige Antwort (als Identifier, z.B. "A")
 #   kategorie: Optionale Kategorie (Standard "default")
 def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # default kategorie falls keine spezifiziert
     # Frage in die Datenbank hinzufügen
@@ -53,6 +53,8 @@ def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # defaul
 # Ruft alle Fragen aus der Datenbank ab und wandelt sie in Frage-Objekte um.
 # Benötigt:
 #   cur: Datenbankcursor
+# Gibt zurück:
+#   fragen: Eine Liste von Frage-Objekten
 def get_fragen(cur):
     # Fragen aus der Datenbank holen
     cur.execute("SELECT * FROM fragen")
@@ -64,7 +66,8 @@ def get_fragen(cur):
     return fragen
 
 # Funktion: import_fragen
-# Importiert Fragen aus einer JSON-Datei in die Datenbank und fügt nur neue Fragen hinzu.
+# Importiert Fragen aus einer JSON-Datei in die Datenbank. Es werden nur Fragen hinzugefügt,
+# die noch nicht anhand ihres Fragetextes in der Datenbank vorhanden sind.
 # Benötigt:
 #   con: Datenbankverbindung
 #   cur: Datenbankcursor
@@ -98,7 +101,7 @@ def import_fragen(con, cur, filename):
         log(f"Fragen aus {filename} konnten nicht importiert werden", 2)
 
 # Funktion: export_fragen
-# Exportiert alle Fragen aus der Datenbank in eine JSON-Datei.
+# Exportiert alle Fragen aus der Datenbank in eine JSON-Datei namens "fragen_export.json".
 # Benötigt:
 #   cur: Datenbankcursor
 def export_fragen(cur):
@@ -120,7 +123,8 @@ def export_fragen(cur):
         Admin()
 
 # Funktion: manuell_fragen
-# Öffnet ein Fenster, um eine einzelne Frage manuell hinzuzufügen.
+# Öffnet ein neues Fenster (Toplevel), um eine einzelne Frage manuell mit ihren Antworten und Kategorie
+# einzugeben und in die Datenbank zu speichern.
 # Benötigt:
 #   con: Datenbankverbindung
 #   cur: Datenbankcursor
@@ -191,7 +195,9 @@ def manuell_fragen(con, cur):
     save_btn.pack(pady=20)
 
 # Funktion: edit_fragen
-# Öffnet ein Fenster, in dem existierende Fragen bearbeitet werden können.
+# Öffnet ein Fenster (Toplevel) zur Bearbeitung existierender Fragen.
+# Zeigt eine Liste aller Fragen an. Durch Klick auf eine Frage öffnet sich ein weiteres Fenster
+# zur Bearbeitung der ausgewählten Frage.
 # Benötigt:
 #   con: Datenbankverbindung
 #   cur: Datenbankcursor
@@ -240,6 +246,10 @@ def edit_fragen(con, cur):
 
 
     # Frage-Bearbeitungsfenster
+    # Öffnet ein neues Fenster (Toplevel) zum Bearbeiten der übergebenen Frage.
+    # Benötigt:
+    #   frage: Das zu bearbeitende Frage-Objekt
+    #   edit_window: Das übergeordnete Fenster, das geschlossen wird
     def frage_bearbeiten_fenster(frage, edit_window):
         edit_window.destroy()
 
@@ -287,6 +297,7 @@ def edit_fragen(con, cur):
         kat_entry.insert(0, frage.kategorie)
         kat_entry.grid(row=9, column=0, columnspan=2, padx=10, pady=5, sticky="w")
 
+        # Speichert die geänderten Fragendetails in der Datenbank.
         def speichern():
             neue_frage = frage_entry.get()
             neue_A = a_entry.get()
@@ -333,7 +344,7 @@ def edit_fragen(con, cur):
 
 
 # Funktion: del_frage
-# Zeigt ein Fenster, in dem mehrere Fragen ausgewählt und anschließend gelöscht werden können.
+# Öffnet ein Fenster (Toplevel), in dem Fragen aus einer Liste ausgewählt und gelöscht werden können.
 # Benötigt:
 #   con: Datenbankverbindung
 #   cur: Datenbankcursor
@@ -382,6 +393,7 @@ def del_frage(con, cur):
         checkbox = ttk.Checkbutton(scroll_frame, text=frage.frage, variable=frage.delete)
         checkbox.pack(anchor="w", padx=10, pady=5)
 
+    # Löscht die ausgewählten Fragen aus der Datenbank.
     def delete_selected():
         auszuwählen = [frage for frage in fragen if frage.delete.get()]
         if not auszuwählen:
@@ -403,22 +415,22 @@ def del_frage(con, cur):
     ttk.Button(del_window, text="Ausgewählte Fragen löschen", command=delete_selected).pack(pady=15)
 
 # Funktion: add_user
-# Fügt einen neuen Benutzer in die Datenbank ein.
+# Fügt einen neuen Benutzer mit Admin-Status, Benutzernamen und Passwort-Hash in die Datenbank ein.
 # Benötigt:
 #   con: Datenbankverbindung
 #   cur: Datenbankcursor
-#   is_admin: Gibt an, ob der Benutzer Adminrechte erhält
-#   username: Benutzername
-#   pw_hash: Passwort-Hash
+#   is_admin: Integer (0 oder 1), der angibt, ob der Benutzer Adminrechte hat
+#   username: Der Benutzername des neuen Benutzers
+#   pw_hash: Der gehashte Passwortstring des neuen Benutzers
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
     log(f"Benutzer {username} erstellt. Admin {is_admin}")
 
 # Funktion: konto_einstellungen
-# Diese Funktion ermöglicht es dem angemeldeten Benutzer, sein Passwort oder seinen Benutzernamen zu ändern
-# oder das Konto vollständig zu löschen. Falls der Benutzer nicht angemeldet ist (user_id == 0),
-# wird er zur Startseite weitergeleitet.
+# Zeigt die Kontoeinstellungen für den angemeldeten Benutzer an.
+# Ermöglicht das Ändern des Passworts, des Benutzernamens oder das Löschen des Kontos.
+# Leitet zur Startseite weiter, wenn kein Benutzer angemeldet ist.
 def konto_einstellungen():
     if user.user_id == 0:
         Startseite()
@@ -440,12 +452,14 @@ def konto_einstellungen():
     benutzername_label.pack(padx=10, pady=10)
 
     # Funktion zur Aktualisierung der Benutzeranzeige
+    # Aktualisiert das Label, das den angemeldeten Benutzernamen anzeigt.
     def aktualisiere_kontoinformationen():
         benutzername_label.config(text=f"Angemeldet als: {user.username}")
 
     aktualisiere_kontoinformationen() # Ruft die Aktualisierung der Kontoinformationen auf
 
     # Fenster für Passwortänderung
+    # Öffnet ein neues Fenster (Toplevel) zur Änderung des Benutzerpassworts.
     def open_change_password_window():
         win_change_pw = tk.Toplevel()
         win_change_pw.title("Passwort ändern")
@@ -481,7 +495,13 @@ def konto_einstellungen():
             messagebox.showinfo("Erfolg", "Passwort erfolgreich geändert.", parent=win_change_pw)
             win_change_pw.destroy()
 
-        def update_password(con, cur, user_id, pw_hash): # Hilfsfunktion zum Aktualisieren des Passwort-Hashes in der Datenbank
+        # Hilfsfunktion zum Aktualisieren des Passwort-Hashes in der Datenbank.
+        # Benötigt:
+        #   con: Datenbankverbindung
+        #   cur: Datenbankcursor
+        #   user_id: ID des Benutzers, dessen Passwort geändert wird
+        #   pw_hash: Der neue Passwort-Hash
+        def update_password(con, cur, user_id, pw_hash):
             cur.execute("UPDATE userdata SET pw_hash = ? WHERE user_id = ?", (pw_hash, user_id))
             con.commit()
             log(f"Passwort für {user.username} mit ID {user_id} geändert")
@@ -490,6 +510,7 @@ def konto_einstellungen():
         ttk.Button(frame, text="Abbrechen", command=win_change_pw.destroy).pack(pady=10)
 
     # Fenster für Benutzername-Änderung
+    # Öffnet ein neues Fenster (Toplevel) zur Änderung des Benutzernamens.
     def open_change_username_window():
         win_change_user = tk.Toplevel()
         win_change_user.title("Benutzername ändern")
@@ -521,6 +542,11 @@ def konto_einstellungen():
             messagebox.showinfo("Erfolg", f"Benutzername erfolgreich zu \"{new_username}\" geändert.", parent=win_change_user)
             win_change_user.destroy()
 
+        # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank.
+        # Benötigt:
+        #   con: Datenbankverbindung
+        #   cur: Datenbankcursor
+        #   new_username: Der neue Benutzername
         def update_username(con, cur, new_username): # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank
             cur.execute("UPDATE userdata SET username = ? WHERE user_id = ?", (new_username, user.user_id))
             con.commit()
@@ -530,6 +556,8 @@ def konto_einstellungen():
         ttk.Button(frame, text="Abbrechen", command=win_change_user.destroy).pack(pady=10)
 
     # Fenster für Kontolöschung
+    # Zeigt eine Bestätigungsdialogbox zur Löschung des Benutzerkontos an.
+    # Bei Bestätigung werden die Benutzerdaten entfernt und der Benutzer abgemeldet.
     def open_delete_account_window():
         root = tk.Tk()
         root.withdraw()  
@@ -549,10 +577,16 @@ def konto_einstellungen():
         except Exception as e: # Wenn ein Fehler auftritt, wird eine Fehlermeldung angezeigt
             messagebox.showerror("Fehler", f"Beim Löschen des Kontos ist ein Fehler aufgetreten: {e}")
 
-    def logout_user(): # Funktion zum Abmelden des Benutzers
+    # Funktion zum Abmelden des Benutzers. Setzt die user_id im globalen user-Objekt auf 0.
+    def logout_user():
         user.user_id = 0
 
-    def remove_user_data(con, cur, user_id): # Hilfsfunktion zum Entfernen der Benutzerdaten aus der Datenbank
+    # Hilfsfunktion zum Entfernen der Benutzerdaten aus der Datenbank.
+    # Benötigt:
+    #   con: Datenbankverbindung
+    #   cur: Datenbankcursor
+    #   user_id: ID des zu löschenden Benutzers
+    def remove_user_data(con, cur, user_id): 
         cur.execute("DELETE FROM userdata WHERE user_id = ?", (user_id,))
         con.commit()
         log(f"Benutzer mit ID {user_id} entfernt")
@@ -574,13 +608,19 @@ def username_exists(cur, username): # Überprüft, ob der Benutzername bereits i
     return cur.fetchone()[0] > 0
 
 # Funktion: current_datetime
-# Liefert das aktuelle Datum und die aktuelle Uhrzeit im angegebenen Format.
+# Gibt das aktuelle Datum und die Uhrzeit als formatierten String zurück.
 # Benötigt:
-#   format: Optionaler Formatstring (Standard "%d.%m.%Y %H:%M:%S")
+#   format: Ein optionaler strftime-Formatstring (Standard: "%d.%m.%Y %H:%M:%S")
+# Gibt zurück:
+#   Einen String, der das aktuelle Datum und die Uhrzeit darstellt.
 def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
     return datetime.datetime.now().strftime(format)
 
 # log funktion
+# Schreibt eine Log-Nachricht in eine Datei. Der Dateiname enthält das aktuelle Datum.
+# Benötigt:
+#   message: Die zu loggende Nachricht (String)
+#   level: Das Log-Level (Integer: 1 für Info, 2 für Warnung, 3 für Kritisch)
 def log(message: str, level: int = 1):
     log_level = {1 : "Info",
                  2 : "Warn",
@@ -606,32 +646,41 @@ inhalt_frame.rowconfigure(0, weight=3)
 inhalt_frame.rowconfigure(1, weight=3)
 
 # Funktion: toggle_fullscreen
-# Schaltet das Fenster in den oder aus dem Vollbildmodus.
+# Schaltet den Vollbildmodus des Hauptfensters um.
 # Benötigt:
-#   event: (Optionales) Ereignisobjekt
+#   event: (Optionales) Tkinter-Ereignisobjekt
 def toggle_fullscreen(event=None):
     root.attributes("-fullscreen", not root.attributes("-fullscreen"))
     log(f"Fullscreen Toggled")
 
 # Funktion: end_fullscreen
-# Beendet den Vollbildmodus.
+# Beendet den Vollbildmodus des Hauptfensters.
 # Benötigt:
-#   event: (Optionales) Ereignisobjekt
+#   event: (Optionales) Tkinter-Ereignisobjekt
 def end_fullscreen(event=None):
     root.attributes("-fullscreen", False)
 
 # Funktion: clear_inhalt
-# Löscht alle Widgets im Hauptinhalt-Frame.
+# Entfernt alle Widgets aus dem Hauptinhalt-Frame (inhalt_frame).
 def clear_inhalt():
     for widget in inhalt_frame.winfo_children():
         widget.destroy()
 
 # Funktion: openfile
-# Öffnet den Dateidialog und gibt den ausgewählten Dateipfad zurück.
+# Öffnet einen Standard-Dateidialog, um eine Datei auszuwählen.
+# Gibt zurück:
+#   Den Pfad zur ausgewählten Datei als String oder einen leeren String, wenn keine Datei ausgewählt wurde.
 def openfile():
     filename = askopenfilename() 
     return filename
 
+# Funktion: Fragen_Analyse
+# Analysiert die vom Benutzer falsch beantworteten Fragen und wählt eine gewichtete Auswahl
+# von 30 Fragen für den Prüfungsmodus aus. Fragen, die häufiger falsch beantwortet wurden,
+# haben eine höhere Wahrscheinlichkeit, ausgewählt zu werden.
+# Stellt sicher, dass insgesamt 30 Fragen zurückgegeben werden, falls genügend Fragen vorhanden sind.
+# Gibt zurück:
+#   Eine Liste von bis zu 30 Frage-Objekten für den Prüfungsmodus oder None, wenn nicht genügend Fragen vorhanden sind.
 def Fragen_Analyse():
     fragen = get_fragen(cur)
     alle_fragen_IDs = [str(i.id) for i in fragen]
@@ -687,7 +736,9 @@ def Fragen_Analyse():
         return finale_fragen
 
 # Funktion: Prüfungsmodus
-# Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
+# Initialisiert die Ansicht für den Prüfungsmodus.
+# Überprüft, ob der Benutzer angemeldet ist. Zeigt eine Informationsseite an,
+# bevor die Prüfung gestartet wird.
 def Prüfungsmodus():
     # Hier wird das Prüfungsmodus Fenster erstellt
     if user.user_id == 0:       # Als erster wird überprüft ob der User angemeldet ist. Wenn nicht wird er zurück zur Startseite geschickt.
@@ -793,11 +844,12 @@ def Starte_Prüfung(prüfungs_frame):
 
 # Funktion: zeige_Prüfungsfragen
 # Zeigt die aktuelle Frage im Prüfungsmodus inklusive Fortschrittsanzeige und Antwortmöglichkeiten.
+# Wenn alle 30 Fragen beantwortet wurden, wird das Ergebnis (Note) angezeigt.
 # Benötigt:
 #   prüfungs_frame: Frame des Prüfungsmodus
-#   frage_index: Index der aktuellen Frage
-#   prüfungsfragen: Liste der Prüfungsfragen
-#   falsche_Prüfungsfragen: Zähler für falsche Antworten
+#   frage_index: Index der aktuellen Frage in der Liste der Prüfungsfragen
+#   prüfungsfragen: Liste der Frage-Objekte für die aktuelle Prüfung
+#   falsche_Prüfungsfragen: Zähler für die Anzahl der falsch beantworteten Fragen in der aktuellen Prüfung
 def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
@@ -866,14 +918,17 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
         weiterleit_Btn.grid(row=1, column=0, pady=20)
 
 # Funktion: prüffrage_überprüfen
-# Überprüft die abgegebene Antwort im Prüfungsmodus und aktualisiert die Benutzerstatistik.
+# Überprüft die vom Benutzer im Prüfungsmodus gegebene Antwort.
+# Aktualisiert die Benutzerstatistiken (Gesamtzahl Fragen, richtig/falsch Statistiken,
+# Zähler für falsch beantwortete Fragen in der aktuellen Prüfung).
+# Speichert den Benutzerfortschritt und zeigt die nächste Frage an.
 # Benötigt:
-#   auswahl: Variable mit gewählter Antwort
-#   aktuelle_frage: Das aktuelle Frage-Objekt
+#   auswahl: Tkinter-StringVar, das die vom Benutzer gewählte Antwort ("A", "B" oder "C") enthält
+#   aktuelle_frage: Das Frage-Objekt der aktuell angezeigten Frage
 #   prüfungs_frame: Frame des Prüfungsmodus
 #   frage_index: Index der aktuellen Frage
 #   prüfungsfragen: Liste der Prüfungsfragen
-#   falsche_Prüfungsfragen: Zähler für falsche Antworten
+#   falsche_Prüfungsfragen: Zähler für falsche Antworten in der aktuellen Prüfung
 def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen):
 
     if aktuelle_frage.antwort == auswahl.get():
@@ -909,7 +964,8 @@ def prüffrage_überprüfen(auswahl, aktuelle_frage, prüfungs_frame, frage_inde
     zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche_Prüfungsfragen)    
 
 # Funktion: Lernmodus
-# Initialisiert den Lernmodus, bei dem der Benutzer alle oder nur falsche Fragen wiederholen kann.
+# Initialisiert die Ansicht für den Lernmodus.
+# Der Benutzer kann wählen, ob er alle Fragen oder nur die bisher falsch beantworteten Fragen lernen möchte.
 def Lernmodus():
     clear_inhalt()
 
@@ -932,9 +988,10 @@ def Lernmodus():
     weiter_btn.grid(column=0, row=3, pady=20, padx=10)
 
 # Funktion: starte_fragen
-# Startet den Ablauf des Lernmodus, indem die Auswahl der Fragen getroffen und zufällig gemischt wird.
+# Startet den Lernzyklus basierend auf der Benutzerauswahl (alle Fragen oder nur falsch beantwortete).
+# Lädt die entsprechenden Fragen, mischt sie zufällig und zeigt die erste Frage an.
 # Benötigt:
-#   wahl: Boolean, ob alle Fragen oder nur falsche Fragen geübt werden sollen
+#   wahl: Boolean; True, um alle Fragen zu lernen, False, um nur falsch beantwortete Fragen zu lernen.
 def starte_fragen(wahl):
     clear_inhalt()
 
@@ -1031,13 +1088,16 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
         wiederholenbtn.grid(column=1, row=1, padx=10, pady=10)
 
 # Funktion: frage_überprüfen
-# Überprüft die Antwort einer Frage im Lernmodus und gibt entsprechendes Feedback.
+# Überprüft die Antwort einer Frage im Lernmodus.
+# Gibt Feedback (richtig/falsch), aktualisiert die Benutzerstatistiken
+# (Gesamtzahl Fragen, Listen der richtig/falsch beantworteten Fragen, Allzeit-Statistiken).
+# Speichert den Benutzerfortschritt und zeigt die nächste Frage an.
 # Benötigt:
-#   auswahl: Variable mit gewählter Antwort
-#   aktuelle_frage: Das aktuelle Frage-Objekt
-#   fragen: Liste der Fragen
+#   auswahl: Tkinter-StringVar, das die vom Benutzer gewählte Antwort ("A", "B" oder "C") enthält
+#   aktuelle_frage: Das Frage-Objekt der aktuell angezeigten Frage
+#   fragen: Liste der Fragen im aktuellen Lernzyklus
 #   frage_index: Index der aktuellen Frage
-#   prüfungs_frame: Frame, in dem geprüft wird
+#   prüfungs_frame: Frame, in dem das Feedback und die nächste Frage angezeigt werden
 def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_frame):
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
@@ -1138,7 +1198,9 @@ def Menu():
         Adminbtn.grid(column=3, row=1, sticky=(tk.S, tk.E), padx=5, pady=10) # type: ignore
 
 # Funktion: Statistik
-# Zeigt die Statistik des Benutzers an, z. B. Anzahl der beantworteten Fragen und falscher Fragen.
+# Zeigt die Lernstatistiken des angemeldeten Benutzers an.
+# Beinhaltet Gesamtanzahl beantworteter Fragen, Anzahl falscher/richtiger Antworten
+# sowie Diagramme zur Veranschaulichung (Verhältnis richtig/falsch, Antworten pro Tag).
 def Statistik():
     clear_inhalt()
     
@@ -1162,7 +1224,7 @@ def Statistik():
     text = ttk.Label(button_rahmen, text=len(user.stat_fragen_richtig), padding=(5,5,10,10))
     text.grid(column=1, row=3, sticky=(tk.W)) # type: ignore
     
-    #erstes diagram
+    #erstes diagramm
     labels = ['Richtig', 'Falsch']
     sizes = [len(user.stat_fragen_richtig), len(user.stat_fragen_falsch)]
     
@@ -1247,6 +1309,8 @@ def Guilogin():
     password_entry = ttk.Entry(button_rahmen, show="*")
     password_entry.grid(column=1, row=1)
     
+    # Verarbeitet die Anmeldeeingaben. Hashes das eingegebene Passwort
+    # und ruft die login()-Funktion auf. Zeigt bei Erfolg das Menü, sonst eine Fehlermeldung.
     def handle_login(): # Verarbeitet die login-Eingaben und meldet den Benutzer an, wenn die Anmeldedaten korrekt sind.
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
@@ -1290,6 +1354,9 @@ def Guiregister():
     is_admin_entry = ttk.Checkbutton(button_rahmen, text="Admin", variable=is_admin)
     is_admin_entry.grid(column=1, row=3, padx=10, pady=5)
 
+    # Verarbeitet die Registrierung eines neuen Benutzers.
+    # Überprüft auf leere Felder und bereits existierende Benutzernamen.
+    # Hashes das Passwort und fügt den Benutzer über add_user() zur Datenbank hinzu.
     def handle_register(): # Verarbeitet die Registrierung eines neuen Benutzers
         username = username_entry.get().strip()
         password = password_entry.get()
@@ -1325,6 +1392,8 @@ def Admin():
         return
     clear_inhalt()
 
+   
+
     admin_frame = ttk.Frame(inhalt_frame) # Admin Frame wird erstellt
     admin_frame.pack(fill="both", expand=True)
     label = ttk.Label(admin_frame, text="Adminbereich", font=("arial", 30, "bold")) # Admin Label wird erstellt
@@ -1350,11 +1419,15 @@ def Admin():
     Startbtn.pack(pady=20)
 
 # Funktion: login
-# Überprüft die Anmeldedaten eines Benutzers und lädt die zugehörigen Daten, falls diese korrekt sind.
+# Überprüft die Anmeldedaten eines Benutzers gegen die in der Datenbank gespeicherten Daten.
+# Bei erfolgreicher Anmeldung werden die Benutzerdaten (ID, Admin-Status, Statistiken etc.)
+# in das globale 'user'-Objekt geladen.
 # Benötigt:
 #   cur: Datenbankcursor
-#   username: Eingebener Benutzername
-#   pw_hash: Eingebener Passwort-Hash
+#   username: Der eingegebene Benutzername
+#   pw_hash: Der Hash des eingegebenen Passworts
+# Gibt zurück:
+#   True bei erfolgreicher Anmeldung, sonst False.
 def login(cur, username, pw_hash):
     userdata = cur.execute("SELECT * FROM userdata").fetchall()
     for data in userdata:
@@ -1394,7 +1467,9 @@ def login(cur, username, pw_hash):
     return False
 
 # Funktion: abmelden
-# Meldet den aktuellen Benutzer ab, setzt das user-Objekt zurück und zeigt die Startseite an.
+# Meldet den aktuellen Benutzer ab.
+# Setzt das globale 'user'-Objekt auf einen Standardzustand zurück (nicht angemeldet)
+# und zeigt die Startseite an. Gibt eine Erfolgs- oder Warnmeldung aus.
 def abmelden():
     global user
     if user.user_id != 0:
@@ -1408,11 +1483,11 @@ def abmelden():
 class Frage:
     # __init__: Initialisiert ein Frage-Objekt.
     # Benötigt:
-    #   id: Eindeutige Identifikation der Frage
-    #   frage: Fragetext
-    #   A, B, C: Antwortoptionen
-    #   antwort: Richtige Antwort
-    #   kategorie: Optionale Kategorie (Standard "default")
+    #   id: Eindeutige Identifikation der Frage aus der Datenbank
+    #   frage: Der Text der Frage
+    #   A, B, C: Die Texte der Antwortoptionen
+    #   antwort: Der Buchstabe der korrekten Antwort ("A", "B" oder "C")
+    #   kategorie: Die Kategorie der Frage (Standard: "default")
     def __init__(self, id, frage, A, B, C, antwort, kategorie="default"):
         self.id = id
         self.frage = frage
@@ -1423,11 +1498,13 @@ class Frage:
         self.kategorie = kategorie
         self.delete = tk.BooleanVar()
     
-    # gebe nur ID aus wenn mit repr(Frage) gecallt für Debug 
+    # __repr__: Gibt eine String-Repräsentation des Frage-Objekts zurück (primär für Debugging).
+    # Zeigt nur die ID der Frage an.
     def __repr__(self):
         return f"\"ID: {self.id}\""
     
-    # export: Gibt ein Dictionary mit Frageinformationen zurück, geeignet für JSON-Export.
+    # export: Gibt ein Dictionary mit den Frageinformationen zurück,
+    # das für den Export in eine JSON-Datei geeignet ist.
     def export(self):
         return {
             "frage" : self.frage,
@@ -1440,8 +1517,14 @@ class Frage:
     
 class User:
     # __init__: Initialisiert ein User-Objekt.
+    # Speichert alle relevanten Benutzerdaten und Statistiken.
     # Benötigt:
-    #   user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig    
+    #   user_id: Eindeutige ID des Benutzers
+    #   is_admin: Integer (0 oder 1), der Admin-Status
+    #   username: Benutzername
+    #   pw_hash: Gehashtes Passwort
+    #   fragen_total: Gesamtanzahl der beantworteten Fragen
+    #   fragen_richtig: Anzahl der insgesamt richtig beantworteten Fragen (dieses Attribut scheint nicht konsistent verwendet zu werden, oft als Liste/JSON-String in DB)
     def __init__(self, user_id, is_admin, username, pw_hash, fragen_total, fragen_richtig):
         self.user_id = user_id
         self.is_admin = is_admin
@@ -1476,48 +1559,58 @@ class User:
         log(f"Userdata in Datenbank gespeichert")
         
 # Funktion: main
-# Startet die Anwendung, initialisiert den Benutzer und die GUI, und öffnet die Datenbank.
+# Hauptfunktion der Anwendung. Initialisiert das globale Benutzerobjekt,
+# konfiguriert Tastenkürzel und das Menü des Hauptfensters, zeigt die Startseite an
+# und startet die Tkinter-Hauptschleife.
 # Benötigt:
-#   con: Datenbankverbindung
-#   cur: Datenbankcursor
+#   con: Datenbankverbindungsobjekt
+#   cur: Datenbankcursorobjekt
 def main(con, cur):
-    # Benutzer Initialisieren
+    # Globales Benutzerobjekt initialisieren (Standardbenutzer, nicht angemeldet)
     global user
     user = User(0, 0, 0, 0, 0, 0)
     
-    # Tastenkürzel
-    root.bind("<Escape>", end_fullscreen)
-    root.bind("<F11>", toggle_fullscreen)
+    # Tastenkürzel für Vollbildmodus definieren
+    root.bind("<Escape>", end_fullscreen) # Beendet den Vollbildmodus
+    root.bind("<F11>", toggle_fullscreen) # Schaltet den Vollbildmodus um
 
-    # Menü
+    # Hauptmenüleiste erstellen
     menubar = tk.Menu(root)
-    file_menu = tk.Menu(menubar, tearoff=0)
+
+    # Datei-Menü erstellen und Einträge hinzufügen
+    file_menu = tk.Menu(menubar, tearoff=0) # tearoff=0 verhindert, dass das Menü abgerissen werden kann
     file_menu.add_command(label="Startseite", command=Startseite)
     file_menu.add_command(label="Adminbereich", command=Admin)
     file_menu.add_command(label="Prüfungsmodus", command=Prüfungsmodus)
-    file_menu.add_separator()
+    file_menu.add_separator() # Trennlinie im Menü
     file_menu.add_command(label="Abmelden", command=abmelden)
-    file_menu.add_command(label="Beenden", command=root.quit)
-    menubar.add_cascade(label="Datei", menu=file_menu)
+    file_menu.add_command(label="Beenden", command=root.quit) # Beendet die Anwendung
+    menubar.add_cascade(label="Datei", menu=file_menu) # Datei-Menü zur Menüleiste hinzufügen
 
-    # konto_einstellungen
+    # Konto-Menü erstellen und Einträge hinzufügen
     account_menu = tk.Menu(menubar, tearoff=0)
     account_menu.add_command(label="Kontoeinstellungen", command=lambda: konto_einstellungen())
-    menubar.add_cascade(label="Konto", menu=account_menu)
+    menubar.add_cascade(label="Konto", menu=account_menu) # Konto-Menü zur Menüleiste hinzufügen
 
+    # Theme-Menü erstellen und Einträge hinzufügen
     theme_menu = tk.Menu(menubar, tearoff=0)
     theme_menu.add_command(label="Dark Mode", command=lambda: root.set_theme("equilux"))
     theme_menu.add_command(label="Light Mode", command=lambda: root.set_theme("breeze"))
-    theme_menu.add_command(label="Holz Mode", command=lambda: root.set_theme("kroc"))
-    menubar.add_cascade(label="Theme", menu=theme_menu)
+    theme_menu.add_command(label="Holz Mode", command=lambda: root.set_theme("kroc")) # Beispiel für ein weiteres Theme
+    menubar.add_cascade(label="Theme", menu=theme_menu) # Theme-Menü zur Menüleiste hinzufügen
 
+    # Menüleiste dem Hauptfenster zuweisen
     root.config(menu=menubar)
-    # Startansicht
+
+    # Startansicht der Anwendung laden
     Startseite()
 
-    # Gui öffnen
+    # GUI-Hauptschleife starten (hält das Fenster offen und verarbeitet Ereignisse)
     root.mainloop()
     
+# Dieser Block wird ausgeführt, wenn das Skript direkt gestartet wird.
+# Stellt die Datenbankverbindung her, führt initiale SQL-Anweisungen aus (z.B. Tabellenerstellung)
+# und ruft dann die main()-Funktion auf. Beinhaltet Fehlerbehandlung für Datenbankprobleme.
 if __name__ == "__main__":
     try:
         with sqlite3.connect(db_name) as con:

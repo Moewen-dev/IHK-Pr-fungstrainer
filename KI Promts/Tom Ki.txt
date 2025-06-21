@@ -1,0 +1,7 @@
+Prompt: 
+"erstelle und passe bitte wo nötig kommentare an. achte darauf keinen code zu verändern."
+Resultat:
+Alle Kommentare im Code mindestens überarbeitet und rechtschreibung überprüft.
+
+Mir ist bei der KI nutzung aufgefallen, dass ich genau das, was ich haben will auch spezifizieren muss.Ansonsten hat es sehr gut geklappt.
+Ich habe natürlich jede Zeile die die KI geschrieben hat zumindest einmal überflogen und aufgepasst ,dass sie auch das tut was ich will. 
