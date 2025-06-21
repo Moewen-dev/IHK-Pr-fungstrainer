@@ -47,13 +47,7 @@ def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # defaul
     # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort, kategorie) VALUES (?, ?, ?, ?, ?, ?)", (frage, A, B, C, antwort, kategorie))
     con.commit()
-    Log(f"Frage in Datenbank hinzugefügt:")
-    Log(f"Frage:        {frage}")
-    Log(f"Antowrt A:    {A}")
-    Log(f"Antowrt B:    {B}")
-    Log(f"Antowrt C:    {C}")
-    Log(f"Richtig:      {antwort}")
-    Log(f"Kategorie:    {kategorie}")
+    Log(f"Frage in Datenbank hinzugefügt: {frage}")
 
 # Funktion: get_fragen
 # Ruft alle Fragen aus der Datenbank ab und wandelt sie in Frage-Objekte um.
@@ -1307,6 +1301,7 @@ def login(cur, username, pw_hash):
                 user.alzeit_fragen_falsch = json.loads(data[12])
             if data[13] != None:
                 user.alzeit_fragen_richtig = json.loads(data[13])
+            Log(f"Benutzer: {username} angemeldet")
             return True
     return False
 
@@ -1315,6 +1310,7 @@ def login(cur, username, pw_hash):
 def abmelden():
     global user
     if user.user_id != 0:
+        Log(f"Benutzer {user.username} abgemeldet")
         user = User(0, 0, 0, 0, 0, 0)
         Startseite()
         messagebox.showinfo("Abmeldung", "Sie wurden erfolgreich abgemeldet.")
@@ -1389,6 +1385,7 @@ class User:
                                      json.dumps(self.alzeit_fragen_richtig, indent=None),
                                      self.user_id))
         con.commit()
+        Log(f"Userdata in Datenbank gespeichert")
         
 # Funktion: main
 # Startet die Anwendung, initialisiert den Benutzer und die GUI, und öffnet die Datenbank.
