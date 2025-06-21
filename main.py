@@ -584,7 +584,7 @@ def Log(message: str, level: int = 1):
     log_level = {1 : "Info",
                  2 : "Warn",
                  3 : "Crit"}
-    with open(f"Log_{current_datetime("%d%m%Y")}.log", "a", encoding="utf-8") as logfile:
+    with open(f"Log_{current_datetime('%d%m%Y')}.log", "a", encoding="utf-8") as logfile:
         logfile.write(f"[{current_datetime()} - {log_level[level]}] {message}\n")
 
 # Gui Funktionen
@@ -634,25 +634,54 @@ def openfile():
 #Nicht Fertig
 
 def Fragen_Analyse():
-
     fragen = get_fragen(cur)
-
-    alle_fragen_IDs = [str(i.id) for i in fragen] # Was macht das? -> Es loopt durch fragen und fügt jede frage.id in die alle_fragen_ids liste als string hinzu
+    alle_fragen_IDs = [str(i.id) for i in fragen]
 
     falsch_prozent = random.randint(50, 75)
-
-    anzahl_falsche_fragen = round(falsch_prozent /100 *30)
+    anzahl_falsche_fragen = round(falsch_prozent / 100 * 30)
     anzahl_richtige_fragen = 30 - anzahl_falsche_fragen
 
+    falsche_fragen = user.alzeit_fragen_falsch
     gewichtete_IDs = []
+    fragen_gewichtigt = []
 
     for i in alle_fragen_IDs:
-        falsche_beantwortet = user.alzeit_fragen_falsch.get(i, 0)
-        gewicht = 1 + falsche_beantwortet
-        gewichtete_IDs.append(gewicht)
+        fehler = falsche_fragen.get(i, 0)
+        if fehler > 0:
+            gewichtete_IDs.append(i)
+            fragen_gewichtigt.append(1 + fehler)
 
-    
+    if not gewichtete_IDs:
+        gewichtete_auswahl = []
+        anzahl_richtige_fragen = 30
+        anzahl_falsche_fragen = 0
+    elif len(gewichtete_IDs) < anzahl_falsche_fragen:
+        gewichtete_auswahl = gewichtete_IDs.copy()
+    else:
+        gewichtete_auswahl = []
+        while len(gewichtete_auswahl) < anzahl_falsche_fragen:
+            ziehung = random.choices(gewichtete_IDs, weights=fragen_gewichtigt, k=1)[0]
+            if ziehung not in gewichtete_auswahl:
+                gewichtete_auswahl.append(ziehung)
 
+    alle_fragen = list(set(alle_fragen_IDs) - set(gewichtete_auswahl))
+
+    if len(alle_fragen) < anzahl_richtige_fragen:
+        zufällige_auswahl = alle_fragen
+    else:
+        zufällige_auswahl = random.sample(alle_fragen, anzahl_richtige_fragen)
+
+    prüfungsmodus_fragen = gewichtete_auswahl + zufällige_auswahl
+
+    fragen = get_fragen(cur)
+    finale_fragen = []
+
+    for i in fragen:
+        prüfungs_id = str(i.id)
+        if prüfungs_id in prüfungsmodus_fragen:
+            finale_fragen.append(i)
+
+    return finale_fragen
 
 # Funktion: Prüfungsmodus
 # Initialisiert und zeigt den Prüfungsmodus, in dem 30 zufällige Fragen gestellt werden.
@@ -674,7 +703,7 @@ def Prüfungsmodus():
             "Das Ergebnis, das du erzielt hast,\nerhältst du, wenn du alle Fragen beantwortet hast.")
     Begrüßungs_label.pack(padx=20, pady=20)
 
-    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Fragen_Analyse())
+    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüfung(prüfungs_frame))
     Start_Btn.place(y=300,x=180)
 
 # Funktion: Starte_Prüfung
@@ -682,11 +711,11 @@ def Prüfungsmodus():
 # Benötigt:
 #   prüfungs_frame: Das Frame, in dem die Prüfung stattfindet.
 def Starte_Prüfung(prüfungs_frame):
-
     for widget in prüfungs_frame.winfo_children():
         widget.destroy()
 
     fragen = get_fragen(cur)
+
     if len(fragen) >= 1:
         prüfungsfragen = Fragen_Analyse()
     else:
