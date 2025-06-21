@@ -1082,22 +1082,22 @@ def Statistik():
     #erstes diagram
     labels = ['Richtig', 'Falsch']
     sizes = [len(user.stat_fragen_richtig), len(user.stat_fragen_falsch)]
+    
+    button_rahmen1 = ttk.LabelFrame(statistik_frame, text="Statistiken Gesamt")
+    button_rahmen1.grid(column=0, row=2, sticky=(tk.N, tk.W)) # type: ignore
 
     # Matplotlib-Figur erstellen
-    fig = Figure(figsize=(3, 2), dpi=100)
+    fig = Figure(figsize=(2, 1), dpi=100)
     ax = fig.add_subplot(111)
     ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
     ax.axis('equal')  # Kreisförmig
 
     # Canvas in Tkinter einbetten
-    canvas = FigureCanvasTkAgg(fig, master=statistik_frame)
+    canvas = FigureCanvasTkAgg(fig, master=button_rahmen1)
     canvas.draw()
     canvas.get_tk_widget().grid(column=0, row=1, columnspan=2, pady=20) # type: ignore
 
     # Zweites Diagramm
-    button_rahmen1 = ttk.LabelFrame(statistik_frame, text="Statistiken")
-    button_rahmen1.grid(column=0, row=2, sticky=(tk.N, tk.W)) # type: ignore
-
     richtig = []
     falsch = []
     daten = []
@@ -1121,9 +1121,11 @@ def Statistik():
 
     print(daten, richtig, falsch)
 
+    button_rahmen2 = ttk.LabelFrame(statistik_frame, text="Statistiken pro Tag")
+    button_rahmen2.grid(column=0, row=3, sticky=(tk.N, tk.W)) # type: ignore
 
-    fig1 = Figure(figsize=(6, 4), dpi=100)
-    ax1 = fig.add_subplot(111)
+    fig1 = Figure(figsize=(3, 2), dpi=100)
+    ax1 = fig1.add_subplot(111)
 
     ax1.set_title('Anzahl der Richtigen/Falschen Antworten pro Tag')
     ax1.set_xlabel('Datum')
@@ -1132,12 +1134,13 @@ def Statistik():
     ax1.plot(daten, falsch, color="red", label='Falsche Antworten')
     ax1.legend()
 
-    canvas1 = FigureCanvasTkAgg(fig1, master=button_rahmen1)
+    canvas1 = FigureCanvasTkAgg(fig1, master=button_rahmen2)
     canvas1.draw()
     canvas1.get_tk_widget().grid(column=0, row=2, columnspan=2, pady=20)
 
     Startbtn = ttk.Button(statistik_frame, text="Startseite", command=Startseite)
     Startbtn.grid(column=0, row=4, sticky=(tk.S, tk.W),pady=20, padx=10) # type: ignore
+
 
     # Funktion: Guilogin
     # Zeigt das Login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
