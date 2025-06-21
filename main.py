@@ -668,14 +668,14 @@ def Prüfungsmodus():
     prüfungs_frame.pack(fill="both", expand=True)
 
     begrüßung_rahmen = ttk.LabelFrame(prüfungs_frame, text="Informationen zum Prüfungsmodus")
-    begrüßung_rahmen.grid(row=0, column=0, padx=40, pady=50)
+    begrüßung_rahmen.place(y=160,x=80)
 
     Begrüßungs_label = ttk.Label(begrüßung_rahmen, text="Du wirst 30 Fragen erhalten, welche zufällig\naus allen Fragen genommen werden.\n"
             "Das Ergebnis, das du erzielt hast,\nerhältst du, wenn du alle Fragen beantwortet hast.")
     Begrüßungs_label.pack(padx=20, pady=20)
 
     Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Fragen_Analyse())
-    Start_Btn.grid(row=1, column=0, pady=50)
+    Start_Btn.place(y=300,x=180)
 
 # Funktion: Starte_Prüfung
 # Löscht das Prüfungsfenster und startet die Prüfung mit 30 zufälligen Fragen.
@@ -836,7 +836,7 @@ def Lernmodus():
     wahl_var = tk.BooleanVar(value=True)
 
     button_rahmen = ttk.LabelFrame(inhalt_frame, text="Lernmodus Auswahl")
-    button_rahmen.place(x=60, y=150)
+    button_rahmen.place(x=100, y=150)
 
     label = ttk.Label(button_rahmen, text="Welche Fragen möchtest du lernen?", font=("arial", 12, "bold"))
     label.grid(column=0, row=0, columnspan=2, pady=(10, 20), padx=10)
@@ -1035,7 +1035,7 @@ def Menu():
     menu_frame = ttk.Frame(inhalt_frame)
 
     button_rahmen = ttk.LabelFrame(inhalt_frame, text="Auswahl")
-    button_rahmen.place(x=60, y=150)
+    button_rahmen.place(x=5, y=150)
 
     menu_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
     label = ttk.Label(button_rahmen, text="Willkommen!\nIm Prüfungstrainer\nWie möchtest du fortfahren?", font=("arial", 15, "bold"))
@@ -1062,7 +1062,7 @@ def Statistik():
     statistik_frame = ttk.Frame(inhalt_frame)
     statistik_frame.pack(fill="both", expand=True)
     button_rahmen = ttk.LabelFrame(statistik_frame, text="Statistiken")
-    button_rahmen.grid(column=0, row=0, sticky=(tk.N, tk.W)) # type: ignore
+    button_rahmen.grid(column=0, row=0, sticky=(tk.N)) # type: ignore
     
     text = ttk.Label(button_rahmen, text="Fragen Beantwortet insgesamt:", padding=(5,5,10,10))
     text.grid(column=0, row=1, sticky=(tk.W, tk.S)) # type: ignore
@@ -1084,7 +1084,7 @@ def Statistik():
     sizes = [len(user.stat_fragen_richtig), len(user.stat_fragen_falsch)]
     
     button_rahmen1 = ttk.LabelFrame(statistik_frame, text="Statistiken Gesamt")
-    button_rahmen1.grid(column=0, row=2, sticky=(tk.N, tk.W)) # type: ignore
+    button_rahmen1.grid(column=0, row=2, sticky=(tk.N)) # type: ignore
 
     # Matplotlib-Figur erstellen
     fig = Figure(figsize=(2, 1), dpi=100)
@@ -1122,12 +1122,12 @@ def Statistik():
     print(daten, richtig, falsch)
 
     button_rahmen2 = ttk.LabelFrame(statistik_frame, text="Statistiken pro Tag")
-    button_rahmen2.grid(column=0, row=3, sticky=(tk.N, tk.W)) # type: ignore
+    button_rahmen2.grid(column=0, row=3, sticky=(tk.N)) # type: ignore
 
     fig1 = Figure(figsize=(3, 2), dpi=100)
     ax1 = fig1.add_subplot(111)
 
-    ax1.set_title('Anzahl der Richtigen/Falschen Antworten pro Tag')
+    ax1.set_title('Richtig/Falsch pro Tag')
     ax1.set_xlabel('Datum')
     ax1.set_ylabel('Antworten')
     ax1.plot(daten, richtig, color="green", label='Richtige Antworten')
