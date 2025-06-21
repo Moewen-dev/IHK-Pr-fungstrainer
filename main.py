@@ -47,7 +47,7 @@ def add_frage(con, cur, frage, A, B, C, antwort, kategorie="default"):  # defaul
     # Frage in die Datenbank hinzufügen
     cur.execute("INSERT INTO fragen (frage, A, B, C, antwort, kategorie) VALUES (?, ?, ?, ?, ?, ?)", (frage, A, B, C, antwort, kategorie))
     con.commit()
-    Log(f"Frage in Datenbank hinzugefügt: {frage}")
+    log(f"Frage in Datenbank hinzugefügt: {frage}")
 
 # Funktion: get_fragen
 # Ruft alle Fragen aus der Datenbank ab und wandelt sie in Frage-Objekte um.
@@ -91,11 +91,11 @@ def import_fragen(con, cur, filename):
                     add_frage(con, cur, frage.frage, frage.A, frage.B, frage.C, frage.antwort, frage.kategorie)
 
         messagebox.showinfo("Erfolg", 'Fragen wurden erfolgreich Importiert!') # MessageBox nach erfolgreichem Fragenimport
-        Log(f"Fragen aus {filename} erfolgreich importiert")
+        log(f"Fragen aus {filename} erfolgreich importiert")
     except TypeError as e:
         print(f"Error: {e}")
         messagebox.showinfo("Fehler", 'Fragen wurden nicht Importiert!\n\nPrüfe ob die .json Datei dem korrekten Format entspricht!') # MessageBox wenn import Fehlgeschlagen
-        Log(f"Fragen aus {filename} konnten nicht importiert werden", 2)
+        log(f"Fragen aus {filename} konnten nicht importiert werden", 2)
 
 # Funktion: export_fragen
 # Exportiert alle Fragen aus der Datenbank in eine JSON-Datei.
@@ -112,10 +112,10 @@ def export_fragen(cur):
             with open("fragen_export.json", "wt", encoding="utf-8") as file:
                 file.write(json.dumps(to_export, ensure_ascii=False))
             messagebox.showinfo("Fragen export", "Fragen erfolgreich exportiert")
-            Log(f"Fragen in fragen_export.json exportiert")
+            log(f"Fragen in fragen_export.json exportiert")
         except:
             messagebox.showerror("Fragen export", "Fragen export nicht erfolgreich")
-            Log(f"Fragen export nicht erfolgreich", 2)
+            log(f"Fragen export nicht erfolgreich", 2)
     else:
         Admin()
 
@@ -303,7 +303,7 @@ def edit_fragen(con, cur):
             con.commit()
 
             messagebox.showinfo("Erfolg", f'Frage "{neue_frage}" erfolgreich aktualisiert.')
-            Log(f"Frage {neue_frage} aktualisiert")
+            log(f"Frage {neue_frage} aktualisiert")
             frage_edit.destroy()
 
             if messagebox.askyesno("Bestätigung", "Möchtest du weitere Fragen bearbeiten?"):
@@ -329,7 +329,7 @@ def edit_fragen(con, cur):
             btn.pack(fill="x", padx=10, pady=5)
         except Exception as e: # Fehler beim Anzeigen einer Frage
             print(f"Fehler beim Anzeigen einer Frage: {e}")
-            Log(f"Anzeigefehler einer Frage: {e}")
+            log(f"Anzeigefehler einer Frage: {e}")
 
 
 # Funktion: del_frage
@@ -393,8 +393,9 @@ def del_frage(con, cur):
         if not fortfahren:
             return
         for frage in auszuwählen:
-            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id))
-            Log(f"Frage mit ID {frage.id} gelöscht")
+            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
+            log(f"Frage mit ID {frage.id} gelöscht")
+
         con.commit()
         messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
         del_window.destroy()
@@ -412,13 +413,13 @@ def del_frage(con, cur):
 def add_user(con, cur, is_admin, username, pw_hash):
     cur.execute("INSERT INTO userdata (is_admin, username, pw_hash) VALUES (?, ?, ?)", (is_admin, username, pw_hash))
     con.commit()
-    Log(f"Benutzer {username} erstellt. Admin {is_admin}")
+    log(f"Benutzer {username} erstellt. Admin {is_admin}")
 
-# Funktion: KontoEinstellungen
+# Funktion: konto_einstellungen
 # Diese Funktion ermöglicht es dem angemeldeten Benutzer, sein Passwort oder seinen Benutzernamen zu ändern
 # oder das Konto vollständig zu löschen. Falls der Benutzer nicht angemeldet ist (user_id == 0),
 # wird er zur Startseite weitergeleitet.
-def KontoEinstellungen():
+def konto_einstellungen():
     if user.user_id == 0:
         Startseite()
         messagebox.showerror("Nicht angemeldet", "Bitte melden Sie sich an, um Ihre Kontoeinstellungen zu ändern.")
@@ -483,7 +484,7 @@ def KontoEinstellungen():
         def update_password(con, cur, user_id, pw_hash): # Hilfsfunktion zum Aktualisieren des Passwort-Hashes in der Datenbank
             cur.execute("UPDATE userdata SET pw_hash = ? WHERE user_id = ?", (pw_hash, user_id))
             con.commit()
-            Log(f"Passwort für {user.username} mit ID {user_id} geändert")
+            log(f"Passwort für {user.username} mit ID {user_id} geändert")
 
         ttk.Button(form_frame, text="Passwort ändern", command=handle_change_password).grid(row=2, column=0, columnspan=2, padx=10, pady=5)
         ttk.Button(frame, text="Abbrechen", command=win_change_pw.destroy).pack(pady=10)
@@ -523,7 +524,7 @@ def KontoEinstellungen():
         def update_username(con, cur, new_username): # Hilfsfunktion zum Aktualisieren des Benutzernamens in der Datenbank
             cur.execute("UPDATE userdata SET username = ? WHERE user_id = ?", (new_username, user.user_id))
             con.commit()
-            Log(f"Username bei Id {user.user_id} zu {new_username} geändert")
+            log(f"Username bei Id {user.user_id} zu {new_username} geändert")
 
         ttk.Button(form_frame, text="Benutzername ändern", command=handle_change_username).grid(row=1, column=0, columnspan=2,padx=10, pady=5)
         ttk.Button(frame, text="Abbrechen", command=win_change_user.destroy).pack(pady=10)
@@ -554,7 +555,7 @@ def KontoEinstellungen():
     def remove_user_data(con, cur, user_id): # Hilfsfunktion zum Entfernen der Benutzerdaten aus der Datenbank
         cur.execute("DELETE FROM userdata WHERE user_id = ?", (user_id,))
         con.commit()
-        Log(f"Benutzer mit ID {user_id} entfernt")
+        log(f"Benutzer mit ID {user_id} entfernt")
 
     # Einstellungen-Rahmen 
     einstellungen_rahmen = ttk.LabelFrame(konto_frame, text="Einstellungen")
@@ -579,12 +580,12 @@ def username_exists(cur, username): # Überprüft, ob der Benutzername bereits i
 def current_datetime(format = "%d.%m.%Y %H:%M:%S"):
     return datetime.datetime.now().strftime(format)
 
-# Log funktion
-def Log(message: str, level: int = 1):
+# log funktion
+def log(message: str, level: int = 1):
     log_level = {1 : "Info",
                  2 : "Warn",
                  3 : "Crit"}
-    with open(f"Log_{current_datetime('%d%m%Y')}.log", "a", encoding="utf-8") as logfile:
+    with open(f"log_{current_datetime('%d%m%Y')}.log", "a", encoding="utf-8") as logfile:
         logfile.write(f"[{current_datetime()} - {log_level[level]}] {message}\n")
 
 # Gui Funktionen
@@ -610,7 +611,7 @@ inhalt_frame.rowconfigure(1, weight=3)
 #   event: (Optionales) Ereignisobjekt
 def toggle_fullscreen(event=None):
     root.attributes("-fullscreen", not root.attributes("-fullscreen"))
-    Log(f"Fullscreen Toggled")
+    log(f"Fullscreen Toggled")
 
 # Funktion: end_fullscreen
 # Beendet den Vollbildmodus.
@@ -1087,7 +1088,7 @@ def frage_überprüfen(auswahl, aktuelle_frage, fragen, frage_index, prüfungs_f
     weiter_btn.pack(pady=20)
 
 # Funktion: Startseite
-# Zeigt die Startseite an, entweder mit Login/Registrierungsoption oder als Menü, wenn ein Benutzer angemeldet ist.
+# Zeigt die Startseite an, entweder mit login/Registrierungsoption oder als Menü, wenn ein Benutzer angemeldet ist.
 def Startseite():
     if user.user_id == 0:
         clear_inhalt()
@@ -1102,11 +1103,9 @@ def Startseite():
 
         button_rahmen = ttk.LabelFrame(center_frame, text="Benutzerzugang") # Rahmen definieren
         button_rahmen.pack()
-
-        # Buttons für Login und Registrierung
-        Loginbtn = ttk.Button(button_rahmen, text="Login", command=Guilogin)
-        Loginbtn.pack(pady=20, padx=40)
-        
+        # Buttons für login und Registrierung
+        loginbtn = ttk.Button(button_rahmen, text="login", command=Guilogin)
+        loginbtn.pack(pady=20, padx=40)
         Registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=Guiregister)
         Registerbtn.pack(pady=20, padx=40)
     else:
@@ -1229,12 +1228,12 @@ def Statistik():
 
 
     # Funktion: Guilogin
-    # Zeigt das Login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
+    # Zeigt das login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
 def Guilogin():
     clear_inhalt()
     login_frame = ttk.Frame(inhalt_frame)
     login_frame.pack(fill="both", expand=True)
-    label = ttk.Label(login_frame, text="Loginbereich", font=("arial", 30, "bold"))
+    label = ttk.Label(login_frame, text="loginbereich", font=("arial", 30, "bold"))
     label.pack(pady=100)
     
     button_rahmen = ttk.LabelFrame(login_frame, text="Anmelden")
@@ -1248,16 +1247,16 @@ def Guilogin():
     password_entry = ttk.Entry(button_rahmen, show="*")
     password_entry.grid(column=1, row=1)
     
-    def handle_login(): # Verarbeitet die Login-Eingaben und meldet den Benutzer an, wenn die Anmeldedaten korrekt sind.
+    def handle_login(): # Verarbeitet die login-Eingaben und meldet den Benutzer an, wenn die Anmeldedaten korrekt sind.
         username = username_entry.get()
         pw_hash = hashlib.sha256(password_entry.get().encode()).hexdigest()
         if login(cur, username, pw_hash):
             Menu()
             return
         else:
-            messagebox.showerror("Login fehlgeschlagen", "Benutzername oder Passwort ist falsch.")
+            messagebox.showerror("login fehlgeschlagen", "Benutzername oder Passwort ist falsch.")
     
-    loginbtn = ttk.Button(button_rahmen, text="Login", command=handle_login)
+    loginbtn = ttk.Button(button_rahmen, text="login", command=handle_login)
     loginbtn.grid(column=0, row=2, columnspan=2, pady=10)
     
     # Register-Button außerhalb des Rahmens
@@ -1390,7 +1389,7 @@ def login(cur, username, pw_hash):
                 user.alzeit_fragen_falsch = json.loads(data[12])
             if data[13] != None:
                 user.alzeit_fragen_richtig = json.loads(data[13])
-            Log(f"Benutzer: {username} angemeldet")
+            log(f"Benutzer: {username} angemeldet")
             return True
     return False
 
@@ -1399,7 +1398,7 @@ def login(cur, username, pw_hash):
 def abmelden():
     global user
     if user.user_id != 0:
-        Log(f"Benutzer {user.username} abgemeldet")
+        log(f"Benutzer {user.username} abgemeldet")
         user = User(0, 0, 0, 0, 0, 0)
         Startseite()
         messagebox.showinfo("Abmeldung", "Sie wurden erfolgreich abgemeldet.")
@@ -1474,7 +1473,7 @@ class User:
                                      json.dumps(self.alzeit_fragen_richtig, indent=None),
                                      self.user_id))
         con.commit()
-        Log(f"Userdata in Datenbank gespeichert")
+        log(f"Userdata in Datenbank gespeichert")
         
 # Funktion: main
 # Startet die Anwendung, initialisiert den Benutzer und die GUI, und öffnet die Datenbank.
@@ -1501,9 +1500,9 @@ def main(con, cur):
     file_menu.add_command(label="Beenden", command=root.quit)
     menubar.add_cascade(label="Datei", menu=file_menu)
 
-    # Kontoeinstellungen
+    # konto_einstellungen
     account_menu = tk.Menu(menubar, tearoff=0)
-    account_menu.add_command(label="Kontoeinstellungen", command=lambda: KontoEinstellungen())
+    account_menu.add_command(label="Kontoeinstellungen", command=lambda: konto_einstellungen())
     menubar.add_cascade(label="Konto", menu=account_menu)
 
     theme_menu = tk.Menu(menubar, tearoff=0)
