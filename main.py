@@ -1098,33 +1098,33 @@ def Statistik():
     canvas.get_tk_widget().grid(column=0, row=1, columnspan=2, pady=20) # type: ignore
 
     # Zweites Diagramm
-    richtig = []
-    falsch = []
-    daten = []
-    temp_date = ""
-    temp_richtig = 0
-    temp_falsch = 0
-
-    for each in user.stat_fragen_richtig:
-        if temp_date == each[0]:
-            daten.append(each[0])
-            richtig.append(temp_richtig)
-        else:
-            temp_date = each[0]
-            temp_richtig = temp_richtig + 1
-
-    for each in user.stat_fragen_falsch:
-        if temp_date == each[0]:
-            falsch.append(temp_falsch)
-        else:
-            temp_falsch = temp_falsch + 1
-
-    print(daten, richtig, falsch)
+    tages_statistik = {}
+    
+    for _, datums_string in user.stat_fragen_richtig:
+        # Nur ddmmYYYY extrahieren
+        datum = datums_string.split(" ")[0]
+        # prüfe ob datum in tagesstatisktik ist. wenn nicht füge es hinzu
+        if datum not in tages_statistik:
+            tages_statistik[datum] = {"richtig" : 0, "falsch" : 0}
+        # erhöhe zähler für richtige fragen
+        tages_statistik[datum]["richtig"] += 1
+        
+    for _, datums_string in user.stat_fragen_falsch:
+        datum = datums_string.split(" ")[0]
+        if datum not in tages_statistik:
+            tages_statistik[datum] = {"richtig" : 0, "falsch" : 0}
+        tages_statistik[datum]["falsch"] += 1
+        
+    sortierte_daten = sorted(tages_statistik.keys(), key=lambda d: datetime.datetime.strptime(d, "%d.%m.%Y"))
+    
+    daten = sortierte_daten     
+    richtig = [tages_statistik[d]["richtig"]for d in sortierte_daten]
+    falsch = [tages_statistik[d]["falsch"]for d in sortierte_daten]
 
     button_rahmen2 = ttk.LabelFrame(statistik_frame, text="Statistiken pro Tag")
     button_rahmen2.grid(column=0, row=3, sticky=(tk.N)) # type: ignore
 
-    fig1 = Figure(figsize=(3, 2), dpi=100)
+    fig1 = Figure(figsize=(4, 4), dpi=100)
     ax1 = fig1.add_subplot(111)
 
     ax1.set_title('Richtig/Falsch pro Tag')
@@ -1133,6 +1133,8 @@ def Statistik():
     ax1.plot(daten, richtig, color="green", label='Richtige Antworten')
     ax1.plot(daten, falsch, color="red", label='Falsche Antworten')
     ax1.legend()
+    # Rotiert die Datums-Labels für bessere Lesbarkeit, falls sie sich überlappen
+    fig1.autofmt_xdate(rotation=45)
 
     canvas1 = FigureCanvasTkAgg(fig1, master=button_rahmen2)
     canvas1.draw()
