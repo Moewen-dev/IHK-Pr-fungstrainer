@@ -632,7 +632,7 @@ def log(message: str, level: int = 1):
 # Hauptfenster und Inhalt vorbereiten
 root = ThemedTk(theme="breeze")
 root.title("Prüfungstrainer")
-root.geometry("500x600")
+root.geometry("500x700")
 
 inhalt_frame = ttk.Frame(root, padding=(3,3,12,12))
 inhalt_frame.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
@@ -1207,7 +1207,7 @@ def Statistik():
     statistik_frame = ttk.Frame(inhalt_frame)
     statistik_frame.pack(fill="both", expand=True)
     button_rahmen = ttk.LabelFrame(statistik_frame, text="Statistiken Gesamt")
-    button_rahmen.grid(column=0, row=0, sticky=(tk.N)) # type: ignore
+    button_rahmen.grid(column=0, row=0, rowspan=2, sticky=(tk.N)) # type: ignore
     
     text = ttk.Label(button_rahmen, text="Fragen Beantwortet insgesamt:", padding=(5,5,10,10))
     text.grid(column=0, row=1, sticky=(tk.W, tk.S)) # type: ignore
@@ -1224,12 +1224,22 @@ def Statistik():
     text = ttk.Label(button_rahmen, text=len(user.stat_fragen_richtig), padding=(5,5,10,10))
     text.grid(column=1, row=3, sticky=(tk.W)) # type: ignore
     
+    text = ttk.Label(button_rahmen, text="Prüfungen erledigt:", padding=(5,5,10,10))
+    text.grid(column=0, row=4, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(button_rahmen, text=user.pruefungen_total, padding=(5,5,10,10))
+    text.grid(column=1, row=4, sticky=(tk.W)) # type: ignore
+    
+    text = ttk.Label(button_rahmen, text="Prüfungen bestanden:", padding=(5,5,10,10))
+    text.grid(column=0, row=5, sticky=(tk.W, tk.S)) # type: ignore
+    text = ttk.Label(button_rahmen, text=user.pruefungen_bestanden, padding=(5,5,10,10))
+    text.grid(column=1, row=5, sticky=(tk.W)) # type: ignore
+    
     #erstes diagramm
     labels = ['Richtig', 'Falsch']
     sizes = [len(user.stat_fragen_richtig), len(user.stat_fragen_falsch)]
     
     button_rahmen1 = ttk.LabelFrame(statistik_frame, text="Statistiken Gesamt")
-    button_rahmen1.grid(column=1, row=0, sticky=(tk.N)) # type: ignore
+    button_rahmen1.grid(column=1, row=0, columnspan=2, sticky=("nswe"), padx=5)
 
     # Matplotlib-Figur erstellen
     fig = Figure(figsize=(2, 1), dpi=100)
@@ -1240,7 +1250,7 @@ def Statistik():
     # Canvas in Tkinter einbetten
     canvas = FigureCanvasTkAgg(fig, master=button_rahmen1)
     canvas.draw()
-    canvas.get_tk_widget().grid(column=0, row=1, columnspan=2, pady=20) # type: ignore
+    canvas.get_tk_widget().grid(column=4, row=1, columnspan=2, pady=20, sticky="nswe")
 
     # Zweites Diagramm
     tages_statistik = {}
@@ -1266,8 +1276,8 @@ def Statistik():
     richtig = [tages_statistik[d]["richtig"]for d in sortierte_daten]
     falsch = [tages_statistik[d]["falsch"]for d in sortierte_daten]
 
-    button_rahmen2 = ttk.LabelFrame(statistik_frame, text="Statistiken pro Tag")
-    button_rahmen2.grid(column=0, row=1, columnspan=2,sticky=(tk.N)) # type: ignore
+    button_rahmen2 = ttk.LabelFrame(statistik_frame, text="Statistiken pro Tag", padding=(10,10,10,10))
+    button_rahmen2.grid(column=0, row=2, columnspan=2,sticky=(tk.N)) # type: ignore
 
     fig1 = Figure(figsize=(4, 4), dpi=100)
     ax1 = fig1.add_subplot(111)
@@ -1285,12 +1295,8 @@ def Statistik():
     canvas1.draw()
     canvas1.get_tk_widget().grid(column=0, row=2, columnspan=2, pady=20)
 
-    Startbtn = ttk.Button(statistik_frame, text="Startseite", command=Startseite)
-    Startbtn.grid(column=0, row=4, sticky=(tk.S, tk.W),pady=20, padx=10) # type: ignore
-
-
-    # Funktion: Guilogin
-    # Zeigt das login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
+# Funktion: Guilogin
+# Zeigt das login-Fenster an und verarbeitet die Benutzereingaben für die Anmeldung.
 def Guilogin():
     clear_inhalt()
     login_frame = ttk.Frame(inhalt_frame)
