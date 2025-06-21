@@ -1061,7 +1061,7 @@ def Statistik():
     
     statistik_frame = ttk.Frame(inhalt_frame)
     statistik_frame.pack(fill="both", expand=True)
-    button_rahmen = ttk.LabelFrame(statistik_frame, text="Statistiken")
+    button_rahmen = ttk.LabelFrame(statistik_frame, text="Statistiken Gesamt")
     button_rahmen.grid(column=0, row=0, sticky=(tk.N)) # type: ignore
     
     text = ttk.Label(button_rahmen, text="Fragen Beantwortet insgesamt:", padding=(5,5,10,10))
@@ -1084,7 +1084,7 @@ def Statistik():
     sizes = [len(user.stat_fragen_richtig), len(user.stat_fragen_falsch)]
     
     button_rahmen1 = ttk.LabelFrame(statistik_frame, text="Statistiken Gesamt")
-    button_rahmen1.grid(column=0, row=2, sticky=(tk.N)) # type: ignore
+    button_rahmen1.grid(column=1, row=0, sticky=(tk.N)) # type: ignore
 
     # Matplotlib-Figur erstellen
     fig = Figure(figsize=(2, 1), dpi=100)
@@ -1122,7 +1122,7 @@ def Statistik():
     falsch = [tages_statistik[d]["falsch"]for d in sortierte_daten]
 
     button_rahmen2 = ttk.LabelFrame(statistik_frame, text="Statistiken pro Tag")
-    button_rahmen2.grid(column=0, row=3, sticky=(tk.N)) # type: ignore
+    button_rahmen2.grid(column=0, row=1, columnspan=2,sticky=(tk.N)) # type: ignore
 
     fig1 = Figure(figsize=(4, 4), dpi=100)
     ax1 = fig1.add_subplot(111)
