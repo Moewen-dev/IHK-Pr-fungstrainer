@@ -21,7 +21,7 @@ sql_statements = ["""CREATE TABLE IF NOT EXISTS fragen (
     username TEXT NOT NULL,
     pw_hash TEXT NOT NULL,
     fragen_total INTEGER,
-    fragen_richtig TEXT,
+    fragen_richtig INT,
     fragen_falsch TEXT,
     stat_fragen_richtig TEXT,
     stat_fragen_falsch TEXT,
@@ -1545,7 +1545,7 @@ class User:
     def save(self):
         save_statement = "UPDATE userdata SET fragen_total = ?, fragen_richtig = ?, fragen_falsch = ?, stat_fragen_richtig = ?, stat_fragen_falsch = ?, pruefungen_total = ?, pruefungen_bestanden = ?, stat_pruefungen = ?, alzeit_fragen_falsch = ?, alzeit_fragen_richtig = ? WHERE user_id = ?"
         cur.execute(save_statement, (self.fragen_total, 
-                                     json.dumps(self.fragen_richtig, indent=None), 
+                                     self.fragen_richtig, 
                                      json.dumps(self.fragen_falsch, indent=None), 
                                      json.dumps(self.stat_fragen_richtig, indent=None), 
                                      json.dumps(self.stat_fragen_falsch, indent=None),
