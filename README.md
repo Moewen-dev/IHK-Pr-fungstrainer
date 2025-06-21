@@ -1,15 +1,2 @@
-Gui:
-    - Login für Admin
-    - Admin Gui
-        -> Fragen hinzufügen
-            -> FRAGE
-            -> A1
-            -> A2
-            -> A3
-            -> Richtige Antwort makieren
-        -> Fragen löschen
-    - User Gui 
-        -> Frage anzeigen (nur multiple choice) 
-        -> Nächste Frage
-        -> Exit
-        -> Wenn wir Zeit haben "Prüfungsmodus"
+So kann die Statiskseite aussehen, wenn sie länger als nur einen Tag genutzt wird
+![alt text](image.png)
