@@ -1275,8 +1275,8 @@ def Statistik():
     ax1.set_title('Richtig/Falsch pro Tag')
     ax1.set_xlabel('Datum')
     ax1.set_ylabel('Antworten')
-    ax1.plot(daten, richtig, color="green", label='Richtige Antworten')
-    ax1.plot(daten, falsch, color="red", label='Falsche Antworten')
+    ax1.plot(daten, richtig, color="green", label='Richtige Antworten', marker="o")
+    ax1.plot(daten, falsch, color="red", label='Falsche Antworten', marker="o")
     ax1.legend()
     # Rotiert die Datums-Labels für bessere Lesbarkeit, falls sie sich überlappen
     fig1.autofmt_xdate(rotation=45)
