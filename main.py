@@ -458,13 +458,13 @@ def KontoEinstellungen():
         form_frame = ttk.LabelFrame(frame, text="Neues Passwort")
         form_frame.pack(pady=20, padx=20)
 
-        ttk.Label(form_frame, text="Neues Passwort:").pack(pady=(10, 0))
+        ttk.Label(form_frame, text="Neues Passwort:").grid(row=0, column=0, padx=10, pady=5)
         new_pw_entry = ttk.Entry(form_frame, show="*")
-        new_pw_entry.pack(pady=5, padx=10)
+        new_pw_entry.grid(row=0, column=1, padx=10, pady=5)
 
-        ttk.Label(form_frame, text="Neues Passwort bestätigen:").pack(pady=(10, 0))
+        ttk.Label(form_frame, text="Neues Passwort bestätigen:").grid(row=1, column=0, padx=10, pady=5)
         confirm_pw_entry = ttk.Entry(form_frame, show="*")
-        confirm_pw_entry.pack(pady=5, padx=10)
+        confirm_pw_entry.grid(row=1, column=1, padx=10, pady=5)
 
         def handle_change_password(): # Funktion zum Verarbeiten der Passwortänderung
             new_pw = new_pw_entry.get()
@@ -485,7 +485,7 @@ def KontoEinstellungen():
             con.commit()
             Log(f"Passwort für {user.username} mit ID {user_id} geändert")
 
-        ttk.Button(form_frame, text="Passwort ändern", command=handle_change_password).pack(pady=20)
+        ttk.Button(form_frame, text="Passwort ändern", command=handle_change_password).grid(row=2, column=0, columnspan=2, padx=10, pady=5)
         ttk.Button(frame, text="Abbrechen", command=win_change_pw.destroy).pack(pady=10)
 
     # Fenster für Benutzername-Änderung
@@ -502,9 +502,9 @@ def KontoEinstellungen():
         form_frame = ttk.LabelFrame(frame, text="Neuer Benutzername")
         form_frame.pack(pady=20, padx=20)
 
-        ttk.Label(form_frame, text="Neuer Benutzername:").pack(pady=(10, 0))
+        ttk.Label(form_frame, text="Neuer Benutzername:").grid(row=0, column=0, padx=10, pady=5)
         new_username_entry = ttk.Entry(form_frame)
-        new_username_entry.pack(pady=5, padx=10)
+        new_username_entry.grid(row=0, column=1, padx=10, pady=5)
 
         def handle_change_username(): # Funktion zum Verarbeiten der Benutzernamen-Änderung
             new_username = new_username_entry.get().strip()
@@ -525,7 +525,7 @@ def KontoEinstellungen():
             con.commit()
             Log(f"Username bei Id {user.user_id} zu {new_username} geändert")
 
-        ttk.Button(form_frame, text="Benutzername ändern", command=handle_change_username).pack(pady=20)
+        ttk.Button(form_frame, text="Benutzername ändern", command=handle_change_username).grid(row=1, column=0, columnspan=2,padx=10, pady=5)
         ttk.Button(frame, text="Abbrechen", command=win_change_user.destroy).pack(pady=10)
 
     # Fenster für Kontolöschung
@@ -562,7 +562,7 @@ def KontoEinstellungen():
 
     ttk.Button(einstellungen_rahmen, text="Passwort ändern", command=open_change_password_window).grid(column=0, row=0, padx=10, pady=10)
     ttk.Button(einstellungen_rahmen, text="Benutzername ändern", command=open_change_username_window).grid(column=1, row=0, padx=10, pady=10)
-    ttk.Button(einstellungen_rahmen, text="Konto löschen", command=open_delete_account_window).grid(column=0, row=1, padx=10, pady=10)
+    ttk.Button(einstellungen_rahmen, text="Konto löschen", command=open_delete_account_window).grid(column=0, row=1, padx=10, pady=10,columnspan=2)
 
     # Zurück zur Startseite
     ttk.Button(konto_frame, text="Startseite", command=Startseite).pack(pady=20)
@@ -1152,15 +1152,15 @@ def Guilogin():
     label.pack(pady=100)
     
     button_rahmen = ttk.LabelFrame(login_frame, text="Anmelden")
-    button_rahmen.place(x=170, y=180)
+    button_rahmen.place(x=120, y=180)
     # Eingabefeld für den Benutzernamen
-    ttk.Label(button_rahmen, text="Benutzername:").pack(pady=(10, 0))
+    ttk.Label(button_rahmen, text="Benutzername:").grid(column=0, row=0)
     username_entry = ttk.Entry(button_rahmen)
-    username_entry.pack(pady=0)
+    username_entry.grid(column=1, row=0)
     # Passwort-Eingabefeld
-    ttk.Label(button_rahmen, text="Passwort:").pack(pady=(10, 0))
+    ttk.Label(button_rahmen, text="Passwort:").grid(column=0, row=1)
     password_entry = ttk.Entry(button_rahmen, show="*")
-    password_entry.pack(pady=0)
+    password_entry.grid(column=1, row=1)
     
     def handle_login(): # Verarbeitet die Login-Eingaben und meldet den Benutzer an, wenn die Anmeldedaten korrekt sind.
         username = username_entry.get()
@@ -1172,11 +1172,11 @@ def Guilogin():
             messagebox.showerror("Login fehlgeschlagen", "Benutzername oder Passwort ist falsch.")
     
     loginbtn = ttk.Button(button_rahmen, text="Login", command=handle_login)
-    loginbtn.pack(pady=20, padx=40)
+    loginbtn.grid(column=0, row=2, columnspan=2, pady=10)
     
     # Register-Button außerhalb des Rahmens
     register_label = ttk.Button(login_frame, text="Noch kein Konto?", command=Guiregister)
-    register_label.place(x=195, y=395) 
+    register_label.place(x=180, y=395) 
     
 # Funktion: Guiregister
 # Zeigt das Registrierungsfenster an und verarbeitet die Eingaben, um einen neuen Benutzer anzulegen.
@@ -1259,7 +1259,7 @@ def Admin():
     fragen_export = ttk.Button(button_rahmen, text="Fragen exportieren", command=lambda: export_fragen(cur))
     fragen_export.grid(column=1, row=1, padx=10, pady=10)
     fragen_delete = ttk.Button(button_rahmen, text="Fragen löschen", command=lambda: del_frage(con, cur))
-    fragen_delete.grid(column=0, row=2, padx=10, pady=10)
+    fragen_delete.grid(column=0, row=2, padx=10, pady=10,columnspan=2)
     
     Startbtn = ttk.Button(admin_frame, text="Startseite", command=Startseite)
     Startbtn.pack(pady=20)
