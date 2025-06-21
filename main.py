@@ -393,11 +393,17 @@ def del_frage(con, cur):
         if not fortfahren:
             return
         for frage in auszuwählen:
-            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id))
+            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
             Log(f"Frage mit ID {frage.id} gelöscht")
+
         con.commit()
         messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
         del_window.destroy()
+
+    fragen = get_fragen(cur)
+    if not fragen:
+        ttk.Label(scroll_frame, text="Keine Fragen in der Datenbank.", foreground="red").pack(pady=20)
+        return
 
     ttk.Button(del_window, text="Ausgewählte Fragen löschen", command=delete_selected).pack(pady=15)
 
