@@ -393,17 +393,11 @@ def del_frage(con, cur):
         if not fortfahren:
             return
         for frage in auszuwählen:
-            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id,))
+            cur.execute("DELETE FROM fragen WHERE id=?", (frage.id))
             Log(f"Frage mit ID {frage.id} gelöscht")
-
         con.commit()
         messagebox.showinfo("Erfolg", "Ausgewählte Fragen wurden gelöscht.")
         del_window.destroy()
-
-    fragen = get_fragen(cur)
-    if not fragen:
-        ttk.Label(scroll_frame, text="Keine Fragen in der Datenbank.", foreground="red").pack(pady=20)
-        return
 
     ttk.Button(del_window, text="Ausgewählte Fragen löschen", command=delete_selected).pack(pady=15)
 
@@ -707,12 +701,12 @@ def Prüfungsmodus():
     begrüßung_rahmen = ttk.LabelFrame(prüfungs_frame, text="Informationen zum Prüfungsmodus")
     begrüßung_rahmen.place(y=160,x=80)
 
-    Begrüßungs_label = ttk.Label(begrüßung_rahmen, text="Du wirst 30 Fragen erhalten, welche zufällig\naus allen Fragen genommen werden.\n"
+    begrüßungs_label = ttk.Label(begrüßung_rahmen, text="Du wirst 30 Fragen erhalten, welche zufällig\naus allen Fragen genommen werden.\n"
             "Das Ergebnis, das du erzielt hast,\nerhältst du, wenn du alle Fragen beantwortet hast.")
-    Begrüßungs_label.pack(padx=20, pady=20)
+    begrüßungs_label.pack(padx=20, pady=20)
 
-    Start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüfung(prüfungs_frame))
-    Start_Btn.place(y=300,x=180)
+    start_Btn = ttk.Button(prüfungs_frame, text="Prüfung starten", command=lambda: Starte_Prüfung(prüfungs_frame))
+    start_Btn.place(y=300,x=180)
 
 weitermachen_var = tk.BooleanVar(value=False)
 
@@ -816,11 +810,11 @@ def zeige_Prüfungsfragen(prüfungs_frame, frage_index, prüfungsfragen, falsche
         progressbar = ttk.Progressbar(prüfungs_frame, maximum=30, variable=progress, length=400)
         progressbar.grid(row=0, column=0, padx=40, pady=5)
 
-        Fortschirt_label = ttk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {len(prüfungsfragen)}")
-        Fortschirt_label.grid(row=2, column=0)
+        fortschirt_label = ttk.Label(prüfungs_frame, text=f"Du bist bei Frage {frage_index +1} von {len(prüfungsfragen)}")
+        fortschirt_label.grid(row=2, column=0)
 
-        Frage_label = ttk.Label(prüfungs_frame, text=aktuelle_frage.frage)
-        Frage_label.grid(row=3, column=0, pady=40)
+        frage_label = ttk.Label(prüfungs_frame, text=aktuelle_frage.frage)
+        frage_label.grid(row=3, column=0, pady=40)
 
         button_rahmen = ttk.LabelFrame(prüfungs_frame)
         button_rahmen.grid(row=4, column=0, padx=40, pady=5)
@@ -953,9 +947,9 @@ def starte_fragen(wahl):
         if len(fragen) >= 1:
             fragen = get_fragen(cur)
         else:
-            Fehler_label = ttk.Label(prüfungs_frame,
+            fehler_label = ttk.Label(prüfungs_frame,
                                     text="Fehler! Es gibt nicht genug Fragen. Importieren sie welche, oder wenden sie sich einen Administrator!")
-            Fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
+            fehler_label.grid(column=0, row=0, sticky=(tk.N, tk.S, tk.E, tk.W)) # type: ignore
 
             weiterleit_Btn = ttk.Button(prüfungs_frame,
                                         text="Fragen Importieren",
@@ -1019,8 +1013,8 @@ def zeige_frage(fragen, prüfungs_frame, frage_index):
             if messagebox.askyesno("Zurück zur Startseite", "Möchtest du wirklich zur Startseite zurückkehren?"):
                 Startseite()
 
-        Startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=wirklich_Startseite)
-        Startbtn.grid(row=10, column=0, pady=20)
+        startbtn = ttk.Button(prüfungs_frame, text="Startseite", command=wirklich_Startseite)
+        startbtn.grid(row=10, column=0, pady=20)
         
     else: # Wenn alle Fragen beantwortet wurden, wird ein Rahmen mit der Option angezeigt, was als nächstes getan werden soll
         fertig_rahmen = ttk.LabelFrame(prüfungs_frame, text="Was möchtest du als Nächstes tun?")
@@ -1102,13 +1096,17 @@ def Startseite():
         
         center_frame = ttk.Frame(start_frame) # Frame für zentrierten Inhalt
         center_frame.place(relx=0.5, rely=0.5, anchor="center")  # Zentriert in start_frame
+
         label = ttk.Label(center_frame, text="Willkommen\nzum Prüfungstrainer!", font=("arial", 30, "bold"), justify="center")
         label.pack(pady=(0, 20))  # Abstand unter dem Text
+
         button_rahmen = ttk.LabelFrame(center_frame, text="Benutzerzugang") # Rahmen definieren
         button_rahmen.pack()
+
         # Buttons für Login und Registrierung
         Loginbtn = ttk.Button(button_rahmen, text="Login", command=Guilogin)
         Loginbtn.pack(pady=20, padx=40)
+        
         Registerbtn = ttk.Button(button_rahmen, text="Registrieren", command=Guiregister)
         Registerbtn.pack(pady=20, padx=40)
     else:
